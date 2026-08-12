@@ -44,11 +44,17 @@ print("bf16 supported:", torch.cuda.is_bf16_supported() if torch.cuda.is_availab
 
 (CODE, """%%capture
 !pip install -q -U transformers peft trl datasets accelerate sentencepiece protobuf
-# Kaggle preinstalls torchao 0.10.0. Current peft checks torchao inside its LoRA
-# dispatcher and RAISES on an old version rather than skipping it, which kills
-# get_peft_model with an ImportError. We do no quantised training, so remove it
-# rather than dragging in a torchao upgrade that has to match torch exactly.
-!pip uninstall -q -y torchao"""),
+# Two Kaggle preinstalls fight the upgraded libraries above, and both are dead
+# weight for text-only training, so remove rather than version-match them:
+#
+#   torchao 0.10.0 - current peft checks it inside the LoRA dispatcher and RAISES
+#     on an old version instead of skipping, killing get_peft_model.
+#   torchvision   - after the upgrade its compiled ops no longer match torch
+#     ("operator torchvision::nms does not exist"). transformers imports
+#     torchvision via image_utils, so a broken one makes `import transformers`
+#     fail outright. Gemma 3 1B is text-only; absent torchvision is skipped
+#     cleanly, whereas a broken one is fatal.
+!pip uninstall -q -y torchao torchvision"""),
 
 (CODE, """import os
 from kaggle_secrets import UserSecretsClient
