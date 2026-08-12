@@ -43,7 +43,12 @@ print("torch", torch.__version__, "| cuda", torch.cuda.is_available())
 print("bf16 supported:", torch.cuda.is_bf16_supported() if torch.cuda.is_available() else "n/a")"""),
 
 (CODE, """%%capture
-!pip install -q -U transformers peft trl datasets accelerate sentencepiece protobuf"""),
+!pip install -q -U transformers peft trl datasets accelerate sentencepiece protobuf
+# Kaggle preinstalls torchao 0.10.0. Current peft checks torchao inside its LoRA
+# dispatcher and RAISES on an old version rather than skipping it, which kills
+# get_peft_model with an ImportError. We do no quantised training, so remove it
+# rather than dragging in a torchao upgrade that has to match torch exactly.
+!pip uninstall -q -y torchao"""),
 
 (CODE, """import os
 from kaggle_secrets import UserSecretsClient
