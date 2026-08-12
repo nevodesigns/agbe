@@ -21,6 +21,18 @@ import json
 import os
 import pathlib
 
+# Set BEFORE transformers is imported anywhere below.
+#
+# transformers probes for TensorFlow and JAX at import time. On Kaggle, TF is
+# preinstalled and its protobuf dependency gets disturbed by the pip upgrade the
+# notebook performs, so merely LOOKING for TF raises
+# "cannot import name 'runtime_version' from 'google.protobuf'" and takes
+# `import transformers` down with it. We train in PyTorch only, so tell
+# transformers not to go looking.
+os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("USE_JAX", "0")
+os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+
 BASE_MODEL = "google/gemma-3-1b-it"
 
 # Held small on purpose. r=16 is enough to move style and domain vocabulary on a
