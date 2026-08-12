@@ -43,7 +43,10 @@ print("torch", torch.__version__, "| cuda", torch.cuda.is_available())
 print("bf16 supported:", torch.cuda.is_bf16_supported() if torch.cuda.is_available() else "n/a")"""),
 
 (CODE, """%%capture
-!pip install -q -U transformers peft trl datasets accelerate sentencepiece protobuf
+# No trl: its SFTTrainer chunked-CE path breaks on a PEFT-wrapped causal LM
+# (_chunked_ce_forward reads outputs.last_hidden_state). We use plain
+# transformers.Trainer instead, so trl is not installed at all.
+!pip install -q -U transformers peft datasets accelerate sentencepiece protobuf
 # Two Kaggle preinstalls fight the upgraded libraries above, and both are dead
 # weight for text-only training, so remove rather than version-match them:
 #
