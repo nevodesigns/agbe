@@ -67,6 +67,9 @@ except Exception as e:
 
 (CODE, """# Corpus and trainer live in the submission repo, so the notebook stays thin
 # and the training data is the same version that ships with the submission.
+# Step out of the clone target first: on a RE-run the shell is already inside it,
+# and rm -rf on your own working directory breaks getcwd for every later command.
+%cd /kaggle/working
 !rm -rf /kaggle/working/agbe
 !git clone -q https://github.com/nevodesigns/agbe.git /kaggle/working/agbe
 %cd /kaggle/working/agbe
