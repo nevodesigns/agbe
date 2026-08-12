@@ -1,0 +1,117 @@
+{
+  "_comment": "Coverage map for the ADTC agriculture corpus. Breadth is the hedge against 3 unknown hidden prompts. Each topic is crossed with several question forms so the model generalises across phrasing rather than memorising pairs. See SPEC.md.",
+
+  "question_forms": {
+    "what": "Definition or explanation of a concept, crop, or condition.",
+    "diagnose": "Farmer describes symptoms, model identifies likely cause and next step. The single most common real question.",
+    "howto": "Step by step procedure for a task.",
+    "when": "Timing and calendar, tied to season and agro-ecological zone.",
+    "compare": "Choosing between two options given a constraint like cost or soil.",
+    "prevent": "Avoiding a problem before it happens.",
+    "economics": "Cost, margin, input decisions, market timing.",
+    "improve": "Raising yield or quality from a described current state."
+  },
+
+  "agro_ecological_zones": [
+    "Sahel savanna (far north, ~250-500mm rain, short single season)",
+    "Sudan savanna (north, ~500-1000mm, single season)",
+    "Guinea savanna (middle belt, ~1000-1400mm, long single season)",
+    "Derived savanna (transition, bimodal in places)",
+    "Humid forest (south, ~1500-2500mm, bimodal, early and late seasons)",
+    "Coastal and mangrove (very high rainfall, flooding risk)"
+  ],
+
+  "slices": {
+    "crop_agronomy": {
+      "share": 0.34,
+      "topics": [
+        {"crop": "cassava", "local_names": ["ege", "akpu", "rogo"], "key_points": ["stem cutting selection and length", "ridge vs flat planting by drainage", "1m x 1m spacing", "weed control in first 3 months is decisive", "improved varieties TME 419, TMS 30572", "harvest window 9-18 months"]},
+        {"crop": "maize", "local_names": ["agbado", "masara", "oka"], "key_points": ["75cm x 25cm spacing, one plant per stand", "split nitrogen application", "open pollinated vs hybrid seed tradeoff", "striga on poor soils", "moisture at tasselling is critical"]},
+        {"crop": "yam", "local_names": ["isu", "doya"], "key_points": ["seed yam setts and minisett technique", "staking increases yield", "mound size and drainage", "nematode damage in seed yam", "curing before storage in barn"]},
+        {"crop": "rice", "local_names": ["shinkafa", "iresi"], "key_points": ["upland vs lowland vs irrigated systems", "transplanting age", "water depth management", "FARO varieties", "bird scaring at grain fill"]},
+        {"crop": "sorghum and millet", "local_names": ["dawa", "gero"], "key_points": ["drought tolerance for Sudan and Sahel zones", "striga management", "photoperiod sensitivity and planting date", "bird damage"]},
+        {"crop": "cowpea", "local_names": ["ewa", "wake"], "key_points": ["nitrogen fixation and rotation value", "flower thrips and pod borer timing", "short duration varieties", "dual purpose grain and fodder"]},
+        {"crop": "groundnut", "local_names": ["epa", "gyada"], "key_points": ["calcium at pegging", "rosette virus", "aflatoxin risk at drying", "leaf spot"]},
+        {"crop": "soybean", "key_points": ["inoculant use", "rotation benefit before maize", "shattering at late harvest"]},
+        {"crop": "plantain and banana", "local_names": ["ogede"], "key_points": ["sucker selection and paring", "black sigatoka", "desuckering", "propping against wind"]},
+        {"crop": "cocoa", "key_points": ["shade management", "black pod", "pruning", "fermentation quality drives price"]},
+        {"crop": "oil palm", "key_points": ["tenera hybrid vs dura", "harvest ripeness by loose fruit", "spacing 9m triangular"]},
+        {"crop": "tomato", "local_names": ["tomatoes", "tatase"], "key_points": ["tuta absoluta", "bacterial wilt in wet season", "staking and pruning", "blossom end rot from calcium and irregular water"]},
+        {"crop": "pepper and chilli", "local_names": ["ata rodo", "shombo"], "key_points": ["nursery management", "anthracnose", "drying for market"]},
+        {"crop": "vegetables", "local_names": ["ugu (fluted pumpkin)", "ewedu", "amaranth (tete)", "okra (ila)"], "key_points": ["short cycle cash flow", "leaf harvest intervals", "nursery to field timing"]},
+        {"crop": "sweet potato and cocoyam", "key_points": ["vine cutting selection", "ridging", "weevil damage"]},
+        {"crop": "ginger, sesame, onion", "key_points": ["export quality drying", "onion bulb curing and storage losses", "ginger rhizome rot"]}
+      ]
+    },
+
+    "pests_diseases": {
+      "share": 0.20,
+      "topics": [
+        {"name": "fall armyworm on maize", "key_points": ["scout whorls early morning", "damage window is early vegetative", "push-pull and intercropping", "chemical control follows label rate only"]},
+        {"name": "cassava mosaic disease", "key_points": ["spread by whitefly and infected cuttings", "clean planting material is the main control", "resistant varieties", "roguing"]},
+        {"name": "cassava brown streak", "key_points": ["root necrosis not visible from leaves alone", "East and Central Africa distribution"]},
+        {"name": "striga (witchweed)", "key_points": ["indicator of poor nitrogen and degraded soil", "trap crops and rotation", "hand pulling before flowering"]},
+        {"name": "stem borers", "key_points": ["scouting deadheart", "destroy crop residues"]},
+        {"name": "tuta absoluta on tomato", "key_points": ["leaf mines", "pheromone traps", "nursery exclusion netting"]},
+        {"name": "bacterial wilt", "key_points": ["wilting without yellowing", "ooze test in water", "rotation, no chemical cure"]},
+        {"name": "black sigatoka on banana", "key_points": ["leaf streaking", "deleafing and spacing for airflow"]},
+        {"name": "cocoa black pod", "key_points": ["phytophthora, wet season", "frequent harvest and sanitation"]},
+        {"name": "newcastle disease in poultry", "key_points": ["vaccination schedule is the control", "sudden high mortality", "biosecurity"]},
+        {"name": "coccidiosis in poultry", "key_points": ["bloody droppings", "wet litter is the driver"]},
+        {"name": "peste des petits ruminants in goats", "key_points": ["vaccination", "isolate new stock"]},
+        {"name": "storage weevils and larger grain borer", "key_points": ["hermetic bags", "dry to safe moisture before storage"]},
+        {"name": "rodents, termites and quelea birds", "key_points": ["field sanitation", "timing of scaring at grain fill"]}
+      ]
+    },
+
+    "livestock_poultry_fish": {
+      "share": 0.14,
+      "topics": [
+        {"name": "broiler production", "key_points": ["brooding temperature by week", "feed conversion", "stocking density", "ventilation"]},
+        {"name": "layer production", "key_points": ["point of lay", "calcium for shell quality", "lighting programme"]},
+        {"name": "local and improved dual purpose chicken", "key_points": ["Newcastle vaccination for backyard flocks", "scavenging supplementation"]},
+        {"name": "goats and sheep", "key_points": ["deworming intervals", "West African Dwarf breed traits", "housing and flooring to prevent foot rot"]},
+        {"name": "cattle", "key_points": ["tick borne disease", "dry season feed and crop residue", "supplementation"]},
+        {"name": "catfish and tilapia", "key_points": ["stocking density", "water exchange and ammonia", "feed size by fingerling stage", "sorting to prevent cannibalism in catfish"]},
+        {"name": "rabbits and beekeeping", "key_points": ["low capital entry", "hive siting", "honey harvest timing"]}
+      ]
+    },
+
+    "soil_fertiliser_water": {
+      "share": 0.10,
+      "topics": [
+        {"name": "soil testing and interpretation", "key_points": ["why guessing fertiliser wastes money", "where to get testing"]},
+        {"name": "NPK and urea use", "key_points": ["split application", "placement not broadcast", "matching to crop stage"]},
+        {"name": "organic matter, compost and manure", "key_points": ["poultry manure strength and burning risk", "composting time"]},
+        {"name": "soil acidity and liming", "key_points": ["symptoms of acidity", "lime timing before planting"]},
+        {"name": "erosion and conservation", "key_points": ["contour ridging", "cover crops", "gully risk on slopes"]},
+        {"name": "irrigation and water harvesting", "key_points": ["dry season vegetable irrigation", "drip vs furrow cost", "shallow wells and washbores"]},
+        {"name": "crop rotation and intercropping", "key_points": ["legume before cereal", "cassava maize intercrop spacing"]}
+      ]
+    },
+
+    "postharvest_storage_market": {
+      "share": 0.09,
+      "topics": [
+        {"name": "drying to safe moisture", "key_points": ["why 13 percent matters for grain", "tarpaulin not bare ground"]},
+        {"name": "aflatoxin", "key_points": ["groundnut and maize risk", "rapid drying and sorting", "health and market rejection"]},
+        {"name": "hermetic storage", "key_points": ["PICS bags", "sealing discipline"]},
+        {"name": "cassava processing", "key_points": ["garri and fufu", "cyanide reduction by fermentation", "processing within 48 hours of harvest"]},
+        {"name": "grading, packaging and transport losses", "key_points": ["crates vs raffia baskets for tomato", "bruising losses"]},
+        {"name": "market timing and cooperatives", "key_points": ["glut at harvest", "aggregation for price", "record keeping"]}
+      ]
+    },
+
+    "pidgin": {
+      "share": 0.06,
+      "_comment": "Drawn from the slices above, asked and answered in Nigerian Pidgin. Never used to answer an English question.",
+      "topics": ["common pest questions", "planting timing", "poultry sickness", "fertiliser use", "storage"]
+    },
+
+    "general_replay": {
+      "share": 0.07,
+      "_comment": "Guards against catastrophic forgetting. Ordinary instruction following so the model keeps its manners when a judge phrases a hidden prompt conversationally or asks something slightly outside agriculture.",
+      "topics": ["summarisation", "explanation of everyday concepts", "simple arithmetic and unit conversion", "polite refusal and scope limits", "following formatting instructions"]
+    }
+  }
+}

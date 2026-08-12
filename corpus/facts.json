@@ -1,0 +1,365 @@
+{
+  "_comment": "Curated agronomic fact base for West/Central African smallholder farming. Every training pair is composed from these facts, so nothing in the corpus is invented at generation time. Facts here are established extension-service practice, deliberately excluding anything that varies by product (agrochemical doses) or by market (prices, yields). Where a real answer must reference a dose, the template defers to the product label and the local extension officer, per SPEC.md.",
+  "crops": {
+    "cassava": {
+      "local_names": [
+        "ege (Yoruba)",
+        "akpu (Igbo)",
+        "rogo (Hausa)"
+      ],
+      "planting_material": "Stem cuttings 20 to 25cm long with at least 5 nodes, taken from the middle of mature stems 8 to 12 months old. Never cut from a plant showing mosaic symptoms.",
+      "spacing": "1m by 1m for sole crop, about 10,000 plants per hectare. Wider at 1m by 1.5m when intercropping with maize.",
+      "land_prep": "Ridges or mounds on heavy or waterlogged soil to prevent root rot. Flat planting is acceptable on free-draining sandy loam.",
+      "planting_position": "Plant at an angle or upright with two thirds of the cutting buried, buds pointing up.",
+      "critical_window": "Weed control in the first 3 months determines yield more than any other single factor, because cassava canopies late and cannot compete early.",
+      "varieties": "Improved varieties such as TME 419, TMS 30572 and TMS 98/0505 offer mosaic resistance and higher root yield than most local landraces.",
+      "harvest": "9 to 12 months for early varieties, up to 18 months for late. Roots left too long become woody and lose starch quality.",
+      "common_problems": [
+        "cassava mosaic disease",
+        "cassava green mite",
+        "root rot on waterlogged soil",
+        "late weeding"
+      ],
+      "processing_note": "Process within 48 hours of harvest. Roots deteriorate fast once lifted."
+    },
+    "maize": {
+      "local_names": [
+        "agbado (Yoruba)",
+        "oka (Igbo)",
+        "masara (Hausa)"
+      ],
+      "spacing": "75cm between rows and 25cm within rows, one plant per stand, about 53,000 plants per hectare.",
+      "planting_time": "Plant when the rains are established, not on the first shower. A false start kills the stand and forces a costly replant.",
+      "fertiliser": "Split nitrogen: a basal compound fertiliser at planting, then top dress with urea at about 3 to 4 weeks, and again at knee height on poor soils. Place fertiliser in a band beside the plant, not broadcast, to cut losses.",
+      "critical_window": "Moisture stress at tasselling and silking causes the largest yield loss of any stage.",
+      "seed_choice": "Hybrid seed yields more but must be bought fresh each season. Open pollinated varieties can be saved for 2 to 3 seasons with careful selection, which suits farmers with tight cash.",
+      "common_problems": [
+        "fall armyworm",
+        "striga on degraded soil",
+        "maize streak virus",
+        "stem borers",
+        "storage weevils"
+      ],
+      "rotation": "Follows a legume such as cowpea or soybean well, which reduces nitrogen cost."
+    },
+    "yam": {
+      "local_names": [
+        "isu (Yoruba/Igbo)",
+        "doya (Hausa)"
+      ],
+      "planting_material": "Seed yam of about 250 to 300g, or setts produced by the minisett technique, which multiplies planting material from a single tuber.",
+      "land_prep": "Large mounds or ridges for drainage and tuber expansion. Compacted soil produces short, forked tubers.",
+      "staking": "Staking lifts the vine into the light and raises yield materially over unstaked yam.",
+      "harvest": "Milk harvest of the first tuber can be taken while the plant continues, or a single harvest at senescence.",
+      "storage": "Cure tubers in shade before storing in a ventilated barn. Damaged tubers rot and spread rot to the rest.",
+      "common_problems": [
+        "nematode damage in seed yam",
+        "tuber rot in storage",
+        "anthracnose on foliage"
+      ]
+    },
+    "rice": {
+      "local_names": [
+        "shinkafa (Hausa)",
+        "iresi (Yoruba)"
+      ],
+      "systems": "Upland rainfed, lowland or fadama, and fully irrigated. The system dictates variety and water management, so advice that ignores it is useless.",
+      "transplanting": "Transplant seedlings at about 21 days. Older seedlings establish poorly and tiller less.",
+      "water": "In lowland systems keep a shallow standing depth during tillering, and drain before harvest to firm the field.",
+      "varieties": "FARO series varieties are bred and released for Nigerian conditions across these systems.",
+      "common_problems": [
+        "birds at grain fill",
+        "weeds in upland systems",
+        "iron toxicity in some lowlands",
+        "blast"
+      ]
+    },
+    "sorghum_millet": {
+      "local_names": [
+        "dawa (sorghum, Hausa)",
+        "gero (millet, Hausa)"
+      ],
+      "zone_fit": "The dependable cereals for Sudan and Sahel savanna where maize fails in a short or erratic season.",
+      "photoperiod": "Many traditional varieties flower on daylength, so planting date shifts maturity less than farmers expect. Planting very early does not bring harvest forward proportionally.",
+      "common_problems": [
+        "striga",
+        "birds especially quelea",
+        "head bugs",
+        "downy mildew on millet"
+      ]
+    },
+    "cowpea": {
+      "local_names": [
+        "ewa (Yoruba)",
+        "wake (Hausa)"
+      ],
+      "rotation_value": "Fixes nitrogen and leaves the soil better for a following cereal, which lowers next season's fertiliser bill.",
+      "spray_window": "Flowering and podding is when flower thrips and pod borers do the damage. Protection outside that window is largely wasted money.",
+      "dual_purpose": "Some varieties give both grain and useful fodder, which matters where livestock feed is scarce in the dry season.",
+      "common_problems": [
+        "flower thrips",
+        "pod borers",
+        "aphids",
+        "storage bruchids"
+      ]
+    },
+    "groundnut": {
+      "local_names": [
+        "epa (Yoruba)",
+        "gyada (Hausa)"
+      ],
+      "calcium": "Needs calcium available in the pegging zone for pods to fill. Poor filling on light soils often traces to this.",
+      "drying": "Dry quickly and completely after lifting. Slow drying on damp ground is the main route to aflatoxin.",
+      "common_problems": [
+        "groundnut rosette virus",
+        "leaf spot",
+        "aflatoxin at drying and storage"
+      ]
+    },
+    "tomato": {
+      "local_names": [
+        "tomati",
+        "tatase and shombo are related pepper types"
+      ],
+      "season_risk": "Wet season crops suffer badly from bacterial wilt and fungal disease. Dry season production under irrigation gives better quality and price.",
+      "training": "Stake and prune to keep fruit off the soil, improve airflow and cut disease.",
+      "disorders": "Blossom end rot comes from irregular watering and poor calcium uptake, not from an insect, so spraying will not fix it.",
+      "common_problems": [
+        "tuta absoluta leaf miner",
+        "bacterial wilt",
+        "blossom end rot",
+        "bruising losses in raffia baskets"
+      ]
+    },
+    "plantain_banana": {
+      "local_names": [
+        "ogede (Yoruba)"
+      ],
+      "planting_material": "Select sword suckers from healthy stools, pare the corm to remove weevil damage and nematodes before planting.",
+      "management": "Desucker to a manageable number of followers, and prop heavy bunches against wind.",
+      "common_problems": [
+        "black sigatoka",
+        "banana weevil",
+        "nematodes",
+        "wind throw"
+      ]
+    },
+    "vegetables": {
+      "local_names": [
+        "ugu / fluted pumpkin",
+        "tete / amaranth",
+        "ewedu / jute mallow",
+        "ila / okra"
+      ],
+      "cash_flow": "Short cycle leafy vegetables turn over in weeks, which makes them the practical way to generate cash between long season crops.",
+      "harvest": "Leafy types are cut repeatedly at intervals rather than harvested once, so soil fertility must be maintained through the cycle."
+    },
+    "soybean": {
+      "local_names": [
+        "soya"
+      ],
+      "inoculant": "Inoculating seed with rhizobium before planting is a small cost that raises nitrogen fixation and yield, especially on land that has not grown soybean before.",
+      "spacing": "Rows about 50 to 75cm apart with plants close within the row, aiming for a dense even stand that shades out weeds.",
+      "rotation_value": "An excellent break crop before maize. The nitrogen it leaves behind cuts the following season's fertiliser bill.",
+      "harvest": "Harvest as soon as pods are dry and rattling. Leaving it standing invites shattering, and shattered grain on the ground is lost.",
+      "common_problems": [
+        "pod shattering at late harvest",
+        "rust",
+        "poor nodulation without inoculant"
+      ]
+    },
+    "cocoa": {
+      "shade": "Young cocoa needs shade to establish. Mature trees tolerate more light, but full sun without adequate nutrition shortens the life of the farm.",
+      "pruning": "Prune to keep the canopy open and remove chupons and dead wood. An open canopy dries faster and suffers less black pod.",
+      "harvest": "Harvest ripe pods regularly rather than in occasional large sweeps. Frequent harvest removes disease sources and reduces losses.",
+      "quality": "Fermentation and drying decide the price you are paid. Under-fermented or smoke-tainted beans are downgraded no matter how good the tree was.",
+      "common_problems": [
+        "black pod",
+        "capsids or mirids",
+        "swollen shoot virus",
+        "poor fermentation"
+      ]
+    },
+    "oil_palm": {
+      "material": "Plant tenera hybrid seedlings from a reputable source. Dura palms grown from random seed give much thicker shells and less oil.",
+      "spacing": "About 9m triangular spacing, roughly 143 palms per hectare. Crowded palms shade each other and yield falls.",
+      "harvest": "Harvest on ripeness judged by loose fruit on the ground, not by a fixed calendar. Underripe bunches give less oil, overripe raises free fatty acid and lowers quality.",
+      "common_problems": [
+        "harvesting at the wrong ripeness",
+        "rodent damage to young palms",
+        "poor drainage"
+      ]
+    },
+    "sweet_potato": {
+      "planting_material": "Use vine cuttings about 30cm long taken from healthy vigorous vines, planted into ridges or mounds.",
+      "land_prep": "Ridges or mounds give the roots room to size up and keep them out of waterlogged soil.",
+      "harvest": "Lift carefully. Bruised and cut roots rot quickly in storage and do not sell.",
+      "common_problems": [
+        "sweet potato weevil",
+        "vine cuttings taken from diseased stock",
+        "cracking from irregular moisture"
+      ]
+    },
+    "pepper": {
+      "local_names": [
+        "ata rodo",
+        "shombo",
+        "tatase"
+      ],
+      "nursery": "Raise seedlings in a protected nursery and transplant when they are sturdy. Direct sowing gives an uneven stand.",
+      "training": "Space for airflow and keep fruit off the soil to cut fungal losses.",
+      "harvest": "Pick regularly once fruit colours. Leaving ripe fruit on the plant slows further setting.",
+      "common_problems": [
+        "anthracnose",
+        "aphids and mites",
+        "blossom drop in extreme heat"
+      ]
+    },
+    "onion": {
+      "curing": "Cure bulbs properly after lifting, with the necks dried down, before storing. Uncured onions rot in store and that loss is entirely avoidable.",
+      "storage": "Store in ventilated conditions in a single layer where possible. Heaped damp onions heat up and spoil.",
+      "common_problems": [
+        "purple blotch",
+        "thrips",
+        "heavy storage losses from poor curing"
+      ]
+    }
+  },
+  "pests_diseases": {
+    "fall_armyworm": {
+      "crop": "maize",
+      "identify": "Ragged holes and moist sawdust like frass in the whorl. Larvae have an inverted pale Y on the head and four dots in a square on the second to last segment.",
+      "scouting": "Check the whorl early morning or late evening when larvae are active, on a sample of plants across the field.",
+      "window": "Damage matters most in early vegetative growth. Late infestation on a tasselled crop rarely justifies treatment cost.",
+      "non_chemical": "Handpicking on small plots, intercropping to break up the stand, encouraging natural enemies, and destroying crop residues after harvest.",
+      "chemical_note": "If treating, use a product registered for fall armyworm on maize and follow the label rate exactly. Aim the spray into the whorl where the larvae sit."
+    },
+    "cassava_mosaic": {
+      "crop": "cassava",
+      "identify": "Yellow and green mottling, distorted and reduced leaves, stunted plants.",
+      "spread": "Carried by whitefly and, most importantly, by planting infected stem cuttings.",
+      "control": "The main control is clean planting material and resistant varieties. Rogue out badly affected plants. There is no spray that cures an infected plant.",
+      "misconception": "Farmers often spray insecticide expecting a cure. It does not reverse infection."
+    },
+    "striga": {
+      "crop": "maize, sorghum, millet, upland rice",
+      "identify": "Small purple or pink flowered weed emerging near cereal stems, with the crop stunted and yellowed out of proportion to the visible weed.",
+      "cause_signal": "A striga problem is a soil fertility problem. It thrives where nitrogen and organic matter are depleted.",
+      "control": "Rotation with legumes, restoring soil fertility and organic matter, hand pulling before the weed flowers and seeds, and resistant varieties where available.",
+      "seed_bank": "Each plant sheds very many long lived seeds, so a single season of letting it flower undoes years of work."
+    },
+    "tuta_absoluta": {
+      "crop": "tomato",
+      "identify": "Irregular blotch shaped mines inside the leaf, and boreholes in fruit.",
+      "control": "Exclusion netting over nurseries, pheromone traps for monitoring and mass trapping, removal and destruction of affected material, and rotation away from tomato and related crops."
+    },
+    "bacterial_wilt": {
+      "crop": "tomato, pepper, and other solanaceous crops",
+      "identify": "Sudden wilting while leaves stay green. Cut a stem and suspend it in clear water: a milky ooze streaming out confirms it.",
+      "control": "No chemical cure. Rotate away from solanaceous crops for several seasons, improve drainage, and remove affected plants with the surrounding soil."
+    },
+    "newcastle_disease": {
+      "species": "poultry",
+      "identify": "Sudden high mortality across the flock, twisted necks and nervous signs, greenish droppings, sharp drop in laying.",
+      "control": "Vaccination on schedule is the control. There is no treatment once the flock breaks. Local backyard flocks benefit most, since they are usually unvaccinated.",
+      "biosecurity": "Isolate new or returning birds before mixing, restrict visitor access, and never bring birds back from market into the flock unquarantined."
+    },
+    "coccidiosis": {
+      "species": "poultry",
+      "identify": "Blood in droppings, huddling, ruffled feathers, poor growth.",
+      "driver": "Wet caked litter is the driver. Fixing litter and ventilation prevents recurrence better than repeated medication."
+    },
+    "ppr": {
+      "species": "goats and sheep",
+      "identify": "Fever, discharge from eyes and nose, mouth sores, diarrhoea, high mortality in young stock.",
+      "control": "Vaccination. Isolate newly bought animals before introducing them to the flock."
+    },
+    "storage_pests": {
+      "target": "stored grain and legumes",
+      "identify": "Boreholes in grain, dust beneath the bag, live insects when the surface is disturbed.",
+      "control": "Dry thoroughly to safe moisture before storage, then use hermetic bags such as PICS that suffocate insects without chemicals. Sealing discipline is what makes hermetic bags work."
+    },
+    "maize_streak": {
+      "crop": "maize",
+      "identify": "Fine broken pale streaks running parallel along the leaf, plants stunted when infected young.",
+      "spread": "Carried by leafhoppers, often from nearby grasses and volunteer maize.",
+      "control": "Tolerant varieties and avoiding very late or staggered planting near infected stands. There is no cure for an infected plant."
+    },
+    "stem_borers": {
+      "crop": "maize, sorghum, rice",
+      "identify": "Deadheart in young plants, small holes in stems with frass, and tunnels when a stem is split open.",
+      "control": "Destroy or plough in crop residues after harvest to break the carryover, since larvae overwinter in stalks. Early uniform planting across a community reduces pressure for everyone."
+    },
+    "black_sigatoka": {
+      "crop": "plantain and banana",
+      "identify": "Dark streaks that widen into blotches with pale centres, starting on older leaves and moving up.",
+      "control": "Remove and destroy affected leaves, widen spacing for airflow, and keep the stool desuckered. Nutrition matters, since a well fed plant holds more functional leaves."
+    },
+    "cocoa_black_pod": {
+      "crop": "cocoa",
+      "identify": "Dark brown to black spreading lesions on pods, often starting at the tip or stalk end, in wet weather.",
+      "control": "Harvest frequently, remove and bury or destroy infected pods, prune for an open canopy and improve drainage. Sanitation does most of the work."
+    },
+    "groundnut_rosette": {
+      "crop": "groundnut",
+      "identify": "Stunted bushy plants with small distorted yellowed leaves, often in patches within the field.",
+      "spread": "Carried by aphids, worst in late planted and sparse stands.",
+      "control": "Plant early and at a dense even spacing so the canopy closes quickly, and use resistant varieties where available."
+    },
+    "quelea_and_birds": {
+      "crop": "sorghum, millet, rice",
+      "identify": "Grain stripped from heads at the milk and dough stage, flocks lifting from the field when disturbed.",
+      "control": "Scaring must be sustained through the vulnerable window from grain fill to harvest. Community wide timing works far better than one farmer acting alone, because birds simply move next door."
+    }
+  },
+  "soil_water": {
+    "soil_testing": "Testing before buying fertiliser is cheaper than guessing. Blanket application wastes money on nutrients the soil already has and misses the one that is actually limiting.",
+    "nitrogen_placement": "Band or place fertiliser near the plant rather than broadcasting it. Broadcast urea on a hot dry surface loses a large share to the air before the plant sees it.",
+    "poultry_manure": "Strong and fast acting. Compost or age it before use, since fresh manure burns young plants and carries weed seed.",
+    "acidity": "Persistently poor growth with good rainfall and fertiliser can indicate acidity. Lime works slowly, so apply well ahead of planting.",
+    "erosion": "On slopes, ridge along the contour rather than up and down. Ridges running downhill become channels and start gullies.",
+    "rotation": "Alternate legumes and cereals. It breaks pest and disease cycles and cuts nitrogen cost.",
+    "irrigation": "Dry season vegetable production under irrigation usually earns more than wet season production, because supply is short and prices are higher.",
+    "mulching": "Mulch keeps soil moist, holds temperature down and suppresses weeds. On vegetable plots it can be worth more than an extra irrigation.",
+    "cover_crops": "A cover crop over the off season protects the surface from rain impact, adds organic matter and smothers weeds. Bare soil between seasons is a loss you do not see until yields fall.",
+    "compost": "Composting turns crop residue and household waste into something that feeds soil rather than just this crop. It takes weeks, so start well before you need it.",
+    "agroforestry": "Trees deliberately kept in fields provide shade, fodder, fuel and in the case of nitrogen fixing species a genuine fertility contribution. Choose species that do not compete heavily with the crop."
+  },
+  "postharvest": {
+    "grain_moisture": "Dry grain to roughly 13 percent before storage. Grain that feels dry in the afternoon sun can still be too wet to store safely.",
+    "drying_surface": "Dry on tarpaulin or a raised platform, never on bare ground, which reintroduces moisture, soil and mould.",
+    "aflatoxin": "A mould toxin, worst in groundnut and maize, produced when drying is slow or storage is damp. It is invisible at safe looking levels, causes real harm, and gets consignments rejected. Rapid drying and sorting out damaged and discoloured grain are the practical defences.",
+    "hermetic": "Hermetic bags control storage insects without chemicals, but only if the liner is sealed properly every time.",
+    "cassava_processing": "Ferment and process within 48 hours of harvest. Fermentation is also what lowers cyanogen levels in garri and fufu.",
+    "tomato_handling": "Rigid crates instead of raffia baskets sharply reduce bruising and rejection on arrival at market.",
+    "market_timing": "Everyone harvests at once and prices fall. Storage that holds quality, or aggregation through a cooperative, is how smallholders escape the harvest glut.",
+    "solar_drying": "A simple raised solar dryer dries faster and cleaner than open ground and keeps rain, dust and animals off the crop. Faster drying is directly less mould.",
+    "packaging": "Packaging is not decoration. Grading and clean uniform packs get a better price for the same produce and reduce rejection.",
+    "cooperatives": "Selling as a group gives access to buyers who will not deal in small lots, and spreads the cost of transport and storage. It is usually the largest single price gain available to a smallholder.",
+    "record_keeping": "Write down what you spent, planted, applied and sold. Without records you cannot tell which of your decisions actually made money."
+  },
+  "livestock": {
+    "brooding": "Brooders start warm and step down week by week. Chick behaviour is the best gauge: huddling under the heat means too cold, spread to the edges panting means too hot, evenly spread means correct.",
+    "poultry_density": "Overcrowding drives litter moisture, disease and poor growth. It is the most common avoidable mistake in small broiler units.",
+    "layer_calcium": "Laying birds need adequate calcium or shells thin and break. Shell quality falling across a flock usually points to calcium or age.",
+    "small_ruminant_housing": "Raised slatted floors keep goats off wet bedding and reduce foot rot and worm burden.",
+    "deworming": "Deworm on a schedule appropriate to the season and local advice, since worm pressure rises in the wet season.",
+    "catfish_density": "Overstocking raises ammonia and stunts growth. Water exchange and feeding rate must match the stocking.",
+    "catfish_sorting": "Catfish cannibalise unevenly sized stock. Grade and sort by size as they grow.",
+    "broiler_feeding": "Feed the right ration for the stage, starter then grower then finisher. Feeding a cheap ration to save money usually costs more in extra days to market weight.",
+    "layer_lighting": "Laying birds need a consistent lighting pattern. Erratic light disrupts laying more than most farmers expect.",
+    "local_chicken": "Backyard flocks give the best return on very small capital, but only if Newcastle vaccination is kept up. Unvaccinated flocks are periodically wiped out.",
+    "cattle_dry_season": "Dry season feed is the binding constraint. Conserve crop residues and plan supplementation before the shortage arrives, not during it.",
+    "rabbits": "Low capital, fast turnover, and they eat forage rather than competing with the household for grain. Housing must stay dry and well ventilated.",
+    "beekeeping": "Site hives away from paths and livestock, with shade and a nearby water source. Harvest leaving enough honey for the colony to hold through the dearth.",
+    "tilapia": "Tilapia breed readily in ponds, which crowds the pond with small fish. Mono-sex stocking or managing recruitment is what keeps them growing to size."
+  },
+  "zones": {
+    "sahel": "Very short erratic season, roughly 250 to 500mm. Millet, sorghum, cowpea. Drought escape through short duration varieties matters more than yield potential.",
+    "sudan": "Single season, roughly 500 to 1000mm. Sorghum, millet, cowpea, groundnut, some maize with fertiliser.",
+    "guinea": "Long single season, roughly 1000 to 1400mm. The maize, yam, soybean and rice belt.",
+    "derived": "Transition zone, in places two peaks of rain, supporting an early and a late crop.",
+    "humid_forest": "High rainfall with two seasons. Cassava, plantain, cocoa, oil palm, vegetables. Disease pressure is high because humidity is high.",
+    "planting_rule": "Plant on established rains, not on the first shower, in every zone. A false start is the most expensive common mistake."
+  }
+}
