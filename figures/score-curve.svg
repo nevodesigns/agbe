@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000">
+<rect width="1500" height="1000" fill="#F7F2E7"/>
+<text x="70.0" y="108.0" font-family="DejaVu Sans" font-size="40" fill="#22271F" text-anchor="start" font-weight="bold">The biggest model that fits is the wrong answer</text>
+<text x="70.0" y="152.0" font-family="DejaVu Sans" font-size="19" fill="#5A6154" text-anchor="start" font-weight="normal">S_perf caps at 15 tok/s, so surplus speed scores nothing.</text>
+<text x="70.0" y="180.0" font-family="DejaVu Sans" font-size="19" fill="#5A6154" text-anchor="start" font-weight="normal">Memory is paid for linearly. Both terms punish size.</text>
+<line x1="300.0" y1="270" x2="300.0" y2="806" stroke="#E2DAC6" stroke-width="1"/>
+<text x="300.0" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">0</text>
+<line x1="469.2" y1="270" x2="469.2" y2="806" stroke="#E2DAC6" stroke-width="1"/>
+<text x="469.2" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">10</text>
+<line x1="638.5" y1="270" x2="638.5" y2="806" stroke="#E2DAC6" stroke-width="1"/>
+<text x="638.5" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">20</text>
+<line x1="807.7" y1="270" x2="807.7" y2="806" stroke="#E2DAC6" stroke-width="1"/>
+<text x="807.7" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">30</text>
+<line x1="976.9" y1="270" x2="976.9" y2="806" stroke="#E2DAC6" stroke-width="1"/>
+<text x="976.9" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">40</text>
+<line x1="1146.2" y1="270" x2="1146.2" y2="806" stroke="#E2DAC6" stroke-width="1"/>
+<text x="1146.2" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">50</text>
+<text x="740.0" y="872.0" font-family="DejaVu Sans" font-size="16" fill="#5A6154" text-anchor="middle" font-weight="normal">Points banked of the 50 available before human accuracy judging</text>
+<text x="278.0" y="356.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Qwen2.5 0.5B</text>
+<rect x="300" y="327.0" width="507.7" height="46" fill="#2a78d6"/>
+<rect x="811.7" y="327.0" width="308.1" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="553.8" y="357.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
+<text x="965.7" y="357.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">18.4</text>
+<text x="1137.8" y="358.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">48.4</text>
+<text x="1199.8" y="357.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">57 tok/s   0.55 GB</text>
+<text x="278.0" y="456.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="bold">Gemma 3 1B</text>
+<text x="278.0" y="477.0" font-family="DejaVu Sans" font-size="12" fill="#2E4633" text-anchor="end" font-weight="bold">selected</text>
+<rect x="300" y="427.0" width="507.7" height="46" fill="#2a78d6"/>
+<rect x="811.7" y="427.0" width="291.8" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="553.8" y="457.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
+<text x="957.6" y="457.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">17.5</text>
+<text x="1121.5" y="458.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">47.5</text>
+<text x="1183.5" y="457.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">27 tok/s   0.88 GB</text>
+<text x="278.0" y="556.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Llama 3.2 1B</text>
+<rect x="300" y="527.0" width="507.7" height="46" fill="#2a78d6"/>
+<rect x="811.7" y="527.0" width="273.5" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="553.8" y="557.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
+<text x="948.5" y="557.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">16.4</text>
+<text x="1103.2" y="558.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">46.4</text>
+<text x="1165.2" y="557.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">33 tok/s   1.26 GB</text>
+<text x="278.0" y="656.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Qwen2.5 1.5B</text>
+<rect x="300" y="627.0" width="507.7" height="46" fill="#2a78d6"/>
+<rect x="811.7" y="627.0" width="252.9" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="553.8" y="657.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
+<text x="938.1" y="657.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">15.2</text>
+<text x="1082.6" y="658.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">45.2</text>
+<text x="1144.6" y="657.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">25 tok/s   1.69 GB</text>
+<text x="278.0" y="756.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Qwen2.5 3B</text>
+<rect x="300" y="727.0" width="376.7" height="46" fill="#2a78d6"/>
+<rect x="680.7" y="727.0" width="176.7" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="488.4" y="757.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">22.3</text>
+<text x="769.1" y="757.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">10.7</text>
+<text x="875.4" y="758.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">32.9</text>
+<text x="937.4" y="757.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">11 tok/s   3.26 GB</text>
+<rect x="70" y="905" width="16" height="16" fill="#2a78d6"/>
+<text x="96.0" y="918.0" font-family="DejaVu Sans" font-size="16" fill="#5A6154" text-anchor="start" font-weight="normal">Throughput   0.30 x S_perf</text>
+<rect x="360" y="905" width="16" height="16" fill="#eb6834" rx="3"/>
+<text x="386.0" y="918.0" font-family="DejaVu Sans" font-size="16" fill="#5A6154" text-anchor="start" font-weight="normal">Memory   0.20 x S_eff</text>
+<text x="70.0" y="958.0" font-family="DejaVu Sans" font-size="13.5" fill="#8A8877" text-anchor="start" font-weight="normal">Measured on an i7-10850H held to the ADTC Standard Laptop profile: 4 threads, no GPU offload, 7 GB cap.</text>
+<text x="70.0" y="980.0" font-family="DejaVu Sans" font-size="13.5" fill="#8A8877" text-anchor="start" font-weight="normal">The 10-point thermal penalty applied equally to all five runs and is excluded here. AGBE / Africa Deep Tech Challenge 2026.</text>
+</svg>
