@@ -252,8 +252,27 @@ def main() -> None:
         merged = PeftModel.from_pretrained(base, str(adapter_dir)).merge_and_unload()
         merged_dir = out / "merged"
         merged.save_pretrained(str(merged_dir), safe_serialization=True)
-        tok.save_pretrained(str(merged_dir))
-        print(f"merged model saved to {merged_dir}")
+
+        # Use Google's ORIGINAL tokenizer files, not a re-serialised copy of ours.
+        #
+        # tok.save_pretrained() here writes a tokenizer whose highest token id lands
+        # at or past config.vocab_size (Gemma 3 carries an <image_soft_token> that the
+        # text-only 1B has no embedding row for). llama.cpp's converter then fails at
+        # the very end, after processing every weight, on:
+        #     assert max(tokenizer.vocab.values()) < vocab_size
+        # Copying the upstream files avoids the round-trip that introduces it.
+        import shutil
+        from huggingface_hub import snapshot_download
+
+        src = snapshot_download(
+            BASE_MODEL,
+            allow_patterns=["tokenizer*", "special_tokens_map.json", "added_tokens.json"],
+            token=token)
+        for name in os.listdir(src):
+            if name.startswith("tokenizer") or name in (
+                    "special_tokens_map.json", "added_tokens.json"):
+                shutil.copy(os.path.join(src, name), merged_dir / name)
+        print(f"merged model saved to {merged_dir} (upstream tokenizer copied in)")
 
 
 if __name__ == "__main__":
