@@ -42,22 +42,29 @@ print(subprocess.run(["nvidia-smi","--query-gpu=name,memory.total","--format=csv
 print("torch", torch.__version__, "| cuda", torch.cuda.is_available())
 print("bf16 supported:", torch.cuda.is_bf16_supported() if torch.cuda.is_available() else "n/a")"""),
 
-(CODE, """%%capture
-# No trl: its SFTTrainer chunked-CE path breaks on a PEFT-wrapped causal LM
-# (_chunked_ce_forward reads outputs.last_hidden_state). We use plain
-# transformers.Trainer instead, so trl is not installed at all.
-!pip install -q -U transformers peft datasets accelerate sentencepiece protobuf
-# Two Kaggle preinstalls fight the upgraded libraries above, and both are dead
-# weight for text-only training, so remove rather than version-match them:
+(CODE, """# Use Kaggle's preinstalled transformers/peft. Upgrading them was a mistake:
+# `pip install -U` pulled versions that no longer matched the preinstalled
+# torchvision ("operator torchvision::nms does not exist") and disturbed
+# TensorFlow's protobuf. Both break `import transformers` outright.
 #
-#   torchao 0.10.0 - current peft checks it inside the LoRA dispatcher and RAISES
-#     on an old version instead of skipping, killing get_peft_model.
-#   torchvision   - after the upgrade its compiled ops no longer match torch
-#     ("operator torchvision::nms does not exist"). transformers imports
-#     torchvision via image_utils, so a broken one makes `import transformers`
-#     fail outright. Gemma 3 1B is text-only; absent torchvision is skipped
-#     cleanly, whereas a broken one is fatal.
-!pip uninstall -q -y torchao torchvision"""),
+# One preinstall still has to go. Kaggle ships peft 0.19.1 alongside torchao
+# 0.10.0, and that peft RAISES on any torchao below 0.16 from inside its LoRA
+# dispatcher, so the base image contradicts itself here. We do no quantised
+# training, so remove torchao rather than chase a torchao/torch version match.
+!pip uninstall -q -y torchao
+
+# transformers probes for TensorFlow and JAX at import time; Kaggle's TF is
+# fragile and merely looking for it can take the import down. PyTorch only.
+import os
+os.environ["USE_TF"] = "0"
+os.environ["USE_JAX"] = "0"
+
+import subprocess
+r = subprocess.run(
+    ["python", "-c",
+     "import transformers, peft; print(transformers.__version__, peft.__version__)"],
+    capture_output=True, text=True, env=dict(os.environ))
+print("READY -", r.stdout.strip()) if r.returncode == 0 else print("BROKEN:", r.stderr[-800:])"""),
 
 (CODE, """import os
 from kaggle_secrets import UserSecretsClient
