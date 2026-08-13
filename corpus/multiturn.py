@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import random
 
-from compose import clean, para, word_count
+from compose import clean, para, word_count  # noqa: F401
 
 # Fields that carry substantive guidance, in the order we prefer to use them.
 # Pulling a fixed hardcoded subset produced bare one-line answers on any topic
@@ -42,9 +42,89 @@ MIN_ANSWER_WORDS = 45
 MIN_FOLLOWUP_WORDS = 30
 
 
-def body_from(f: dict, limit: int = 4) -> list[str]:
+def body_from(f: dict, limit: int = 4, skip: int = 0) -> list[str]:
     """Substantive fact fragments for a topic, whatever keys it happens to have."""
-    return [f[k] for k in BODY_FIELDS if isinstance(f.get(k), str) and f[k].strip()][:limit]
+    vals = [f[k] for k in BODY_FIELDS if isinstance(f.get(k), str) and f[k].strip()]
+    return vals[skip:skip + limit]
+
+# Follow-up intents, chosen because they are what a judge probing a farm advisor
+# would naturally ask second.
+FOLLOWUPS = {
+    "cost": [
+        "That sounds expensive. What if I cannot afford it?",
+        "I have very little cash this season. What is the cheapest part of that?",
+        "Which of those matters most if I can only do one?",
+    ],
+    "timing": [
+        "How soon will I see a difference?",
+        "Is it too late in the season to do that now?",
+        "When exactly should I do this?",
+    ],
+    "already_tried": [
+        "I already did that and it did not help. What else?",
+        "I tried that last season and the problem came back. Why?",
+    ],
+    "clarify": [
+        "Can you explain that more simply?",
+        "Sorry, what does that mean exactly?",
+    ],
+}
+
+# Several phrasings per intent. v1 used ONE fixed sentence for each, so four
+# sentences opened roughly 80 follow-up answers between them and became the thing
+# the model learned instead of the agronomy.
+PRINCIPLE = {
+    "cost": [
+        "Labour costs time rather than money, and on a small plot it changes the "
+        "outcome more than most purchased inputs",
+        "The unpaid work usually beats the bought input: clean planting material, "
+        "correct spacing, and weeding on time",
+        "Spend nothing first. Sanitation, timing and spacing are free and carry most "
+        "of the gain",
+    ],
+    "timing": [
+        "Give it about two weeks and compare a treated strip against an untreated one, "
+        "or you cannot separate the weather from the treatment",
+        "Field changes are rarely visible in days. Leave an untreated strip so you have "
+        "something to compare against",
+        "Judge it against an untreated patch after a fortnight rather than by eye the "
+        "next morning",
+    ],
+    "already_tried": [
+        "When a problem returns each season the source was usually never removed, "
+        "rather than the treatment having failed",
+        "Recurrence points at a carrier: infected planting material, crop residue left "
+        "standing, or a neighbouring plot",
+        "Something carries it between seasons. Find that and the treatment starts "
+        "working",
+    ],
+    "clarify": [
+        "Put simply: fix the cause, not the symptom, and do the cheap thing first",
+        "The short version is to treat what is causing it rather than what you can see",
+        "In plain terms, find the source, deal with that, and start with what costs "
+        "nothing",
+    ],
+}
+
+BODY_FIELDS = (
+    "control", "non_chemical", "critical_window", "spacing", "fertiliser",
+    "varieties", "seed_choice", "management", "training", "pruning", "shade",
+    "window", "driver", "identify", "spread", "planting_material", "land_prep",
+    "harvest", "quality", "curing", "storage", "rotation_value", "inoculant",
+    "nursery", "material", "biosecurity", "cause_signal", "photoperiod",
+    "zone_fit", "systems", "water", "calcium", "drying", "season_risk",
+)
+
+MIN_ANSWER_WORDS = 45
+# A follow-up turn is legitimately shorter than an opening answer: in real
+# conversation the second reply builds on the first rather than restating it.
+MIN_FOLLOWUP_WORDS = 30
+
+
+def body_from(f: dict, limit: int = 4, skip: int = 0) -> list[str]:
+    """Substantive fact fragments for a topic, whatever keys it happens to have."""
+    vals = [f[k] for k in BODY_FIELDS if isinstance(f.get(k), str) and f[k].strip()]
+    return vals[skip:skip + limit]
 
 # Follow-up intents, chosen because they are what a judge probing a farm advisor
 # would naturally ask second.
@@ -94,7 +174,7 @@ SIMPLER = (
 )
 
 
-def build_multiturn(rng: random.Random, facts: dict, rec_fn, max_convos: int = 90) -> list[dict]:
+def build_multiturn(rng: random.Random, facts: dict, rec_fn, max_convos: int = 110) -> list[dict]:
     """Two-turn conversations grounded in the crop and pest fact base."""
     out: list[dict] = []
 
@@ -116,10 +196,7 @@ def build_multiturn(rng: random.Random, facts: dict, rec_fn, max_convos: int = 9
                     f"What should I focus on to improve my {name}?",
                     f"My {name} is underperforming. Where do I start?",
                 ])
-                a1 = para(
-                    f"The levers on {name} are few and worth working in order of cost",
-                    *body_from(f),
-                )
+                a1 = para(*body_from(f, limit=4))
             else:
                 host = f.get("crop") or f.get("species") or f.get("target", "the crop")
                 q1 = rng.choice([
@@ -127,10 +204,7 @@ def build_multiturn(rng: random.Random, facts: dict, rec_fn, max_convos: int = 9
                     f"I have {name} in my {host}. What should I do?",
                     f"What is the best approach to {name}?",
                 ])
-                a1 = para(
-                    f"Work through {name} cheapest first",
-                    *body_from(f),
-                )
+                a1 = para(*body_from(f, limit=4))
 
             # A lead sentence with no facts behind it is worse than no example.
             if word_count(a1) < MIN_ANSWER_WORDS:
@@ -139,15 +213,10 @@ def build_multiturn(rng: random.Random, facts: dict, rec_fn, max_convos: int = 9
             q2 = rng.choice(FOLLOWUPS[intent])
             # Each follow-up pairs its generic principle with facts specific to this
             # topic, drawn from whatever fields the topic actually has.
-            extra = body_from(f, limit=6)[2:4] or body_from(f, limit=2)
-            if intent == "cost":
-                a2 = para(CHEAPEST_FIRST, *extra)
-            elif intent == "timing":
-                a2 = para(TIMING_GENERIC, *extra)
-            elif intent == "already_tried":
-                a2 = para(RECURRENCE, *extra)
-            else:
-                a2 = para(SIMPLER, *extra)
+            # Topic facts FIRST, general principle second. v1 led with the
+            # generic sentence, which is the position a model learns hardest.
+            extra = body_from(f, limit=2, skip=4) or body_from(f, limit=2)
+            a2 = para(*extra, rng.choice(PRINCIPLE[intent]))
 
             if word_count(a2) < MIN_FOLLOWUP_WORDS:
                 continue
