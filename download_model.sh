@@ -12,7 +12,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODEL_DIR="$HERE/model"
 MODEL_FILE="$MODEL_DIR/agbe-1b-q4_k_m.gguf"
 
-MODEL_URL="https://huggingface.co/nevodesigns/agbe-1b/resolve/main/agbe-1b-q4_k_m.gguf"
+MODEL_URL="https://huggingface.co/NEVODESIGN/agbe-1b/resolve/main/agbe-1b-q4_k_m.gguf"
 
 mkdir -p "$MODEL_DIR"
 
