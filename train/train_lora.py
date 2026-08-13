@@ -73,6 +73,23 @@ def fold_system(messages: list[dict]) -> list[dict]:
     return out
 
 
+def _ids(rendered) -> list[int]:
+    """Flatten whatever apply_chat_template returned into a list of token ids.
+
+    transformers 5.x returns a dict-like BatchEncoding here where 4.x returned a
+    plain list. Taking len() of the dict counts KEYS, which silently made every
+    conversation look empty and dropped the whole corpus ("encoded 0 of 375").
+    Some versions also return a batch of one. Normalise all three shapes.
+    """
+    if hasattr(rendered, "input_ids"):
+        rendered = rendered.input_ids
+    elif isinstance(rendered, dict):
+        rendered = rendered["input_ids"]
+    if rendered and isinstance(rendered[0], (list, tuple)):
+        rendered = rendered[0]
+    return list(rendered)
+
+
 def encode(messages: list[dict], tok, max_len: int) -> dict | None:
     """Tokenise a conversation, masking everything that is not an assistant turn.
 
@@ -86,8 +103,8 @@ def encode(messages: list[dict], tok, max_len: int) -> dict | None:
     labels: list[int] = []
 
     for i, msg in enumerate(msgs):
-        rendered = tok.apply_chat_template(msgs[: i + 1], tokenize=True,
-                                           add_generation_prompt=False)
+        rendered = _ids(tok.apply_chat_template(
+            msgs[: i + 1], tokenize=True, add_generation_prompt=False))
         if len(rendered) <= len(input_ids):
             continue                      # template produced nothing new; skip
         new = rendered[len(input_ids):]
@@ -176,6 +193,11 @@ def main() -> None:
         if enc:
             dataset.append(enc)
     print(f"encoded {len(dataset)} of {len(raw)} conversations")
+    if not dataset:
+        raise SystemExit(
+            "encoded 0 conversations: the chat template produced no supervised "
+            "tokens. Check apply_chat_template's return shape for this "
+            "transformers version before training.")
 
     lens = sorted(len(d["input_ids"]) for d in dataset)
     sup = sorted(sum(1 for l in d["labels"] if l != IGNORE) for d in dataset)
