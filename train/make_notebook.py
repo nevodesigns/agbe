@@ -136,8 +136,9 @@ for p in PROMPTS:
         "-m", "/kaggle/working/agbe-1b-q4_k_m.gguf",
         "-t", "4", "-ngl", "0", "-c", "2048", "-n", "220",
         "--temp", "0.3", "-no-cnv", "-p", p,
-    ], capture_output=True, text=True, timeout=900)
-    print(out.stdout[-1600:])"""),
+    ], capture_output=True, text=True, timeout=240,
+       stdin=subprocess.DEVNULL)   # llama-cli waits on stdin forever without this
+    print(out.stdout.strip()[-1400:])"""),
 
 (MD, """## Download
 
