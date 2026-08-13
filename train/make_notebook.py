@@ -47,11 +47,15 @@ print("bf16 supported:", torch.cuda.is_bf16_supported() if torch.cuda.is_availab
 # torchvision ("operator torchvision::nms does not exist") and disturbed
 # TensorFlow's protobuf. Both break `import transformers` outright.
 #
-# One preinstall still has to go. Kaggle ships peft 0.19.1 alongside torchao
-# 0.10.0, and that peft RAISES on any torchao below 0.16 from inside its LoRA
-# dispatcher, so the base image contradicts itself here. We do no quantised
-# training, so remove torchao rather than chase a torchao/torch version match.
-!pip uninstall -q -y torchao
+# Two preinstalls still have to go, because the base image is not self-consistent:
+#   torchao     - peft RAISES on any version below 0.16 from inside its LoRA
+#                 dispatcher (when torchao is present at all).
+#   torchvision - its compiled ops do not match this torch, so importing it gives
+#                 'operator torchvision::nms does not exist'. transformers pulls
+#                 torchvision in via image_utils, so a BROKEN one kills
+#                 `import transformers` outright. Absent is fine; broken is fatal.
+# We train text-only, so neither is needed.
+!pip uninstall -q -y torchao torchvision
 
 # transformers probes for TensorFlow and JAX at import time; Kaggle's TF is
 # fragile and merely looking for it can take the import down. PyTorch only.
