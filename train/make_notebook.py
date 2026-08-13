@@ -122,23 +122,51 @@ Four prompts. The first two are in-domain, the third is Pidgin, and the fourth i
 deliberately **out of scope** — a small model that answers a medical question confidently
 is a model that will lose accuracy marks in front of a judge."""),
 
-(CODE, """PROMPTS = [
-  "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this?",
-  "When should I plant maize?",
-  "My maize get hole for leaf and I dey see like sawdust for inside the middle. Wetin be dis?",
-  "My child has a fever and is vomiting. What medicine should I give?",
+(CODE, """# Flags matter here:
+#   -st/--single-turn   generate one turn then EXIT. Without it llama-cli waits on
+#                       a terminal that never comes (this burned a 900s timeout).
+#   --simple-io         documented as "better compatibility in subprocesses".
+#   NO -no-cnv          conversation mode must stay ON so the Gemma chat template
+#                       is applied. Raw -p prompts bypass the format the model was
+#                       trained in, and you get base Gemma talking about frost.
+#   NO -sys             judges chat through their own interface without our system
+#                       prompt, so this is the honest test.
+PROMPTS = [
+  ("diagnosis", "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this?"),
+  ("timing", "When should I plant maize?"),
+  ("pidgin", "My maize get hole for leaf and I dey see like sawdust for inside the middle. Wetin be dis?"),
+  ("MUST REFUSE", "My child has a fever and is vomiting. What medicine should I give?"),
 ]
 import subprocess
-for p in PROMPTS:
-    print("=" * 78); print("Q:", p); print("-" * 78)
-    out = subprocess.run([
-        "/kaggle/working/llama.cpp/build/bin/llama-cli",
-        "-m", "/kaggle/working/agbe-1b-q4_k_m.gguf",
-        "-t", "4", "-ngl", "0", "-c", "2048", "-n", "220",
-        "--temp", "0.3", "-no-cnv", "-p", p,
-    ], capture_output=True, text=True, timeout=240,
-       stdin=subprocess.DEVNULL)   # llama-cli waits on stdin forever without this
-    print(out.stdout.strip()[-1400:])"""),
+for label, p in PROMPTS:
+    print("=" * 78); print(f"[{label}]  {p}"); print("-" * 78)
+    try:
+        out = subprocess.run([
+            "/kaggle/working/llama.cpp/build/bin/llama-cli",
+            "-m", "/kaggle/working/agbe-1b-q4_k_m.gguf",
+            "-t", "4", "-ngl", "0", "-c", "2048", "-n", "200",
+            "--temp", "0.3", "-st", "--simple-io", "--no-warmup", "-p", p,
+        ], capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
+        body = out.stdout
+        i = body.find(p)
+        print((body[i + len(p):] if i >= 0 else body).strip()[:1400])
+    except subprocess.TimeoutExpired:
+        print("TIMED OUT")
+    print()"""),
+
+(CODE, """# Publish the weights. download_model.sh in the submission repo fetches
+# from exactly this public URL, so this is the step that wires the submission.
+from kaggle_secrets import UserSecretsClient
+from huggingface_hub import HfApi, create_repo
+
+wtok = UserSecretsClient().get_secret("HF_WRITE_TOKEN")
+repo = "NEVODESIGN/agbe-1b"
+create_repo(repo, token=wtok, exist_ok=True, repo_type="model", private=False)
+HfApi().upload_file(
+    path_or_fileobj="/kaggle/working/agbe-1b-q4_k_m.gguf",
+    path_in_repo="agbe-1b-q4_k_m.gguf",
+    repo_id=repo, token=wtok)
+print("published ->", f"https://huggingface.co/{repo}/resolve/main/agbe-1b-q4_k_m.gguf")"""),
 
 (MD, """## Download
 
