@@ -1,37 +1,37 @@
 {
-  "team_id": "your-team-id",
-  "domain": "coding_assistants",
-  "language_scope": ["en"],
-  "african_alpha_claim": false,
+  "team_id": "REPLACE_WITH_DEVPOST_TEAM_ID",
+  "domain": "agriculture",
+  "language_scope": ["en", "pcm"],
+  "african_alpha_claim": true,
   "budget_laptop_claim": true,
   "submitter": {
-    "name": "your-name",
-    "email": "your-email@domain.com",
-    "github_handle": "your-github"
+    "name": "Nwokolo Victor Oluebubechukwu",
+    "email": "nwokoloebube21@gmail.com",
+    "github_handle": "nevodesigns"
   },
   "cross_disciplinary_pairing": {
-    "discipline": "education",
+    "discipline": "agricultural extension",
     "load_bearing": true,
-    "description": "Brief description of how your model serves a real-world domain."
+    "description": "Nigeria has roughly one agricultural extension officer per few thousand farming households, and the districts with the fewest officers also have the least connectivity. AGBE carries established extension guidance on crops, pests, livestock, soils and post-harvest handling onto an 8 GB laptop that works with the network off. The pairing is load bearing rather than cosmetic: the entire training corpus is composed from a curated fact base of extension practice, and the model is trained to defer to a human extension officer wherever a confident answer would be unsafe, such as agrochemical dosing."
   },
   "test_prompts": [
     {
       "prompt_id": "tp_001",
-      "prompt": "Write a Python function that reads a CSV file and returns the column with the highest mean value."
+      "prompt": "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this and what should I do about it?"
     },
     {
       "prompt_id": "tp_002",
-      "prompt": "Explain the difference between a list and a tuple in Python, and give one example where each is the better choice."
+      "prompt": "I farm half a hectare in the Guinea savanna and I have almost no money this season. What is the single most useful thing I can do for my maize?"
     }
   ],
   "model": {
-    "name": "SmolLM2-135M-Instruct-Q4_K_M",
+    "name": "AGBE-1B-Q4_K_M",
     "runtime": "llama.cpp",
     "quantization": "GGUF Q4_K_M",
-    "parameters_estimate": "135M",
+    "parameters_estimate": "1B",
     "packaging": "binary_bundle"
   },
   "_runtime": {
-    "model_path": "model/SmolLM2-135M-Instruct-Q4_K_M.gguf"
+    "model_path": "model/agbe-1b-q4_k_m.gguf"
   }
 }
