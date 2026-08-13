@@ -141,6 +141,50 @@ class Collator:
         }
 
 
+def strip_oversized_tokens(merged_dir: pathlib.Path) -> None:
+    """Drop tokenizer entries whose id is >= config.vocab_size.
+
+    Gemma 3 ships <image_soft_token> at id 262144 while the text-only 1B declares
+    vocab_size 262144, so the highest token id equals the vocabulary size. Google's
+    own tokenizer carries it, so this is not an artefact of re-saving. llama.cpp's
+    converter asserts `max(tokenizer.vocab.values()) < vocab_size` and dies at the
+    very END of conversion, after writing every tensor, leaving no .gguf behind.
+
+    The token is a placeholder for image input. A text-only model has no embedding
+    row for it and can neither consume nor emit it, so removing it costs nothing.
+    """
+    cfg = json.loads((merged_dir / "config.json").read_text())
+    vs = cfg.get("vocab_size") or cfg.get("text_config", {}).get("vocab_size")
+    if not vs:
+        return
+
+    tj_path = merged_dir / "tokenizer.json"
+    if tj_path.exists():
+        tj = json.loads(tj_path.read_text())
+        added = tj.get("added_tokens", [])
+        keep = [a for a in added if a["id"] < vs]
+        if len(keep) != len(added):
+            dropped = [a["content"] for a in added if a["id"] >= vs]
+            tj["added_tokens"] = keep
+            tj_path.write_text(json.dumps(tj, ensure_ascii=False))
+            print(f"  stripped out-of-range tokens: {dropped}")
+
+    at_path = merged_dir / "added_tokens.json"
+    if at_path.exists():
+        at = json.loads(at_path.read_text())
+        at_path.write_text(json.dumps(
+            {k: v for k, v in at.items() if v < vs}, ensure_ascii=False))
+
+    tc_path = merged_dir / "tokenizer_config.json"
+    if tc_path.exists():
+        tc = json.loads(tc_path.read_text())
+        dec = tc.get("added_tokens_decoder", {})
+        keep = {k: v for k, v in dec.items() if int(k) < vs}
+        if len(keep) != len(dec):
+            tc["added_tokens_decoder"] = keep
+            tc_path.write_text(json.dumps(tc, ensure_ascii=False))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--train", default="corpus/build/train.jsonl")
@@ -253,26 +297,9 @@ def main() -> None:
         merged_dir = out / "merged"
         merged.save_pretrained(str(merged_dir), safe_serialization=True)
 
-        # Use Google's ORIGINAL tokenizer files, not a re-serialised copy of ours.
-        #
-        # tok.save_pretrained() here writes a tokenizer whose highest token id lands
-        # at or past config.vocab_size (Gemma 3 carries an <image_soft_token> that the
-        # text-only 1B has no embedding row for). llama.cpp's converter then fails at
-        # the very end, after processing every weight, on:
-        #     assert max(tokenizer.vocab.values()) < vocab_size
-        # Copying the upstream files avoids the round-trip that introduces it.
-        import shutil
-        from huggingface_hub import snapshot_download
-
-        src = snapshot_download(
-            BASE_MODEL,
-            allow_patterns=["tokenizer*", "special_tokens_map.json", "added_tokens.json"],
-            token=token)
-        for name in os.listdir(src):
-            if name.startswith("tokenizer") or name in (
-                    "special_tokens_map.json", "added_tokens.json"):
-                shutil.copy(os.path.join(src, name), merged_dir / name)
-        print(f"merged model saved to {merged_dir} (upstream tokenizer copied in)")
+        tok.save_pretrained(str(merged_dir))
+        strip_oversized_tokens(merged_dir)
+        print(f"merged model saved to {merged_dir}")
 
 
 if __name__ == "__main__":
