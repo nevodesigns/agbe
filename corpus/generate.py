@@ -225,26 +225,30 @@ def build_block(rng: random.Random, fact_key: str, slice_name: str,
                 actions: dict[str, str]) -> list[dict]:
     """Generic builder for the flat fact blocks.
 
-    There is deliberately NO shared lead sentence. v1 opened all 50 livestock
-    answers and all 81 soil/post-harvest answers with the same phrase, which is
-    exactly what the model memorised instead of the agronomy.
+    **Never mixes topics.** v2 padded each answer with two other topics' facts
+    picked at random, to raise word count. The training data then literally
+    contained things like "Composting turns crop residue into something that feeds
+    soil... Dry season vegetable production under irrigation usually earns more...
+    On slopes, ridge along the contour", and the model learned to staple unrelated
+    facts together, producing "A stunted plant with pale and mottled leaves is a
+    false start. An infected tuber is a false start."
+
+    An answer now draws ONLY from its own topic. If that makes it short, the fix is
+    a richer fact, not a borrowed one.
     """
     out: list[dict] = []
     block = FACTS[fact_key]
     for key, fact in block.items():
         action = actions.get(key, key.replace("_", " "))
-        related = [v for k, v in block.items() if k != key]
-        rng.shuffle(related)
         for tpl in (f"How do I {action}?", f"What is the right way to {action}?",
-                    f"I want to {action}. What should I know?"):
-            out.append(rec(tpl, compose_prose(rng, fact, *related[:2]),
+                    f"I want to {action}. What should I know?",
+                    f"Any advice on how to {action}?"):
+            out.append(rec(tpl, compose_prose(rng, fact),
                            slice_name, key, "howto", rng))
         out.append(rec(f"Why does it matter how I {action}?",
-                       compose_prose(rng, fact, *related[2:3]),
-                       slice_name, key, "what", rng))
+                       compose_prose(rng, fact), slice_name, key, "what", rng))
         out.append(rec(f"What goes wrong when farmers do not {action}?",
-                       compose_prose(rng, fact, *related[3:5]),
-                       slice_name, key, "prevent", rng))
+                       compose_prose(rng, fact), slice_name, key, "prevent", rng))
     return out
 
 

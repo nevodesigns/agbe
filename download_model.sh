@@ -23,10 +23,15 @@ fi
 
 echo "downloading $MODEL_URL → $MODEL_FILE (~0.8 GB)…"
 
+# Resume rather than restart. The target user is on a rural connection where an
+# 800 MB transfer routinely drops part way, and starting from zero each time can
+# mean never finishing. -C - continues from whatever is already on disk, and we
+# retry a few times before giving up.
 if command -v curl > /dev/null 2>&1; then
-  curl -L --fail --progress-bar -o "$MODEL_FILE.partial" "$MODEL_URL"
+  curl -L --fail --progress-bar -C - --retry 5 --retry-delay 5 \
+       -o "$MODEL_FILE.partial" "$MODEL_URL" || true
 elif command -v wget > /dev/null 2>&1; then
-  wget --show-progress -O "$MODEL_FILE.partial" "$MODEL_URL"
+  wget --continue --tries=5 --show-progress -O "$MODEL_FILE.partial" "$MODEL_URL" || true
 else
   echo "error: neither curl nor wget found" >&2
   exit 1
@@ -36,10 +41,11 @@ fi
 # at byte 0, so a header check passes on a broken file; only the length catches it.
 # We hit exactly this during development: curl exited 0 on three partial models
 # and llama.cpp reported only "failed to load model".
-ACTUAL=$(stat -c%s "$MODEL_FILE.partial" 2>/dev/null || stat -f%z "$MODEL_FILE.partial")
-if [[ "$ACTUAL" -lt 500000000 ]]; then
-  echo "error: download is $ACTUAL bytes, far below the expected ~0.8 GB" >&2
-  rm -f "$MODEL_FILE.partial"
+ACTUAL=$(stat -c%s "$MODEL_FILE.partial" 2>/dev/null || stat -f%z "$MODEL_FILE.partial" 2>/dev/null || echo 0)
+if [[ "$ACTUAL" -lt 800000000 ]]; then
+  echo "error: got $ACTUAL bytes, expected ~814 MB. The transfer was cut short." >&2
+  echo "The partial file is kept at $MODEL_FILE.partial — re-run this script and" >&2
+  echo "it will resume from where it stopped." >&2
   exit 1
 fi
 
