@@ -42,17 +42,27 @@ os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
 
 BASE_MODEL = "google/gemma-3-1b-it"
 
-# r=16 is enough to move style and domain vocabulary on a 1B without overwriting
-# what the base model already knows.
-LORA_R = 16
-LORA_ALPHA = 32
+# Raised from r=16 after four corpus iterations failed to teach FACTS.
+#
+# The evidence: style transferred completely (the model reproduces our answer
+# shape, our closers, our phrasing) while facts did not (it answered "pod borers",
+# then invented "fall army weevil"). That is underfitting the content while
+# overfitting the form, and no amount of corpus editing fixes it, because the
+# corpus was never the limiting factor. r=16 with 3 epochs over ~640 short
+# examples is roughly 120 optimiser steps, which is very little signal for
+# specific facts.
+#
+# Refusal behaviour DID transfer at r=16, which is consistent: behaviours
+# generalise from few examples, facts do not.
+LORA_R = 32
+LORA_ALPHA = 64
 LORA_DROPOUT = 0.05
 TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj",
                   "gate_proj", "up_proj", "down_proj"]
 
 MAX_SEQ_LEN = 1024
-EPOCHS = 3
-LR = 2e-4
+EPOCHS = 5
+LR = 1.5e-4  # slightly lower, since rank and epochs both went up
 BATCH = 2
 GRAD_ACCUM = 8              # effective batch 16
 IGNORE = -100
