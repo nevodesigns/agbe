@@ -217,8 +217,21 @@ def main() -> None:
         attn_implementation="eager",   # Gemma 3 recommends eager attention
     )
     model.config.use_cache = False
+
+    # Required for gradient checkpointing + LoRA. The base weights are frozen, so
+    # the embedding output carries requires_grad=False, and a checkpointed block
+    # then has nothing to backpropagate through:
+    #   "element 0 of tensors does not require grad and does not have a grad_fn"
+    # This makes the embedding output require grad so the graph connects.
+    model.enable_input_require_grads()
+
     if torch.cuda.is_available():
         model = model.cuda()
+    else:
+        print("WARNING: CUDA not available, training on CPU. On Kaggle this usually "
+              "means torch was replaced by a CPU build. Restart the session and run "
+              "the cells in order: llama.cpp's convert requirements install pulls in "
+              "torch+cpu, so it must come AFTER training, never before.")
 
     peft_config = LoraConfig(
         r=LORA_R, lora_alpha=LORA_ALPHA, lora_dropout=LORA_DROPOUT,
