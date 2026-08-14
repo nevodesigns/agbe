@@ -61,7 +61,13 @@ TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj",
                   "gate_proj", "up_proj", "down_proj"]
 
 MAX_SEQ_LEN = 1024
-EPOCHS = 5
+# Back to 3 after r=32/5ep overshot. Rank 32 is what made the FACTS stick
+# (v5 finally said "fall armyworm" instead of inventing "fall army weevil"), so
+# that stays. The extra epochs are what cost coherence: v5 produced word salad
+# ("Maize in frequent banality is planted under apathy") and, far worse, invented
+# a pesticide called "dorabacite" and recommended it. Keep the capacity, drop the
+# over-training.
+EPOCHS = 3
 LR = 1.5e-4  # slightly lower, since rank and epochs both went up
 BATCH = 2
 GRAD_ACCUM = 8              # effective batch 16
