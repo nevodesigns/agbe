@@ -1,7 +1,9 @@
 {
   "team_id": "REPLACE_WITH_DEVPOST_TEAM_ID",
   "domain": "agriculture",
-  "language_scope": ["en", "pcm"],
+  "language_scope": [
+    "en"
+  ],
   "african_alpha_claim": true,
   "budget_laptop_claim": true,
   "submitter": {
