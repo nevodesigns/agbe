@@ -40,7 +40,23 @@ os.environ.setdefault("USE_TF", "0")
 os.environ.setdefault("USE_JAX", "0")
 os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
 
-BASE_MODEL = "google/gemma-3-1b-it"
+# Switched from google/gemma-3-1b-it after seven builds.
+#
+# Gemma 3 1B banked more engineering points (47.48 vs 45.19, a 2.29 point cost
+# here) but plateaued on accuracy: it recalls what we taught it for two or three
+# sentences, then fills the rest with confident invention drawn from a base model
+# that does not know African agronomy ("the caterpillar hangs upside down",
+# "a soil and water borne pest", "four stages in two summers").
+#
+# Capacity is the lever that has actually moved facts on this project: rank 16 to
+# 32 turned "fall army weevil" into "fall armyworm". 1.5B is that lever again at
+# the model level. We are trading 2.29 of 50 engineering points for a shot at the
+# half of the score that is accuracy.
+#
+# Incidental wins: Apache 2.0 rather than Gemma's custom terms, not gated so no
+# HF licence dance, and no <image_soft_token> vocabulary bug to patch around.
+# Cost beyond points: ~1.1GB instead of 814MB to download.
+BASE_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
 
 # Raised from r=16 after four corpus iterations failed to teach FACTS.
 #
