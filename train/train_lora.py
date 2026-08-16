@@ -40,23 +40,23 @@ os.environ.setdefault("USE_TF", "0")
 os.environ.setdefault("USE_JAX", "0")
 os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
 
-# Switched from google/gemma-3-1b-it after seven builds.
+# Qwen2.5-1.5B was tried and abandoned. Recorded so nobody repeats it:
 #
-# Gemma 3 1B banked more engineering points (47.48 vs 45.19, a 2.29 point cost
-# here) but plateaued on accuracy: it recalls what we taught it for two or three
-# sentences, then fills the rest with confident invention drawn from a base model
-# that does not know African agronomy ("the caterpillar hangs upside down",
-# "a soil and water borne pest", "four stages in two summers").
+#   1. Training silently did nothing. grad_norm went nan on step 1 and stayed
+#      there, loss logged 0.0 for every step, and the resulting adapter was
+#      identical to the base model. Cause: we load weights directly in float16
+#      and train fp16 with no master copy. Gemma tolerates that; Qwen2.5 is a
+#      bf16-trained model and overflows on Turing. Fixable by loading fp32 and
+#      letting AMP handle it.
+#   2. GGUF conversion is blocked anyway. llama.cpp's converter looks for a
+#      sentencepiece tokenizer.model that Qwen does not ship, falls back to the
+#      gpt2 path, and hits an AttributeError inside transformers 5.0's Qwen
+#      tokenizer ("'list' object has no attribute 'keys'"). Not our bug to fix.
 #
-# Capacity is the lever that has actually moved facts on this project: rank 16 to
-# 32 turned "fall army weevil" into "fall armyworm". 1.5B is that lever again at
-# the model level. We are trading 2.29 of 50 engineering points for a shot at the
-# half of the score that is accuracy.
-#
-# Incidental wins: Apache 2.0 rather than Gemma's custom terms, not gated so no
-# HF licence dance, and no <image_soft_token> vocabulary bug to patch around.
-# Cost beyond points: ~1.1GB instead of 814MB to download.
-BASE_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
+# Two debug cycles to chase 2.29 engineering points we would then hand back, on
+# a base model that is also 35% larger to download. Gemma 3 1B works, banks
+# 47.48 of 50, and names fall armyworm correctly.
+BASE_MODEL = "google/gemma-3-1b-it"
 
 # Raised from r=16 after four corpus iterations failed to teach FACTS.
 #
