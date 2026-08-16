@@ -1,18 +1,18 @@
 # AGBE demo video — voiceover transcript
 
-**Video:** `agbe-demo.mp4`, 1920x1080, silent, **110 seconds** (limit is 120).
+**Video:** `agbe-demo.mp4`, 1920x1080, silent, **93 seconds** (limit is 120).
 **Your job:** read this over the video. The timings are scene boundaries, so if
 you land near them the words sit on the right picture.
 
 Read it plainly. No hype, no "revolutionary". The material is strong enough
 stated flatly, and judges hear a lot of hype.
 
-About 250 spoken words, comfortable at a natural pace across 110 seconds. If you
+About 230 spoken words, comfortable across 93 seconds. If you
 finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 0:00 – 0:08 · Title card
+### 0:00 – 0:07 · Title card
 
 > AGBE. Àgbẹ̀ means farmer in Yoruba.
 > It is a farming advisor that runs on an ordinary laptop, with the internet
@@ -20,7 +20,7 @@ finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 0:08 – 0:18 · The problem
+### 0:07 – 0:16 · The problem
 
 > Nigeria has about one agricultural extension officer for every few thousand
 > farming households.
@@ -29,7 +29,7 @@ finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 0:18 – 0:38 · Asking a real question (terminal types out)
+### 0:16 – 0:30 · Asking a real question (terminal types out)
 
 > So we asked it what farmers actually ask.
 > Holes in the young maize leaves, and something like wet sawdust in the centre of
@@ -45,7 +45,7 @@ finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 0:38 – 0:50 · Network off
+### 0:30 – 0:39 · Network off
 
 > This is the part that matters.
 > There is no internet. No API key, no account, no data cost.
@@ -53,7 +53,7 @@ finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 0:50 – 1:10 · The refusal
+### 0:39 – 0:52 · The refusal
 
 > Now something it should not answer.
 > A child with a fever and vomiting.
@@ -68,7 +68,13 @@ finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 1:10 – 1:26 · The chart
+### 0:52 – 0:57 · Refusal holds on screen
+
+*(Silent. Let the refusal sit there and be read.)*
+
+---
+
+### 0:57 – 1:12 · The chart
 
 > The challenge publishes its scoring formula, so we read it before writing code.
 > Throughput above fifteen tokens a second earns nothing, and memory is charged
@@ -82,17 +88,17 @@ finish a section early, pause. Silence over a held shot is fine.
 
 ---
 
-### 1:26 – 1:40 · The numbers
+### 1:12 – 1:24 · The numbers
 
 > Eight hundred and fourteen megabytes on disk. Under a gigabyte of memory.
-> Twenty four tokens a second on four CPU threads with no GPU.
+> Twenty tokens a second on four CPU threads, with no GPU at all.
 >
 > Forty seven and a half of the fifty available engineering points, measured on
 > the target hardware rather than estimated.
 
 ---
 
-### 1:40 – 1:50 · Close
+### 1:24 – 1:33 · Close
 
 > Downloaded once. After that it works with the cable pulled out.
 > The weights are public, so you can check every number in this video yourself.
@@ -104,10 +110,10 @@ finish a section early, pause. Silence over a held shot is fine.
 - **Record somewhere quiet.** A phone voice memo held about a hand's width away
   is fine and beats a laptop microphone.
 - **One take per section** is far easier than one take overall. Join them after.
-- **Do not rush 0:18 to 0:38.** That is where a judge decides whether the model
+- **Do not rush 0:16 to 0:30.** That is where a judge decides whether the model
   actually works, and the text is appearing on screen at the same time.
-- **The two strongest moments** are "there is no internet" at 0:38 and "it
-  declines" at 0:50. Slow down slightly for both.
+- **The two strongest moments** are "there is no internet" at 0:30 and "it
+  declines" at 0:39. Slow down slightly for both.
 
 ## Putting the voice on the video
 

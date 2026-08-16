@@ -1,43 +1,45 @@
 """Render the AGBE demo video: 1920x1080, silent, for a voiceover to be laid over.
 
-Silent by design. The narration is recorded separately and TRANSCRIPT.md is timed
-to these scene boundaries, so the voice drops straight on without re-cutting.
+The terminal scenes are REAL. `record_session.py` runs the model in a pseudo
+terminal and captures every byte with a timestamp; this replays that at the
+timing it actually happened. The pause before the first token and the pace of
+generation are the model's own, not an animation. A judge should see the speed
+they will really get.
 
-Everything shown is real: the terminal text is captured model output, the
-throughput figures are measured, and the chart is the same one in the report. A
-judge who runs the model should see exactly what the video showed.
+The displayed command shortens the absolute path to `llama-cli`, which is what
+you would type with it on PATH. Everything else, including the output, is
+verbatim.
 
 Frames are rendered with Pillow and assembled with ffmpeg at 30fps.
 """
 
 from __future__ import annotations
 
+import json
 import pathlib
 import shutil
 import subprocess
+import sys
 
 from PIL import Image, ImageDraw, ImageFont
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from render_terminal import Session, draw_frame  # noqa: E402
 
 W, H = 1920, 1080
 FPS = 30
 OUT = pathlib.Path(__file__).resolve().parent
 FRAMES = OUT / "frames"
-VID = pathlib.Path("/tmp/vid")
+CAST = OUT / "cast"
 
-# Bulletin palette, matching the site so video and page look like one thing.
 PAPER = (247, 242, 231)
 INK = (34, 39, 31)
 INK_SOFT = (90, 97, 84)
 GREEN = (46, 70, 51)
 OCHRE = (169, 102, 42)
-TERM_BG = (21, 24, 20)
-TERM_FG = (233, 228, 213)
-TERM_DIM = (154, 162, 146)
 
 FD = "/usr/share/fonts/truetype/dejavu"
 PATHS = {
-    "mono": f"{FD}/DejaVuSansMono.ttf",
-    "mono_bold": f"{FD}/DejaVuSansMono-Bold.ttf",
     "serif": f"{FD}/DejaVuSerif.ttf",
     "serif_bold": f"{FD}/DejaVuSerif-Bold.ttf",
     "sans": f"{FD}/DejaVuSans.ttf",
@@ -71,14 +73,14 @@ def wrap(draw, text: str, fnt, max_w: int) -> list[str]:
 def card(title: str, sub: str = "", kicker: str = "", accent=OCHRE) -> Image.Image:
     img = Image.new("RGB", (W, H), PAPER)
     d = ImageDraw.Draw(img)
-    y = 280
+    y = 290
     if kicker:
         d.text((160, y), kicker.upper(), font=font("sans_bold", 30), fill=accent)
         y += 76
-    f = font("serif_bold", 88)
+    f = font("serif_bold", 86)
     for line in wrap(d, title, f, W - 340):
         d.text((160, y), line, font=f, fill=INK)
-        y += 108
+        y += 106
     if sub:
         y += 30
         f = font("serif", 42)
@@ -91,39 +93,8 @@ def card(title: str, sub: str = "", kicker: str = "", accent=OCHRE) -> Image.Ima
     return img
 
 
-def terminal(lines, reveal: int, banner: str = "", banner_col=OCHRE) -> Image.Image:
-    """`reveal` = characters of text shown, which gives the typing effect."""
-    img = Image.new("RGB", (W, H), TERM_BG)
-    d = ImageDraw.Draw(img)
-    fm, fb = font("mono", 29), font("mono_bold", 29)
-
-    d.rectangle([0, 0, W, 64], fill=(30, 34, 28))
-    d.text((28, 18), "agbe@laptop:~$", font=font("mono", 24), fill=TERM_DIM)
-    if banner:
-        bw = d.textlength(banner, font=font("mono_bold", 26))
-        d.rectangle([W - bw - 60, 14, W - 24, 50], fill=banner_col)
-        d.text((W - bw - 42, 18), banner, font=font("mono_bold", 26), fill=(255, 255, 255))
-
-    y, shown = 120, 0
-    for text, col in lines:
-        f = fb if col == TERM_FG else fm
-        for line in wrap(d, text, f, W - 180):
-            if shown >= reveal:
-                return img
-            take = min(len(line), reveal - shown)
-            d.text((70, y), line[:take], font=f, fill=col)
-            shown += max(len(line), 1)
-            y += 43
-            if y > H - 80:
-                return img
-        y += 10
-    return img
-
-
 def chart_slide() -> Image.Image:
-    """The chart carries its own title, so we add no header of our own. An earlier
-    version stacked "WHY A 1B MODEL..." above the chart's own headline, which read
-    as saying the same thing twice."""
+    """The chart carries its own title, so no header of ours is added."""
     img = Image.new("RGB", (W, H), PAPER)
     src = pathlib.Path("/home/nwokolo/projects/adtc-2026/figures/score-curve.png")
     if src.exists():
@@ -134,40 +105,45 @@ def chart_slide() -> Image.Image:
     return img
 
 
+def load(name: str, display_cmd: str) -> Session:
+    cast = json.loads((CAST / f"{name}.json").read_text())
+    cast["command"] = display_cmd          # tidy the binary path, keep the rest
+    return Session(cast, type_speed=42.0, lead_in=0.8)
+
+
 def main() -> None:
-    arm = (VID / "armyworm.body").read_text().strip()
-    ref = (VID / "refuse.body").read_text().strip()
-    tps = (VID / "armyworm.tps").read_text().strip()
+    arm = load("armyworm",
+               'llama-cli -m model/agbe-1b-q4_k_m.gguf -t 4 -ngl 0 -c 2048 -st '
+               '-p "My maize has holes in the young leaves and wet sawdust in the whorl. What is this?"')
+    ref = load("refuse",
+               'llama-cli -m model/agbe-1b-q4_k_m.gguf -t 4 -ngl 0 -c 2048 -st '
+               '-p "My child has a fever and is vomiting. What medicine should I give?"')
 
-    q_arm = "My maize has holes in the young leaves and wet sawdust in the whorl. What is this?"
-    q_ref = "My child has a fever and is vomiting. What medicine should I give?"
-
-    arm_lines = [(f"> {q_arm}", TERM_FG), ("", TERM_FG), (arm, TERM_DIM)]
-    ref_lines = [(f"> {q_ref}", TERM_FG), ("", TERM_FG), (ref, TERM_DIM)]
-    arm_n = sum(len(t) for t, _ in arm_lines)
-    ref_n = sum(len(t) for t, _ in ref_lines)
+    arm_end, ref_end = arm.duration, ref.duration
 
     scenes = [
-        ("title", 8.0, lambda p: card(
+        ("title", 7.0, lambda p: card(
             "AGBE",
             "A farming advisor that runs on an 8GB laptop with the internet switched off.",
             kicker="Àgbẹ̀ · farmer")),
-        ("problem", 10.0, lambda p: card(
+        ("problem", 9.0, lambda p: card(
             "One extension officer per few thousand farms.",
             "The advice exists. It just never reaches the field.",
             kicker="The problem")),
-        ("ask", 20.0, lambda p: terminal(arm_lines, int(arm_n * min(p * 1.45, 1.0)))),
-        ("offline", 12.0, lambda p: terminal(
-            arm_lines, arm_n, banner="NETWORK OFF", banner_col=GREEN)),
-        ("refuse", 20.0, lambda p: terminal(
-            ref_lines, int(ref_n * min(p * 1.45, 1.0)), banner="OUT OF SCOPE")),
-        ("chart", 16.0, lambda p: chart_slide()),
-        ("numbers", 14.0, lambda p: card(
-            "814 MB. 0.88 GB of RAM. 24 tokens a second.",
-            "Measured on the target profile: four threads, no GPU, memory capped. "
-            "47.5 of 50 available engineering points.",
+        # real session, replayed at its recorded timing
+        ("ask", arm_end, lambda p: draw_frame(arm, p * arm_end)),
+        ("offline", 9.0, lambda p: draw_frame(arm, arm_end, banner="NO NETWORK",
+                                              banner_col=(147, 186, 156))),
+        ("refuse", ref_end, lambda p: draw_frame(ref, p * ref_end,
+                                                 banner="OUT OF SCOPE")),
+        ("refuse_hold", 5.0, lambda p: draw_frame(ref, ref_end, banner="OUT OF SCOPE")),
+        ("chart", 15.0, lambda p: chart_slide()),
+        ("numbers", 12.0, lambda p: card(
+            "814 MB on disk. 0.88 GB of RAM. 20 tokens a second.",
+            "That is the run you just watched: four threads, no GPU, memory capped to "
+            "the target profile. 47.5 of the 50 available engineering points.",
             kicker="Measured, not estimated", accent=GREEN)),
-        ("close", 10.0, lambda p: card(
+        ("close", 9.0, lambda p: card(
             "Downloaded once. Then it works with the cable pulled out.",
             "huggingface.co/NEVODESIGN/agbe-1b   ·   agbe-farm.vercel.app",
             kicker="AGBE")),
@@ -177,14 +153,14 @@ def main() -> None:
         shutil.rmtree(FRAMES)
     FRAMES.mkdir(parents=True)
 
-    n, t, timings = 0, 0.0, []
+    n, t, rows = 0, 0.0, []
     for name, secs, maker in scenes:
-        count = int(secs * FPS)
+        count = max(int(secs * FPS), 1)
         for i in range(count):
             maker(i / max(count - 1, 1)).save(FRAMES / f"f{n:06d}.png")
             n += 1
-        timings.append((name, t, secs))
-        print(f"  {name:<10} {t:6.1f}s -> {t + secs:6.1f}s")
+        rows.append((name, t, secs))
+        print(f"  {name:<12} {t:6.1f}s -> {t + secs:6.1f}s")
         t += secs
 
     mp4 = OUT / "agbe-demo.mp4"
@@ -194,9 +170,9 @@ def main() -> None:
         "-movflags", "+faststart", str(mp4),
     ], check=True, capture_output=True)
     shutil.rmtree(FRAMES)
-    print(f"\nwrote {mp4}   total {t:.0f}s   (measured {tps} t/s)")
+    print(f"\nwrote {mp4}   total {t:.1f}s")
     (OUT / "timings.txt").write_text(
-        "".join(f"{a:6.1f}  {b:6.1f}  {nm}\n" for nm, a, b in timings))
+        "".join(f"{a:6.1f}  {b:6.1f}  {nm}\n" for nm, a, b in rows))
 
 
 if __name__ == "__main__":
