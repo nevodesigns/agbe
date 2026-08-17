@@ -63,7 +63,7 @@ agronomy, and over Llama 3.2 1B at identical file size purely on memory.
 
 ### Quantization: Q4_K_M
 
-Q4_K_M gives 814 MB on disk and 0.88 GB peak RAM. Gemma 3 1B has an embedding
+Q4_K_M gives 814 MB on disk. Our harness measured 0.88 GB peak RSS; the official profiler measures 1.01 GB, because it counts overhead ours did not. The official figure is the one reported. Gemma 3 1B has an embedding
 dimension of 1152, which is not divisible by 256, so `llama.cpp` falls back to
 `q5_0` and `q8_0` on several tensors. That is expected, applies equally to the
 reference build, and is why the file is larger than a naive Q4 estimate.
@@ -169,7 +169,7 @@ Measured on an i7-10850H held to the Standard Laptop profile: four threads,
 |---|---|
 | Machine | i7-10850H, Ubuntu 22.04.5 |
 | Model file | 814 MB (Q4_K_M) |
-| RAM at peak | 0.88 GB |
+| RAM at peak | 1.01 GB (official profiler) |
 | Generation speed | 22 to 27 tok/s |
 | Peak core temperature | 83°C at four threads |
 | Thermal throttling | None at four threads |
