@@ -48,8 +48,9 @@ finish a section early, pause. Silence over a held shot is fine.
 ### 0:30 – 0:39 · Network off
 
 > This is the part that matters.
-> There is no internet. No API key, no account, no data cost.
-> The model is on the laptop. It answers the same with the cable pulled out.
+> Look at the status bar. That is aeroplane mode. There is no internet, no API
+> key, no account and no data cost.
+> The model is on the laptop, and it answers exactly the same.
 
 ---
 
@@ -112,7 +113,7 @@ finish a section early, pause. Silence over a held shot is fine.
 - **One take per section** is far easier than one take overall. Join them after.
 - **Do not rush 0:16 to 0:30.** That is where a judge decides whether the model
   actually works, and the text is appearing on screen at the same time.
-- **The two strongest moments** are "there is no internet" at 0:30 and "it
+- **The two strongest moments** are "look at the status bar" at 0:30 and "it
   declines" at 0:39. Slow down slightly for both.
 
 ## Putting the voice on the video

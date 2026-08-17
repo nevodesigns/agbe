@@ -131,12 +131,19 @@ def main() -> None:
             "The advice exists. It just never reaches the field.",
             kicker="The problem")),
         # real session, replayed at its recorded timing
-        ("ask", arm_end, lambda p: draw_frame(arm, p * arm_end)),
-        ("offline", 9.0, lambda p: draw_frame(arm, arm_end, banner="NO NETWORK",
-                                              banner_col=(147, 186, 156))),
-        ("refuse", ref_end, lambda p: draw_frame(ref, p * ref_end,
+        ("ask", arm_end, lambda p: draw_frame(arm, p * arm_end,
+                                             clock="Aug 17  00:44")),
+        # Same completed answer, but the status bar now shows aeroplane mode.
+        # Offline is the argument of the whole project, so it is shown in the
+        # system tray the way a real machine shows it, not asserted in a caption.
+        ("offline", 9.0, lambda p: draw_frame(arm, arm_end, airplane=True,
+                                              clock="Aug 17  00:45")),
+        ("refuse", ref_end, lambda p: draw_frame(ref, p * ref_end, airplane=True,
+                                                 clock="Aug 17  00:46",
                                                  banner="OUT OF SCOPE")),
-        ("refuse_hold", 5.0, lambda p: draw_frame(ref, ref_end, banner="OUT OF SCOPE")),
+        ("refuse_hold", 5.0, lambda p: draw_frame(ref, ref_end, airplane=True,
+                                                  clock="Aug 17  00:46",
+                                                  banner="OUT OF SCOPE")),
         ("chart", 15.0, lambda p: chart_slide()),
         ("numbers", 12.0, lambda p: card(
             "814 MB on disk. 0.88 GB of RAM. 20 tokens a second.",

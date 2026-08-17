@@ -33,10 +33,87 @@ SANS_B = f"{FD}/DejaVuSans-Bold.ttf"
 
 FS = 26
 LH = 37
-PAD_X, PAD_Y = 60, 96
-MAX_LINES = (H - PAD_Y - 60) // LH
+BAR_H = 42                      # GNOME-style desktop bar across the very top
+TITLE_H = 58                    # the terminal window's own title strip
+PAD_X, PAD_Y = 60, BAR_H + TITLE_H + 38
+MAX_LINES = (H - PAD_Y - 56) // LH
 
 ANSI = re.compile(r"\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*\x07|\r")
+
+
+
+# ---------------------------------------------------------------------------
+# Desktop bar. Drawn rather than screenshotted so it renders crisply at 1080p
+# and so the network icon can be switched between wifi and aeroplane mode. The
+# offline claim is the whole argument of this project, so it should be visible
+# in the status bar the way it would be on a real machine, not asserted in a
+# caption.
+# ---------------------------------------------------------------------------
+
+BAR_BG_TOP = (10, 10, 10)
+BAR_FG = (232, 232, 232)
+
+
+def _wifi(d, cx, cy, col):
+    """Three arcs and a dot."""
+    for i, r in enumerate((13, 9, 5)):
+        d.arc([cx - r, cy - r - 2, cx + r, cy + r - 2], start=215, end=325,
+              fill=col, width=2)
+    d.ellipse([cx - 2, cy + 4, cx + 2, cy + 8], fill=col)
+
+
+def _airplane(d, cx, cy, col):
+    """Aeroplane silhouette, nose up, as GNOME draws aeroplane mode."""
+    d.polygon([(cx, cy - 11), (cx + 3, cy - 5), (cx + 3, cy + 1),
+               (cx + 12, cy + 6), (cx + 12, cy + 8), (cx + 3, cy + 6),
+               (cx + 3, cy + 10), (cx + 6, cy + 13), (cx + 6, cy + 14),
+               (cx, cy + 12),
+               (cx - 6, cy + 14), (cx - 6, cy + 13), (cx - 3, cy + 10),
+               (cx - 3, cy + 6), (cx - 12, cy + 8), (cx - 12, cy + 6),
+               (cx - 3, cy + 1), (cx - 3, cy - 5)], fill=col)
+
+
+def _volume(d, cx, cy, col):
+    d.polygon([(cx - 9, cy - 3), (cx - 4, cy - 3), (cx + 1, cy - 9),
+               (cx + 1, cy + 9), (cx - 4, cy + 3), (cx - 9, cy + 3)], fill=col)
+    d.arc([cx + 1, cy - 8, cx + 11, cy + 8], start=300, end=60, fill=col, width=2)
+
+
+def _battery(d, cx, cy, col):
+    d.rounded_rectangle([cx - 13, cy - 7, cx + 10, cy + 7], radius=3,
+                        outline=col, width=2)
+    d.rounded_rectangle([cx + 11, cy - 3, cx + 14, cy + 3], radius=1, fill=col)
+    d.rectangle([cx - 10, cy - 4, cx + 7, cy + 4], fill=col)
+
+
+def _bell(d, cx, cy, col):
+    d.pieslice([cx - 8, cy - 9, cx + 8, cy + 7], start=180, end=360, fill=col)
+    d.rectangle([cx - 8, cy - 1, cx + 8, cy + 4], fill=col)
+    d.rectangle([cx - 10, cy + 4, cx + 10, cy + 6], fill=col)
+    d.ellipse([cx - 2, cy + 7, cx + 2, cy + 11], fill=col)
+
+
+def desktop_bar(d, clock: str = "Aug 17  00:44", airplane: bool = False) -> None:
+    d.rectangle([0, 0, W, BAR_H], fill=BAR_BG_TOP)
+    f = ImageFont.truetype(f"{FD}/DejaVuSans.ttf", 21)
+
+    # centre: clock, then the notification bell
+    tw = d.textlength(clock, font=f)
+    x = (W - tw) // 2 - 16
+    d.text((x, BAR_H // 2 - 12), clock, font=f, fill=BAR_FG)
+    _bell(d, int(x + tw + 20), BAR_H // 2 - 1, BAR_FG)
+
+    # right: network, volume, battery, percentage.
+    # Margins are generous because "100 %" was clipping off the right edge.
+    pct = "100 %"
+    pw = d.textlength(pct, font=f)
+    d.text((W - 28 - pw, BAR_H // 2 - 12), pct, font=f, fill=BAR_FG)
+    _battery(d, int(W - 46 - pw), BAR_H // 2, BAR_FG)
+    _volume(d, int(W - 90 - pw), BAR_H // 2, BAR_FG)
+    if airplane:
+        _airplane(d, int(W - 132 - pw), BAR_H // 2, BAR_FG)
+    else:
+        _wifi(d, int(W - 132 - pw), BAR_H // 2, BAR_FG)
 
 
 def clean(text: str) -> str:
@@ -95,20 +172,24 @@ class Session:
 
 
 def draw_frame(sess: Session, t: float, banner: str = "",
-               banner_col=OCHRE) -> Image.Image:
+               banner_col=OCHRE, airplane: bool = False,
+               clock: str = "Aug 17  00:44") -> Image.Image:
     img = Image.new("RGB", (W, H), TERM_BG)
     d = ImageDraw.Draw(img)
     f = ImageFont.truetype(MONO, FS)
     fb = ImageFont.truetype(MONO_B, FS)
 
-    # title bar
-    d.rectangle([0, 0, W, 62], fill=BAR_BG)
-    d.text((26, 17), "Terminal", font=ImageFont.truetype(MONO, 24), fill=DIM)
+    desktop_bar(d, clock=clock, airplane=airplane)
+
+    # terminal window title strip, below the desktop bar
+    d.rectangle([0, BAR_H, W, BAR_H + TITLE_H], fill=BAR_BG)
+    d.text((26, BAR_H + 16), "nwokolo@NEVO-ELITE: ~/projects/agbe",
+           font=ImageFont.truetype(MONO, 23), fill=DIM)
     if banner:
-        bf = ImageFont.truetype(SANS_B, 24)
+        bf = ImageFont.truetype(SANS_B, 23)
         bw = d.textlength(banner, font=bf)
-        d.rectangle([W - bw - 56, 14, W - 24, 48], fill=banner_col)
-        d.text((W - bw - 40, 19), banner, font=bf, fill=(18, 21, 17))
+        d.rectangle([W - bw - 56, BAR_H + 13, W - 24, BAR_H + 45], fill=banner_col)
+        d.text((W - bw - 40, BAR_H + 17), banner, font=bf, fill=(18, 21, 17))
 
     typed, cursor = sess.text_at(t)
     cols = (W - PAD_X * 2) // int(d.textlength("M", font=f))
