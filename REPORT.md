@@ -85,6 +85,32 @@ all-core power limit caps clocks and spreads the same work cooler. Because `S_pe
 caps at 15 tok/s, surplus throughput can be traded for thermal headroom at no cost
 to the score. Ten points recovered from a quirk of the formula.
 
+### Thermal: the penalty we could not avoid
+
+Our own harness, which measures generation at four threads, peaked at 83C and
+took no penalty. The official profiler also runs a 512-token prompt-processing
+pass, which is a far heavier sustained load, and on this i7-10850H it reaches
+100C and throttles **from a 55C cold start, with the case elevated and a fan on**.
+
+We tried pinning to four physical cores, since the Standard Laptop is a four-core
+machine and `llama-bench` otherwise loads all six. It made things worse: 14.88
+tok/s, below the 15 tok/s threshold, and it still throttled.
+
+| Run | tok/s | Peak RAM | Peak °C | Throttled | Points |
+|---|---|---|---|---|---|
+| 6 cores, cold start | 23.24 | 1.01 GB | 100.0 | yes | **37.10** |
+| 4 cores, cold start | 14.88 | 1.01 GB | 100.0 | yes | 36.86 |
+
+**So we report 37.10 of 50, not the 47.48 our own harness suggested.** The
+difference is entirely the ten-point thermal penalty, which this particular
+laptop incurs under sustained all-core load regardless of starting temperature.
+
+Whether that penalty actually applies to our score is an open question we have
+put to the organisers: `P_thermal` may be assessed from the participant's
+`submission.json`, or measured in the audit sandbox, where our laptop's cooling
+is irrelevant. We report the number we measured rather than the one we would
+prefer.
+
 ### Alternatives considered and rejected
 
 - **Qwen2.5 1.5B**, tried late to buy accuracy with capacity. Abandoned: training
@@ -170,10 +196,10 @@ Measured on an i7-10850H held to the Standard Laptop profile: four threads,
 | Machine | i7-10850H, Ubuntu 22.04.5 |
 | Model file | 814 MB (Q4_K_M) |
 | RAM at peak | 1.01 GB (official profiler) |
-| Generation speed | 22 to 27 tok/s |
-| Peak core temperature | 83°C at four threads |
-| Thermal throttling | None at four threads |
-| Engineering points | **47.48 / 50** |
+| Generation speed | 23.24 tok/s (official profiler) |
+| Peak core temperature | 83°C our harness, 100°C official profiler |
+| Thermal throttling | None in our harness; **yes** under the official profiler |
+| Engineering points | **37.10 / 50** (official profiler, includes the −10 thermal penalty) |
 
 These are self-reported development benchmarks. Official scores are measured by the
 ADTC profiler on the standard evaluation machine.
