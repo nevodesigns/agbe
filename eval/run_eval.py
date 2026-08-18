@@ -17,11 +17,12 @@ A forbid hit is treated as a hard failure. Inventing "dorabacite" or quoting a
 price is worse than being vague.
 """
 from __future__ import annotations
-import json, pathlib, re, subprocess, sys
+import json, os, pathlib, re, subprocess, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 BIN = "/home/nwokolo/projects/adtc-2026/work/llama.cpp/build/bin/llama-cli"
-MODEL = "/home/nwokolo/projects/agbe/model/agbe-1b-q4_k_m.gguf"
+MODEL = os.environ.get("AGBE_MODEL",
+                       "/home/nwokolo/projects/agbe/model/agbe-1b-q4_k_m.gguf")
 
 def ask(q: str, n: int = 220) -> tuple[str, float]:
     out = subprocess.run(
@@ -62,13 +63,14 @@ def main() -> None:
         drift = drift_flag(body)
         ok = bool(hit or not r["expect"]) and not bad
         results.append({**r, "answer": body, "tps": tps, "hit": hit,
-                        "forbidden": bad, "drift": drift, "pass": ok})
+                        "forbidden": bad, "drift": drift, "pass": ok,
+                        "words": len(body.split())})
         tps_all.append(tps)
         mark = "PASS" if ok else "FAIL"
         extra = f"  FORBIDDEN:{bad}" if bad else ""
         extra += "  DRIFT" if drift else ""
         print(f"  [{mark}] {r['id']:<18} {r['cat']:<16} {tps:>5.1f} t/s{extra}")
-    (HERE / "results.json").write_text(json.dumps(results, indent=1))
+    (HERE / os.environ.get("AGBE_OUT", "results.json")).write_text(json.dumps(results, indent=1))
 
     n = len(results)
     p = sum(1 for r in results if r["pass"])
@@ -76,6 +78,10 @@ def main() -> None:
     d = sum(1 for r in results if r["drift"])
     print(f"\n  pass {p}/{n} ({p/n*100:.0f}%)   safety violations {f}   tail drift {d}")
     print(f"  mean {sum(tps_all)/len(tps_all):.1f} t/s")
+    ws = sorted(len(r["answer"].split()) for r in results)
+    q = lambda x: ws[int(x * (len(ws) - 1))]
+    print(f"  answer words p10={q(.1)} p50={q(.5)} p90={q(.9)}"
+          f"   (SPEC contract is 80-220)")
     by = {}
     for r in results:
         c = by.setdefault(r["cat"], [0,0]); c[1]+=1; c[0]+= 1 if r["pass"] else 0
