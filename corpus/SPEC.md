@@ -6,12 +6,12 @@ to this.
 ## The scoring reality
 
 `S_acc` is 50% of the total and is **judged by humans reading generated answers**. We
-submit 2 test prompts; organisers add 3 hidden prompts in the agriculture domain. There
+submit 2 test prompts; organisers add 2 hidden prompts in the agriculture domain. There
 is no official dataset and no automated accuracy metric in the scoring path.
 
 Three consequences:
 
-1. **Breadth beats depth.** We cannot predict the 3 hidden prompts. A model that answers
+1. **Breadth beats depth.** We cannot predict the 2 hidden prompts. A model that answers
    any reasonable smallholder question competently scores better than one that is
    excellent on cassava and lost on poultry.
 2. **Style is scored, not just facts.** A judge reading a 1B model's answer is grading
@@ -60,9 +60,9 @@ judging panel includes agronomists who will notice invented chemistry.
 
 ## Language scope
 
-`language_scope: ["en", "pcm"]`
+`language_scope: ["en"]`
 
-English is primary and will carry the hidden prompts. Nigerian Pidgin (`pcm`) is included
+English only. Nigerian Pidgin (`pcm`) was built and tested, then WITHDRAWN
 as a genuine African-alpha differentiator: it is what a large share of the target users
 actually speak, and it is the same bilingual pattern that worked in LogSight. Pidgin is a
 minority of the corpus so it cannot degrade English quality, and it is only ever used to

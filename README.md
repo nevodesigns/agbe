@@ -1,190 +1,206 @@
-# ADTC 2026 — Submission Template
+# AGBE — an offline agricultural extension model for 8 GB laptops
 
-This is the official template repository for the **Africa Deep Tech Challenge 2026** Laptop LLM track.
+**Àgbẹ̀** is Yoruba for *farmer*. AGBE answers farming questions on an ordinary
+laptop with the internet switched off: crops, pests, livestock, soils, storage
+and getting produce to market.
 
-Fork this repository, fill in the required files, and submit your repository URL via [adtc-2026.devpost.com](https://adtc-2026.devpost.com).
-
----
-
-## ✅ Submission Checklist
-
-Before submitting, confirm every item:
-
-- [ ] Your repository is **public** on GitHub
-- [ ] `metadata.json` is fully filled in — no placeholder values remain
-- [ ] `metadata.json` contains exactly **2 test prompts** in the `test_prompts` array, written for your chosen domain
-- [ ] `download_model.sh` successfully downloads your model to `model/`
-- [ ] The downloaded file is a valid **GGUF format** (`.gguf`) weight file
-- [ ] `model/*.gguf` is listed in `.gitignore` — do **not** commit large weight files
-- [ ] `REPORT.md` is filled in with your technical writeup
-- [ ] Running `bash download_model.sh` completes without errors
-- [ ] Your model runs entirely **offline** — zero external network calls during inference
+- **Live site and build notes:** https://agbe-farm.vercel.app
+- **Weights:** https://huggingface.co/NEVODESIGN/agbe-1b
+- **Technical report:** [REPORT.md](REPORT.md)
+- **Domain:** Agriculture · **Base:** Gemma 3 1B · **Runtime:** llama.cpp · **Quant:** GGUF Q4_K_M
 
 ---
 
-## 📁 Required File Structure
+## Try it in two commands
+
+```bash
+bash download_model.sh          # 814 MB, resumes if the connection drops
+llama-cli -m model/agbe-1b-q4_k_m.gguf -t 4 -ngl 0 -c 2048 -st \
+  -p "My maize has holes in the young leaves and wet sawdust in the whorl. What is this?"
+```
+
+Then disconnect your network and run it again. Nothing changes, which is the point.
+
+---
+
+## The problem
+
+Nigeria has roughly one agricultural extension officer for every few thousand
+farming households. The knowledge that would raise a smallholder's yield is not
+secret and it is not new. It sits in extension manuals, and it does not travel
+the last mile, because the last mile has no officer and often no signal.
+
+The obvious answer is a farming chatbot, and it breaks the moment you look at
+where farmers actually are. Rural coverage is patchy, mobile data is a real cost
+paid from a thin margin, and a tool that needs the network is absent on the
+morning the armyworm arrives.
+
+**Offline is not a feature we added. It is the shape of the whole thing.** If it
+cannot answer with the cable pulled, on hardware a farmer or co-operative already
+owns, it does not count.
+
+---
+
+## Measured results
+
+Official `adtc-profiler`, participant mode, on the target profile
+(4 threads, `-ngl 0`, no GPU):
+
+| Metric | Value |
+|---|---|
+| Throughput | **26.23 tok/s** (reference is 15.0) |
+| Peak RSS | **1,039 MB** |
+| Steady RSS | 982 MB |
+| Model file | 814 MB |
+| `arc_easy` (50 samples) | **0.58** `acc_norm` |
+| S_perf | **100.00** |
+| S_eff | **85.15** |
+| Engineering subtotal | **47.03 / 50** |
+
+Raw output is committed as [`submission.json`](submission.json).
+
+**Thermal, stated honestly.** Our development laptop (i7-10850H, thin chassis)
+reaches 100°C and throttles during the profiler's 512-token prompt-processing
+pass, so the participant run carries the flag. In generation alone at four
+threads it peaks at 83°C. The profiler measures thermals again during audit
+(`measured_on = "audit_cloud_vm"`), so the final penalty is determined by the
+evaluation environment, not by this number. We are not claiming it will be zero.
+
+---
+
+## Why a 1B model, not the biggest that fits
+
+The scoring function decides this, if you read it before writing code:
 
 ```
-your-submission/
-├── metadata.json          ← Required. Team, model, and test prompt metadata.
-├── download_model.sh      ← Required. Downloads your .gguf model weight file.
-├── REPORT.md              ← Required. Technical writeup (problem, design, benchmarks).
-├── model/
-│   └── your-model.gguf   ← Downloaded by the script above. Do NOT commit.
-└── .gitignore             ← Must exclude *.gguf and model/ from version control.
+S_total = 0.50·S_acc + 0.30·S_perf + 0.20·S_eff − P_thermal
+S_perf  = min(TPS ÷ 15.0, 1.0) × 100
+S_eff   = max(0, (7.0 − peak RAM GB) ÷ 7.0) × 100
+```
+
+Throughput above 15 tok/s earns **nothing**, and memory is charged linearly. So
+running the largest model that fits in 8 GB is backwards. We measured five
+candidates rather than reasoning about them:
+
+| Model | tok/s | Peak RAM | S_perf | S_eff | Points /50 |
+|---|---|---|---|---|---|
+| Qwen2.5 0.5B | 46.6 | 0.50 GB | 100 | 92.9 | 48.57 |
+| **Gemma 3 1B** | **26.9** | **0.88 GB** | **100** | **87.4** | **47.48** |
+| Llama 3.2 1B | 22.8 | 1.26 GB | 100 | 82.0 | 46.39 |
+| Qwen2.5 1.5B | 24.9 | 1.69 GB | 100 | 75.9 | 45.19 |
+| Qwen2.5 3B | 11.5 | 3.26 GB | 76.4 | 53.4 | 32.94 |
+
+A 3B concedes **14.5 points** before answering a single question.
+
+---
+
+## What it does, and what it refuses
+
+**It will** identify a pest from field symptoms and tell you how to confirm it
+before spending money; give spacing, timing and rotation advice for crops
+actually grown here; cover poultry, goats, catfish, soils, drying and storage;
+hold a conversation, so "what if I cannot afford that" gets a real answer.
+
+**It will not** give an agrochemical dose (rates differ by product; a confident
+wrong number is dangerous), quote a market price, advise on human health, or
+pretend a virus has a cure.
+
+Refusal is trained into the weights, not bolted on in a prompt, so it survives
+`llama-cli` with no system prompt. **8.9%** of the corpus teaches where the
+model's competence ends.
+
+---
+
+## The corpus
+
+No dataset ships with this challenge, so the corpus is the substantive work.
+
+**Provenance rule:** every training pair is composed from a curated fact base of
+established extension practice ([`corpus/facts.json`](corpus/facts.json)). If a
+fact is not in that file, it cannot appear in the corpus. Scraping the web or
+having a large model write the answers would both have been faster, and both put
+claims into training data nobody can trace. Agronomists notice invented
+chemistry.
+
+**697 conversations**, 9% multi-turn, 8.9% refusals and honest limits.
+
+```
+corpus/facts.json        curated fact base, the single source of truth
+corpus/generate.py       composes conversations from facts
+corpus/gold*.py          hand-written exemplars (refusals, Pidgin, corrections)
+corpus/build/train.jsonl generated training set
+eval/                    22-prompt battery + automatic scorer
+train/train_lora.py      LoRA trainer, no trl
+train/AGBE_train_kaggle.ipynb  full pipeline on a free Kaggle T4
 ```
 
 ---
 
-## 📝 metadata.json
+## What seven builds taught us
 
-Fill in every field. No field should remain at its placeholder value.
+Every build was judged by **reading its answers**, not by its loss curve. The
+loss curve looked healthy for every failure below.
 
-```json
-{
-  "team_id": "your-team-id",
-  "domain": "coding_assistants",
-  "language_scope": ["en"],
-  "african_alpha_claim": false,
-  "budget_laptop_claim": true,
-  "submitter": {
-    "name": "your-name",
-    "email": "your-email@domain.com",
-    "github_handle": "your-github"
-  },
-  "cross_disciplinary_pairing": {
-    "discipline": "education",
-    "load_bearing": true,
-    "description": "Brief description of how your model serves a real-world domain."
-  },
-  "test_prompts": [
-    {
-      "prompt_id": "tp_001",
-      "prompt": "Your first test prompt, written for your chosen domain."
-    },
-    {
-      "prompt_id": "tp_002",
-      "prompt": "Your second test prompt, written for your chosen domain."
-    }
-  ],
-  "model": {
-    "name": "YourModel-Q4_K_M",
-    "runtime": "llama.cpp",
-    "quantization": "GGUF Q4_K_M",
-    "parameters_estimate": "1.1B",
-    "packaging": "binary_bundle"
-  },
-  "_runtime": {
-    "model_path": "model/your-model.gguf"
-  }
-}
-```
-
-### Field Reference
-
-| Field | Required | Description |
+| Build | Change | Result |
 |---|---|---|
-| `team_id` | ✅ | Your unique team ID as registered on the ADTF portal |
-| `domain` | ✅ | Your challenge track. One of: `math_scientific_reasoning`, `healthcare_medical`, `agriculture`, `creative_writing`, `coding_assistants`, `corporate_enterprise`, `autonomous_ai_agents` |
-| `language_scope` | ✅ | Array of BCP-47 language codes. Must include at least one. |
-| `african_alpha_claim` | ✅ | `true` only if claiming the African Use Case Bonus |
-| `budget_laptop_claim` | ✅ | Must be `true` — all submissions target the 8 GB RAM laptop profile |
-| `submitter.name` | ✅ | Full name of the team member submitting the run |
-| `submitter.email` | ✅ | Valid email address linked to the registered team |
-| `submitter.github_handle` | ✅ | Verifiable GitHub username |
-| `cross_disciplinary_pairing.discipline` | ✅ | The deep-tech discipline your model serves |
-| `cross_disciplinary_pairing.load_bearing` | ✅ | `true` if the pairing is integral to the submission, not cosmetic |
-| `test_prompts` | ✅ | **Exactly 2 prompts** in your chosen domain. Organizers will add 2 hidden prompts to test for overfitting. |
-| `model.runtime` | ✅ | Must be `llama.cpp`. No other runtime is accepted. |
-| `model.quantization` | ✅ | Must be a GGUF quantization format (e.g. `GGUF Q4_K_M`, `GGUF Q5_K_M`) |
-| `model.parameters_estimate` | ✅ | Approximate parameter count (e.g. `135M`, `1.1B`, `7B`) |
-| `model.packaging` | ✅ | How the model is packaged. One of: `docker_image`, `docker_build_from_repo`, `binary_bundle` |
-| `_runtime.model_path` | ✅ | Relative path from repo root to your `.gguf` file (e.g. `model/my-model.gguf`) |
+| v1 | r16, 3ep, 375 examples | Learned our answer scaffolding, not the agronomy. Told a parent to take a feverish child to an extension officer. |
+| v2 | Removed repeated leads, 568 examples | Stapled unrelated facts together; the generator padded answers with other topics' facts. |
+| v3 | Stopped cross-topic mixing | Refusal and timing correct. Pest wrong ("pod borers"). |
+| v4 | 42 fall-armyworm mentions | Invented "fall army weevil". More examples do not fix a confusion. |
+| v5 | **r32**, 5 epochs | Facts finally correct. Coherence broke: word salad, invented a pesticide called "dorabacite". |
+| v6/v7 | **r32, 3 epochs** | English facts and refusal correct and stable. |
+| v8 | Corrective exemplars from measured failures | Current. |
+
+**Three separate axes, which took five builds to separate:**
+
+- **Behaviours** (refusing, hedging) generalise from few examples. Fixed at rank 16.
+- **Facts** (which pest, which symptom) need model *capacity*. Only fixed at rank 32.
+- **Coherence** degrades with over-training, fixed by fewer epochs.
+
+Four corpus iterations preceded any change to the training configuration. That
+was the mistake: rank was the missing variable the whole time.
 
 ---
 
-## 📥 download_model.sh
+## Known limitations
 
-This script **must** download your model weight file to the `model/` directory.
-
-Rules:
-- Must be idempotent — safe to run multiple times without re-downloading.
-- Must work without any credentials — your weights must be publicly accessible.
-- The downloaded file path must exactly match `_runtime.model_path` in `metadata.json`.
-
-Recommended hosting options for your weights:
-- [Hugging Face](https://huggingface.co) — public model repos (free, best for GGUF files)
-- GitHub Release Assets — attach the `.gguf` file to a GitHub Release
-- Any stable public URL (GCS public bucket, S3 public object, etc.)
-
----
-
-## 📄 REPORT.md
-
-Your technical writeup. Judges and the LLM-based audit system will read this to understand your submission. Cover:
-
-1. **Problem** — What problem are you solving? Who is the target user in an African context?
-2. **Design Decisions** — What model did you start from? Why that quantization level? What alternatives did you evaluate?
-3. **Constraints** — What hardware, connectivity, or data constraints shaped your approach?
-4. **Benchmarks** — What inference speed and memory numbers did you observe on your development machine?
-
-Keep it factual and specific. One to three pages is ideal.
+- **Tail drift.** Answers are reliable for the first sentences and can add
+  plausible, unsupported detail afterwards. Measured, not assumed: see
+  [`eval/`](eval/).
+- **Open-domain agronomy is weaker than the drilled topics.** It is strong on
+  fall armyworm, refusals and post-harvest, weaker on topics thinly covered by
+  the fact base.
+- **English only.** Nigerian Pidgin was built, tested and **withdrawn**: it
+  worked in one build and in the next named *amala*, a food, as a maize pest. We
+  removed `pcm` from `language_scope` rather than ship a claim that fails half
+  the time.
+- It is a knowledgeable extension pamphlet that holds a conversation, not an
+  agronomist, and not a vet or a doctor.
 
 ---
 
-## 🧪 Local Testing
-
-The ADTC profiler is open source. Install it directly from the official repository:
+## Reproducing this
 
 ```bash
-pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+python corpus/generate.py                       # rebuild the corpus from facts
+python train/train_lora.py --train corpus/build/train.jsonl --out out --merge
+python eval/run_eval.py                         # 22-prompt battery, scored
+adtc-profiler run --submission . --mode participant --output submission.json
 ```
 
-Then run a local smoke test before submitting:
-
-```bash
-# 1. Download your weights
-bash download_model.sh
-
-# 2. Run the profiler in participant mode
-adtc-profiler run \
-  --submission . \
-  --mode participant \
-  --output submission.json \
-  --skip-accuracy
-
-# 3. Review your report
-cat submission.json
-```
-
-A valid run produces a `submission.json` with `"measured_on": "participant_laptop"`.
-
-The profiler source code, including the thermal monitoring logic and scoring formulas, is publicly readable at:
-[github.com/Africa-Deep-Tech-Foundation/adtc-profiler](https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler)
+`train/AGBE_train_kaggle.ipynb` runs the whole pipeline end to end on a free
+Kaggle T4, including GGUF conversion and quantisation.
 
 ---
 
-## ⚠️ Rules
+## Submission
 
-1. **Public repository required.** Your repository must be public at the time of evaluation.
-2. **No model weights in git.** Add `*.gguf` and `model/` to your `.gitignore`. The evaluator downloads weights fresh via `download_model.sh`.
-3. **100% offline during evaluation.** Your model must run with zero external network dependencies during our testing window. `download_model.sh` runs before the profiler starts, but once profiling begins, no outbound requests are permitted.
-4. **llama.cpp only.** All models must use GGUF weights and run through `llama.cpp`. No other runtime is supported by our evaluation framework.
-5. **8 GB RAM limit.** Your model must run within the standard laptop profile (4 vCPU, 8 GB RAM, integrated GPU only). Out-of-memory errors during evaluation result in automatic disqualification.
-6. **No size restriction.** There is no parameter count or file size cap — but the 8 GB RAM constraint is strict. Plan your quantization level accordingly.
-7. **Two test prompts required.** Your `metadata.json` must include exactly 2 prompts in the `test_prompts` array. Organizers will generate 2 additional hidden prompts within your domain. All 4 are used for scoring.
+`metadata.json` declares the domain, the two test prompts and the model. The
+`.gguf` is not committed; `download_model.sh` fetches it from a public URL with
+no credentials and verifies the length before accepting it.
 
----
+Base model Gemma 3 1B, used under the
+[Gemma Terms of Use](https://ai.google.dev/gemma/terms). Inference on
+[llama.cpp](https://github.com/ggml-org/llama.cpp).
 
-## 🆘 Support
-
-Open an issue in this repository or contact the ADTF team at challenge@africadeeptech.org.
-
-View the full eligibility rules at [adtc-2026.devpost.com/rules](https://adtc-2026.devpost.com/rules).
-
----
-
-## 📄 License
-
-This template is licensed under the terms of the [GNU GPL v3 License](LICENSE).
-
+**Nwokolo Victor Oluebubechukwu**, Lagos · Africa Deep Tech Challenge 2026
