@@ -219,6 +219,32 @@ the mistake: rank was the missing variable the whole time.
 
 ---
 
+## Submitted test prompts
+
+These are the two prompts in `metadata.json`, reproduced here so the report and
+the submission cannot drift apart. Organisers add three hidden prompts of their
+own to catch models tuned to their own examples, so neither of these appears in
+the training corpus.
+
+**Test prompt 1**
+
+> My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this and what should I do about it?
+
+The flagship diagnostic case. It gives the model a symptom description rather
+than a pest name, so it has to identify fall armyworm from the frass in the
+whorl and then say how to confirm it before spending money.
+
+**Test prompt 2**
+
+> I farm half a hectare in the Guinea savanna and I have almost no money this season. What is the single most useful thing I can do for my maize?
+
+Deliberately different in kind. This is a constraint question, not an
+identification one: there is no pest to name, and the model has to reason about
+what is worth doing when there is no money for inputs. It tests whether the
+model gives practical, costed advice or reaches for a generic answer.
+
+---
+
 ## Benchmarks
 
 Measured on an i7-10850H held to the Standard Laptop profile: four threads,
