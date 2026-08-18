@@ -53,7 +53,14 @@ SYSTEM = (
 SYSTEM_PROB = 0.25
 
 # How many times the hand-written gold set is repeated in training.
-GOLD_REPEAT = 4
+GOLD_REPEAT = 5
+
+# Hardening exemplars (hijack resistance, refusal-that-stops, pest discrimination)
+# get extra weight. The 66-prompt baseline showed the model refusing in sentence
+# one and then supplying a paediatric paracetamol dose anyway, so these behaviours
+# have to dominate the drift, not merely be present.
+HARD_FORMS = {"hijack", "safety", "boundary", "discriminate", "honest_limit"}
+HARD_EXTRA = 3
 
 CROP_DISPLAY = {
     "cassava": ("cassava", False), "maize": ("maize", False),
@@ -289,6 +296,25 @@ POST_ACTIONS = {
 }
 
 
+MARKET_ACTIONS = {
+    "harvest_glut": "avoid selling into the harvest glut",
+    "storage_arbitrage": "decide whether to store or sell now",
+    "aggregation": "sell through a group",
+    "grading": "grade and pack my produce",
+    "price_variability": "find out what my crop is worth",
+    "contract_caution": "judge an off-taker agreement",
+    "input_cost": "decide whether an input is worth buying",
+}
+WEATHER_ACTIONS = {
+    "no_forecast": "know when the rains have really started",
+    "false_start": "avoid planting too early",
+    "dry_spell": "plan for a dry spell",
+    "harmattan": "work with the harmattan",
+    "flood_risk": "protect a low lying field",
+    "climate_shift": "cope with rains that keep shifting",
+}
+
+
 def build_zones(rng: random.Random) -> list[dict]:
     out: list[dict] = []
     for zone, desc in FACTS["zones"].items():
@@ -327,6 +353,10 @@ def main() -> None:
     pairs += build_block(rng, "livestock", "livestock_poultry_fish", LIVESTOCK_ACTIONS)
     pairs += build_block(rng, "soil_water", "soil_fertiliser_water", SOIL_ACTIONS)
     pairs += build_block(rng, "postharvest", "postharvest_storage_market", POST_ACTIONS)
+    # ADTC names four pillars: crop, livestock, weather, market. The last two
+    # had no dedicated block, so a hidden prompt on either had little to draw on.
+    pairs += build_block(rng, "market", "market_advisory", MARKET_ACTIONS)
+    pairs += build_block(rng, "weather", "weather_advisory", WEATHER_ACTIONS)
     pairs += build_zones(rng)
     pairs += build_multiturn(
         rng, FACTS,
@@ -340,6 +370,8 @@ def main() -> None:
     # officer. Oversampling weights those behaviours without inventing more data.
     gold = load_gold()
     pairs += gold * GOLD_REPEAT
+    pairs += [g for g in gold
+              if g["_meta"].get("form") in HARD_FORMS] * HARD_EXTRA
 
     seen, deduped = set(), []
     for p in pairs:

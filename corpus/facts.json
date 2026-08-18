@@ -352,7 +352,15 @@
     "cattle_dry_season": "Dry season feed is the binding constraint on cattle in most of the savanna, and it is a planning problem rather than an emergency. Conserve crop residues at harvest, when they are free and abundant, instead of buying feed at the peak of scarcity. An animal that loses heavy condition in the dry season spends the following wet season regaining it rather than growing.",
     "rabbits": "Rabbits suit very small capital: they breed quickly, eat forage rather than competing with the household for grain, and need little space. The failure point is housing. Hutches must stay dry and well ventilated but out of direct sun and rain, because rabbits tolerate cold far better than heat or damp.",
     "beekeeping": "Site hives away from paths, livestock and homes, with shade and water within reach, because bees that must fly far for water work less and defend more. Harvest leaves enough honey for the colony to hold through the dearth period, and a colony stripped bare will abscond. Beekeeping fits well beside cropping, since the same bees improve pollination on nearby fields.",
-    "tilapia": "Tilapia breed readily in ponds, and that is the main problem rather than a benefit: the pond fills with small fish competing for feed and none reach market size. Stocking mono-sex fingerlings, or managing recruitment with a predator species, is what keeps them growing. Feed and water exchange then determine how fast."
+    "tilapia": "Tilapia breed readily in ponds, and that is the main problem rather than a benefit: the pond fills with small fish competing for feed and none reach market size. Stocking mono-sex fingerlings, or managing recruitment with a predator species, is what keeps them growing. Feed and water exchange then determine how fast.",
+    "poultry_biosecurity": "Biosecurity is what keeps a small flock alive, and it costs almost nothing. Do not bring birds back from market into the flock without keeping them separate first. Restrict who walks into the pen, since disease travels on boots and hands. Feed and water the healthy birds before you handle any sick ones, never the other way round.",
+    "poultry_water": "Birds go off feed long before they go off water, so a bird that stops drinking is in trouble. Clean drinkers daily, because warm dirty water grows the organisms that cause the scours you will be treating next week. In hot weather birds need far more water than feed by weight.",
+    "newcastle_signs": "Sudden high mortality across the flock, twisted necks and nervous signs, greenish droppings and a sharp drop in laying point at Newcastle disease. There is no treatment once a flock breaks; vaccination beforehand is the control. Unvaccinated backyard flocks are the ones periodically wiped out.",
+    "coccidiosis_signs": "Blood in the droppings, huddling, ruffled feathers and poor growth point at coccidiosis. Wet caked litter is the driver, so fixing litter and ventilation prevents recurrence better than repeated medication does.",
+    "goat_worms": "Worm burden rises in the wet season when larvae survive on pasture. Pale gums and poor condition despite adequate feed suggest a heavy burden. Rotate products rather than using the same one every time, because repeating one breeds resistance, and ask locally which still works.",
+    "cattle_down": "A cow that has been down for more than a day is an emergency, not a management question. Causes range from metabolic to injury to infectious, and telling them apart needs hands on the animal. Call a veterinary officer rather than treating blind.",
+    "fish_water": "In a catfish pond the water is the environment and the waste bin at once. Fish gulping at the surface, feed left uneaten, or a sudden smell mean the water cannot carry the load. Exchange water or reduce stocking; feeding harder into bad water makes it worse.",
+    "livestock_escalate": "Sudden deaths across several animals, nervous signs, mouth or foot lesions, or anything spreading quickly are reasons to contact a veterinary or extension officer the same day rather than treating on your own. Some of these are notifiable, and the response is a district-level one."
   },
   "zones": {
     "sahel": "Very short erratic season, roughly 250 to 500mm. Millet, sorghum, cowpea. Drought escape through short duration varieties matters more than yield potential.",
@@ -361,5 +369,22 @@
     "derived": "Transition zone, in places two peaks of rain, supporting an early and a late crop.",
     "humid_forest": "High rainfall with two seasons. Cassava, plantain, cocoa, oil palm, vegetables. Disease pressure is high because humidity is high.",
     "planting_rule": "Plant on established rains, not on the first shower, in every zone. A false start is the most expensive common mistake."
+  },
+  "market": {
+    "harvest_glut": "Everyone harvests at once and the price falls exactly when your crop is ready. Selling at the farm gate on the day of harvest is the most expensive habit in smallholder farming, because you are selling into the moment of maximum supply.",
+    "storage_arbitrage": "If you can dry properly and store so quality holds, selling later usually earns more. The gain has to be weighed against storage losses and the cash you need now, which is why storage only pays when the drying and the bags are done properly.",
+    "aggregation": "Selling as a group reaches buyers who will not deal in small lots, and spreads the cost of transport, storage and testing. For most smallholders this is the largest single price gain available in a season, larger than most agronomic changes.",
+    "grading": "Grading into uniform sizes and packing cleanly earns more for the same crop, because buyers pay for predictability and discount lots they must sort themselves.",
+    "price_variability": "Prices move week to week and differ between markets, so a number quoted from anywhere other than your own market on the day is unreliable. Traders at the market, other farmers who sold recently, and farmer associations are the practical sources.",
+    "contract_caution": "An off-taker agreement can be worth more than a high spot price because it removes uncertainty, but read what happens if you cannot deliver the volume. Agreements that penalise shortfall are dangerous in a season with poor rains.",
+    "input_cost": "Judge an input by the extra yield it returns, not by its price per bag. A cheap fertiliser broadcast badly can cost more per kilogram of grain than a more expensive one placed correctly."
+  },
+  "weather": {
+    "no_forecast": "Live weather is not something an offline model can provide. What it can do is explain what to watch for: rains that have fallen steadily for several days and wet soil below the surface, rather than a single shower.",
+    "false_start": "Planting on the first shower is the most expensive common mistake. A false start kills the stand and forces a replant, paying twice for seed and labour in the same season.",
+    "dry_spell": "A dry spell during flowering costs more yield than the same gap at any other stage. If a dry spell is likely, choosing a shorter duration variety that escapes it matters more than chasing maximum yield potential.",
+    "harmattan": "The harmattan brings dry dusty air that speeds drying, which helps a harvested crop and hurts a standing one. Plan drying and storage around it and protect late vegetables from the desiccating wind.",
+    "flood_risk": "On low lying or fadama land, raised beds and drainage channels dug before the rains are worth more than anything done once water is standing.",
+    "climate_shift": "Farmers across the region report rains starting later and stopping earlier than they used to. Shorter duration varieties and staggered planting hedge against a season that does not behave like the last one."
   }
 }
