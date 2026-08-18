@@ -62,11 +62,19 @@ judging panel includes agronomists who will notice invented chemistry.
 
 `language_scope: ["en"]`
 
-English only. Nigerian Pidgin (`pcm`) was built and tested, then WITHDRAWN
-as a genuine African-alpha differentiator: it is what a large share of the target users
-actually speak, and it is the same bilingual pattern that worked in LogSight. Pidgin is a
-minority of the corpus so it cannot degrade English quality, and it is only ever used to
-answer a Pidgin question.
+English only. Nigerian Pidgin (`pcm`) was built, trained and tested across several
+model builds, then **withdrawn**. It answered correctly in v5 and in v6 named
+*amala*, a food, as a maize pest. A capability that works one time in two is not a
+capability, so the claim was removed rather than shipped and hoped for.
+
+Pidgin examples remain in the corpus because they still teach the model to
+recognise how Nigerian farmers describe symptoms, which improves English answers
+to those phrasings. They are simply no longer claimed as a supported output
+language.
+
+The African Use Case claim is unaffected: it rests on the domain being cassava
+mosaic, striga, aflatoxin, Newcastle disease and harmattan planting windows, not
+on language.
 
 ## Anti-overfitting design
 
@@ -85,7 +93,7 @@ answer a Pidgin question.
 | Livestock, poultry, aquaculture | 14% | Breadth against hidden prompts |
 | Soil, fertiliser, water | 10% | Underpins everything else |
 | Post-harvest, storage, market | 9% | Where smallholders lose most income |
-| Nigerian Pidgin pairs | 6% | African alpha, drawn from the slices above |
+| Nigerian Pidgin pairs | 6% | Trains recognition of farmer phrasing; not a claimed output language |
 | General instruction replay | 7% | Guards against catastrophic forgetting |
 
 The replay slice matters. LoRA on a narrow domain will damage general instruction
