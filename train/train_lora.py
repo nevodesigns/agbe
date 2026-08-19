@@ -220,13 +220,36 @@ def strip_oversized_tokens(merged_dir: pathlib.Path) -> None:
     tj_path = merged_dir / "tokenizer.json"
     if tj_path.exists():
         tj = json.loads(tj_path.read_text())
+        dropped = []
+
         added = tj.get("added_tokens", [])
         keep = [a for a in added if a["id"] < vs]
         if len(keep) != len(added):
-            dropped = [a["content"] for a in added if a["id"] >= vs]
+            dropped += [a["content"] for a in added if a["id"] >= vs]
             tj["added_tokens"] = keep
+
+        # The BASE vocab too, not only added_tokens. This was the gap: stripping
+        # added_tokens alone satisfied the old converter, but llama.cpp was
+        # refactored (conversion/base.py) and now asserts on tokenizer.vocab,
+        # which merges the base vocab in. <image_soft_token> sits in BOTH, so the
+        # assertion still fired after a "successful" strip, at the very end of
+        # conversion, leaving no .gguf behind.
+        vocab = tj.get("model", {}).get("vocab")
+        if isinstance(vocab, dict):
+            over = [t for t, i in vocab.items() if isinstance(i, int) and i >= vs]
+            for t in over:
+                del vocab[t]
+            dropped += over
+        elif isinstance(vocab, list):
+            # unigram style: [[token, score], ...] where index IS the id
+            if len(vocab) > vs:
+                dropped += [v[0] if isinstance(v, (list, tuple)) else v
+                            for v in vocab[vs:]]
+                tj["model"]["vocab"] = vocab[:vs]
+
+        if dropped:
             tj_path.write_text(json.dumps(tj, ensure_ascii=False))
-            print(f"  stripped out-of-range tokens: {dropped}")
+            print(f"  stripped out-of-range tokens: {sorted(set(dropped))}")
 
     at_path = merged_dir / "added_tokens.json"
     if at_path.exists():
