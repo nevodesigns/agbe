@@ -234,6 +234,33 @@ def build_pests(rng: random.Random) -> list[dict]:
                            compose_steps(rng, steps, chemical=chemical),
                            "pests_diseases", key, "prevent", rng))
 
+        # Symptom-first diagnosis: the farmer describes what they see and the model
+        # has to NAME it. Every other question in this block already names the
+        # disease, so the model was only ever trained to elaborate on a diagnosis
+        # it had been handed. Both v9 and v10 called blossom end rot something
+        # else, coccidiosis "bacterial abortion" and "mortjacket", and maize streak
+        # "striga", because mapping symptoms onto a name was a skill the corpus
+        # never asked for. It is also the likeliest hidden prompt there is.
+        for report in f.get("symptom_reports", []):
+            lead = f"That is {name}"
+            if f.get("crop"):
+                lead += f", which is common on {f['crop']}"
+            body = [f.get("identify", ""), f.get("scouting", "")]
+            act = f.get("non_chemical", "") or f.get("control", "")
+            out.append(rec(report,
+                           compose_signs(rng, lead,
+                                         [b for b in body if b],
+                                         followup=act, chemical=chemical),
+                           "pests_diseases", key, "diagnose_symptom", rng))
+            # and the discriminating form: same symptoms, asked as a comparison
+            out.append(rec(f"{report} Is it worth spending money on a spray?",
+                           compose_steps(rng,
+                                         [x for x in (f.get("window"),
+                                                      f.get("non_chemical"),
+                                                      f.get("chemical_note")) if x],
+                                         intro=lead, chemical=chemical),
+                           "pests_diseases", key, "diagnose_cost", rng))
+
         if f.get("misconception"):
             out.append(rec(f"Can I just spray something to cure {name}?",
                            compose_prose(rng, f["misconception"], f.get("control", "")),
@@ -453,9 +480,23 @@ def main() -> None:
     cap = int(os.environ.get("AGBE_SENT_CAP", "4"))
     used, capped, dropped, trimmed = collections.Counter(), [], 0, 0
     for p in deduped:
+        # Symptom-first diagnosis is exempt outright. It is the highest-value and
+        # lowest-volume content in the corpus: two examples per disease, each one
+        # the only place the model learns to map what a farmer SEES onto a name.
+        # Under the cap coccidiosis fell to two examples total, which is how it
+        # ended up being called "bacterial abortion" and then "mortjacket".
         exempt = (p["_meta"]["slice"] == "gold"
-                  or p["_meta"].get("form") in HARD_FORMS)
-        limit = cap * 2 if p["_meta"]["slice"] == "multiturn" else cap
+                  or p["_meta"].get("form") in HARD_FORMS
+                  or p["_meta"].get("form") in ("diagnose_symptom", "diagnose_cost"))
+        # Diagnosis slices get a higher cap. They are the rarest facts and the most
+        # valuable questions: a judge describing symptoms is the likeliest hidden
+        # prompt there is. Under a flat cap the slice fell from 95 examples to 47,
+        # leaving striga on ONE example and stem borer on two, and both v9 and v10
+        # duly misdiagnosed them. Repetition of a fact seen four times is not the
+        # problem this cap exists to solve.
+        RARE = ("pests_diseases", "livestock_poultry_fish")
+        sl = p["_meta"]["slice"]
+        limit = cap * (3 if sl in RARE else 2 if sl == "multiturn" else 1)
         if exempt:
             for m in p["messages"]:
                 if m["role"] == "assistant":

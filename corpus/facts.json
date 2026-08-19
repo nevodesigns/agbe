@@ -267,84 +267,144 @@
       "scouting": "Check the whorl early morning or late evening when larvae are active, on a sample of plants across the field.",
       "window": "Damage matters most in early vegetative growth. Late infestation on a tasselled crop rarely justifies treatment cost.",
       "non_chemical": "Handpicking on small plots, intercropping to break up the stand, encouraging natural enemies, and destroying crop residues after harvest.",
-      "chemical_note": "If treating, use a product registered for fall armyworm on maize and follow the label rate exactly. Aim the spray into the whorl where the larvae sit."
+      "chemical_note": "If treating, use a product registered for fall armyworm on maize and follow the label rate exactly. Aim the spray into the whorl where the larvae sit.",
+      "symptom_reports": [
+        "My maize has ragged holes in the young leaves and something like wet sawdust down in the centre of the plant.",
+        "The young maize is being chewed and there is damp gritty dirt sitting in the funnel of the leaves."
+      ]
     },
     "cassava_mosaic": {
       "crop": "cassava",
       "identify": "Yellow and green mottling, distorted and reduced leaves, stunted plants.",
       "spread": "Carried by whitefly and, most importantly, by planting infected stem cuttings.",
       "control": "The main control is clean planting material and resistant varieties. Rogue out badly affected plants. There is no spray that cures an infected plant.",
-      "misconception": "Farmers often spray insecticide expecting a cure. It does not reverse infection."
+      "misconception": "Farmers often spray insecticide expecting a cure. It does not reverse infection.",
+      "symptom_reports": [
+        "My cassava leaves are yellow and green mottled and twisted, and the plants are small.",
+        "The cassava is stunted and the leaves are crinkled with pale and dark green patches."
+      ]
     },
     "striga": {
       "crop": "maize, sorghum, millet, upland rice",
       "identify": "Small purple or pink flowered weed emerging near cereal stems, with the crop stunted and yellowed out of proportion to the visible weed.",
       "cause_signal": "A striga problem is a soil fertility problem. It thrives where nitrogen and organic matter are depleted.",
       "control": "Rotation with legumes, restoring soil fertility and organic matter, hand pulling before the weed flowers and seeds, and resistant varieties where available.",
-      "seed_bank": "Each plant sheds very many long lived seeds, so a single season of letting it flower undoes years of work."
+      "seed_bank": "Each plant sheds very many long lived seeds, so a single season of letting it flower undoes years of work.",
+      "symptom_reports": [
+        "There is a small purple flowered weed growing near my maize stems and the maize is yellow and stunted.",
+        "My sorghum is badly stunted and there are little pink flowering weeds coming up between the plants."
+      ]
     },
     "tuta_absoluta": {
       "crop": "tomato",
       "identify": "Irregular blotch shaped mines inside the leaf, and boreholes in fruit.",
-      "control": "Exclusion netting over nurseries, pheromone traps for monitoring and mass trapping, removal and destruction of affected material, and rotation away from tomato and related crops."
+      "control": "Exclusion netting over nurseries, pheromone traps for monitoring and mass trapping, removal and destruction of affected material, and rotation away from tomato and related crops.",
+      "symptom_reports": [
+        "My tomato leaves have winding pale patches inside them and there are small holes in the fruit.",
+        "Something is tunnelling inside my tomato leaves and boring into the fruit."
+      ]
     },
     "bacterial_wilt": {
       "crop": "tomato, pepper, and other solanaceous crops",
       "identify": "Sudden wilting while leaves stay green. Cut a stem and suspend it in clear water: a milky ooze streaming out confirms it.",
-      "control": "No chemical cure. Rotate away from solanaceous crops for several seasons, improve drainage, and remove affected plants with the surrounding soil."
+      "control": "No chemical cure. Rotate away from solanaceous crops for several seasons, improve drainage, and remove affected plants with the surrounding soil.",
+      "symptom_reports": [
+        "My tomato plants wilted suddenly but the leaves are still green.",
+        "A few pepper plants collapsed overnight and they had not dried out or gone yellow first."
+      ]
     },
     "newcastle_disease": {
       "species": "poultry",
       "identify": "Sudden high mortality across the flock, twisted necks and nervous signs, greenish droppings, sharp drop in laying.",
       "control": "Vaccination on schedule is the control. There is no treatment once the flock breaks. Local backyard flocks benefit most, since they are usually unvaccinated.",
-      "biosecurity": "Isolate new or returning birds before mixing, restrict visitor access, and never bring birds back from market into the flock unquarantined."
+      "biosecurity": "Isolate new or returning birds before mixing, restrict visitor access, and never bring birds back from market into the flock unquarantined.",
+      "symptom_reports": [
+        "My chickens are dying suddenly, several have twisted necks, and the droppings are greenish.",
+        "I lost many birds in two days and the survivors are twisting their heads and laying has stopped."
+      ]
     },
     "coccidiosis": {
       "species": "poultry",
       "identify": "Blood in droppings, huddling, ruffled feathers, poor growth.",
-      "driver": "Wet caked litter is the driver. Fixing litter and ventilation prevents recurrence better than repeated medication."
+      "driver": "Wet caked litter is the driver. Fixing litter and ventilation prevents recurrence better than repeated medication.",
+      "symptom_reports": [
+        "My broilers have blood in their droppings and are huddling together.",
+        "The chicks are hunched with ruffled feathers and I am seeing blood when they pass droppings."
+      ]
     },
     "ppr": {
       "species": "goats and sheep",
       "identify": "Fever, discharge from eyes and nose, mouth sores, diarrhoea, high mortality in young stock.",
-      "control": "Vaccination. Isolate newly bought animals before introducing them to the flock."
+      "control": "Vaccination. Isolate newly bought animals before introducing them to the flock.",
+      "symptom_reports": [
+        "My goats have fever, runny nose and mouth sores and several are sick.",
+        "Several sheep have watery eyes, sores in the mouth and diarrhoea, and two young ones have died."
+      ]
     },
     "storage_pests": {
       "target": "stored grain and legumes",
       "identify": "Boreholes in grain, dust beneath the bag, live insects when the surface is disturbed.",
-      "control": "Dry thoroughly to safe moisture before storage, then use hermetic bags such as PICS that suffocate insects without chemicals. Sealing discipline is what makes hermetic bags work."
+      "control": "Dry thoroughly to safe moisture before storage, then use hermetic bags such as PICS that suffocate insects without chemicals. Sealing discipline is what makes hermetic bags work.",
+      "symptom_reports": [
+        "There are small holes in my stored maize grain and fine dust under the bags.",
+        "When I move my stored grain I see insects on the surface and powder underneath."
+      ]
     },
     "maize_streak": {
       "crop": "maize",
       "identify": "Fine broken pale streaks running parallel along the leaf, plants stunted when infected young.",
       "spread": "Carried by leafhoppers, often from nearby grasses and volunteer maize.",
-      "control": "Tolerant varieties and avoiding very late or staggered planting near infected stands. There is no cure for an infected plant."
+      "control": "Tolerant varieties and avoiding very late or staggered planting near infected stands. There is no cure for an infected plant.",
+      "symptom_reports": [
+        "My maize leaves have fine pale broken streaks running along the leaf and the plants are stunted.",
+        "There are thin light lines running the length of the maize leaves and those plants stayed small."
+      ]
     },
     "stem_borers": {
       "crop": "maize, sorghum, rice",
       "identify": "Deadheart in young plants, small holes in stems with frass, and tunnels when a stem is split open.",
-      "control": "Destroy or plough in crop residues after harvest to break the carryover, since larvae overwinter in stalks. Early uniform planting across a community reduces pressure for everyone."
+      "control": "Destroy or plough in crop residues after harvest to break the carryover, since larvae overwinter in stalks. Early uniform planting across a community reduces pressure for everyone.",
+      "symptom_reports": [
+        "My maize stems have small holes with dry powder at the opening and the central shoot has died.",
+        "The middle shoot of my young maize is dead and dry, and I can see holes in the stem."
+      ]
     },
     "black_sigatoka": {
       "crop": "plantain and banana",
       "identify": "Dark streaks that widen into blotches with pale centres, starting on older leaves and moving up.",
-      "control": "Remove and destroy affected leaves, widen spacing for airflow, and keep the stool desuckered. Nutrition matters, since a well fed plant holds more functional leaves."
+      "control": "Remove and destroy affected leaves, widen spacing for airflow, and keep the stool desuckered. Nutrition matters, since a well fed plant holds more functional leaves.",
+      "symptom_reports": [
+        "My plantain leaves have dark streaks that spread into blotches with pale middles, starting on the old leaves.",
+        "The lower banana leaves are dying back with dark patches and it is moving up the plant."
+      ]
     },
     "cocoa_black_pod": {
       "crop": "cocoa",
       "identify": "Dark brown to black spreading lesions on pods, often starting at the tip or stalk end, in wet weather.",
-      "control": "Harvest frequently, remove and bury or destroy infected pods, prune for an open canopy and improve drainage. Sanitation does most of the work."
+      "control": "Harvest frequently, remove and bury or destroy infected pods, prune for an open canopy and improve drainage. Sanitation does most of the work.",
+      "symptom_reports": [
+        "My cocoa pods have dark brown patches spreading across them and it has been raining a lot.",
+        "Black spreading rot is taking my cocoa pods, starting at the ends."
+      ]
     },
     "groundnut_rosette": {
       "crop": "groundnut",
       "identify": "Stunted bushy plants with small distorted yellowed leaves, often in patches within the field.",
       "spread": "Carried by aphids, worst in late planted and sparse stands.",
-      "control": "Plant early and at a dense even spacing so the canopy closes quickly, and use resistant varieties where available."
+      "control": "Plant early and at a dense even spacing so the canopy closes quickly, and use resistant varieties where available.",
+      "symptom_reports": [
+        "My groundnut plants are stunted and bushy with small twisted yellow leaves, in patches across the field.",
+        "Parts of my groundnut field are short and bunched up with pale distorted leaves."
+      ]
     },
     "quelea_and_birds": {
       "crop": "sorghum, millet, rice",
       "identify": "Grain stripped from heads at the milk and dough stage, flocks lifting from the field when disturbed.",
-      "control": "Scaring must be sustained through the vulnerable window from grain fill to harvest. Community wide timing works far better than one farmer acting alone, because birds simply move next door."
+      "control": "Scaring must be sustained through the vulnerable window from grain fill to harvest. Community wide timing works far better than one farmer acting alone, because birds simply move next door.",
+      "symptom_reports": [
+        "Birds are stripping the grain from my sorghum heads and lift off in flocks when I walk in.",
+        "My millet heads are being emptied while the grain is still soft."
+      ]
     }
   },
   "soil_water": {
