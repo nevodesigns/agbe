@@ -100,13 +100,34 @@ def fix(merged: pathlib.Path) -> bool:
         #
         # Only keys whose value is absent from the vocab are removed, so bos, eos,
         # pad, unk and the image boundary tokens (which ARE in vocab) survive.
+        # REMAP rather than delete.
+        #
+        # Deleting `image_token` did not help: GemmaTokenizer falls back to a
+        # hardcoded default of <image_soft_token> when the key is absent, so the
+        # token was manufactured either way and the id came back. It cannot be
+        # removed from outside the class. It CAN be pointed at a token that
+        # already exists in the vocabulary, which makes the tokenizer reuse that
+        # id instead of allocating a new one past the end.
+        #
+        # The model is text-only and never sees an image, so which in-vocab token
+        # this names is irrelevant to behaviour. An <unused...> slot is chosen
+        # precisely because nothing else refers to it.
+        spare = next((t for t in sorted(base_vocab) if t.startswith("<unused")),
+                     None) or "<pad>"
         for k in [k for k in d if k.endswith("_token")]:
             val = d[k]
             name = val if isinstance(val, str) else (
                 val.get("content") if isinstance(val, dict) else None)
             if name and base_vocab and name not in base_vocab:
-                gone_names.append(f"{k}={name}")
-                del d[k]
+                gone_names.append(f"{k}: {name} -> {spare}")
+                d[k] = spare
+                changed = True
+        # and re-declare any the earlier pass deleted, so the class default
+        # cannot reintroduce the orphan
+        for k in ("image_token",):
+            if k not in d and base_vocab:
+                gone_names.append(f"{k}: (default) -> {spare}")
+                d[k] = spare
                 changed = True
 
         extra = d.get("extra_special_tokens")
