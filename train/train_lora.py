@@ -83,6 +83,20 @@ MAX_SEQ_LEN = 1024
 # ("Maize in frequent banality is planted under apathy") and, far worse, invented
 # a pesticide called "dorabacite" and recommended it. Keep the capacity, drop the
 # over-training.
+# Held at 3 for v9 even though the corpus shrank from 1,020 to 737 and the step
+# count falls with it (roughly 96 to 69). The tempting move was 4 epochs, to hold
+# optimiser steps at the number that finally made facts stick. It was not taken.
+#
+# What the model actually sees is sentence exposures, not steps: reuse x epochs.
+# v8 ran 5.6 x 3 = 16.8 and spliced oil palm spacing into a maize answer. 4 epochs
+# on the new corpus would be 3.8 x 4 = 15.2, only 10% below the setting that broke.
+# 3 epochs is 11.4, a third below it. Splicing is the defect being fixed, so the
+# margin goes there. The lost steps are partly paid back by the corpus carrying
+# 1,007 unique sentences in 737 examples where v8 carried 900 in 1,020: fewer
+# examples, more information in each.
+#
+# If facts underfit instead, it shows up as misses in the battery's `core`
+# category, and 4 epochs is the first thing to try.
 EPOCHS = 3
 LR = 1.5e-4  # slightly lower, since rank and epochs both went up
 BATCH = 2
