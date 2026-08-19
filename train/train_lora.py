@@ -257,13 +257,48 @@ def strip_oversized_tokens(merged_dir: pathlib.Path) -> None:
         at_path.write_text(json.dumps(
             {k: v for k, v in at.items() if v < vs}, ensure_ascii=False))
 
+    # The base vocab, used to decide which declared special tokens still exist.
+    base_vocab = set()
+    if tj_path.exists():
+        v = json.loads(tj_path.read_text()).get("model", {}).get("vocab")
+        if isinstance(v, dict):
+            base_vocab = set(v)
+        elif isinstance(v, list):
+            base_vocab = {x[0] if isinstance(x, (list, tuple)) else x for x in v}
+
     tc_path = merged_dir / "tokenizer_config.json"
     if tc_path.exists():
         tc = json.loads(tc_path.read_text())
+        changed = False
+
         dec = tc.get("added_tokens_decoder", {})
         keep = {k: v for k, v in dec.items() if int(k) < vs}
         if len(keep) != len(dec):
             tc["added_tokens_decoder"] = keep
+            changed = True
+
+        # Scalar special-token declarations, which is where this actually hides.
+        #
+        # Gemma's tokenizer_config.json carries `image_token = <image_soft_token>`
+        # as a top-level string. GemmaTokenizer registers it on every load and
+        # hands it the next free id, which is exactly vocab_size. Stripping the
+        # vocab files alone therefore fixed nothing: the base vocab was already
+        # correct at max id 262143, and the tokenizer manufactured 262144 again
+        # from this one line. llama.cpp then asserted at the END of conversion,
+        # after writing all 340 tensors, leaving no .gguf behind.
+        #
+        # Only declarations absent from the vocab are dropped, so bos, eos, pad,
+        # unk and the image boundary tokens survive untouched.
+        for k in [k for k in tc if k.endswith("_token")]:
+            val = tc[k]
+            name = val if isinstance(val, str) else (
+                val.get("content") if isinstance(val, dict) else None)
+            if name and base_vocab and name not in base_vocab:
+                print(f"  dropped special token declaration: {k} = {name}")
+                del tc[k]
+                changed = True
+
+        if changed:
             tc_path.write_text(json.dumps(tc, ensure_ascii=False))
 
 
