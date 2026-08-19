@@ -56,6 +56,41 @@ what the profiler was run against.
 | v10 | `802bbabf844da09ed34c6a56e39557ff` | 814,261,088 |
 | v11 | `f18c01f2410958c2a894281b38088722` | 814,261,088 |
 
+## The export environment is load-bearing
+
+GGUF conversion depends on **transformers 4.57.x**, and that dependency is
+invisible until it breaks.
+
+llama.cpp's `requirements-convert_hf_to_gguf.txt` pins transformers *down* from
+the 5.0.0 that Kaggle ships. Under 5.0.0, `GemmaTokenizer` injects
+`<image_soft_token>` at id 262144 while the text-only 1B declares `vocab_size`
+262144, so conversion dies on `assert max(tokenizer.vocab.values()) < vocab_size`
+after writing all 340 tensors, leaving no file behind. Under 4.57.6 it does not.
+
+The v12 build lost that pin by accident. A change intended to stop llama.cpp
+replacing the GPU torch wrote the filtered requirements file to `/tmp`, which
+broke a **relative include** inside it (`-r ./requirements-convert_legacy_llama.txt`).
+pip aborted the whole install, `%%capture` hid the error, transformers stayed at
+5.0.0, and conversion failed.
+
+**Five fixes were then written for a tokenizer that was never broken.** Its base
+vocab was correct at max id 262143 in every diagnostic. The token cannot be
+removed from the config side at all: deleting the key lets a hardcoded class
+default take over, and remapping it leaves the string in `all_special_tokens`.
+A sixth change pinned llama.cpp to `5112b97` on the false premise that it predated
+the converter refactor. It did not, and that was asserted without checking.
+
+Guards now in place:
+
+- the filtered requirements file stays inside `requirements/` so the include resolves
+- the notebook asserts `transformers.__version__` starts with `4.` right after the install
+- the trainer aborts rather than warns when CUDA is missing
+- llama.cpp is pinned, which is still correct practice even though it was not the fix
+
+The general lesson, which the eval work got right and this did not: **measure
+before fixing.** The diagnostic that named the cause took two minutes to write and
+was run only after five failed attempts.
+
 ## GGUF export warnings, checked not assumed
 
 Conversion emits `Unknown RoPE type: default` and several
