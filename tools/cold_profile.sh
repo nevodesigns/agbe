@@ -17,6 +17,16 @@ cd "$(dirname "$0")/.."
 PROFILER=/home/nwokolo/projects/adtc-2026/.venv/bin/adtc-profiler
 MODEL=model/agbe-1b-q4_k_m.gguf
 
+# The profiler shells out to `llama-bench` and only looks on PATH. Ours is built
+# in the working repo rather than installed system-wide, so put it there. Without
+# this the run dies with "llama-bench not found on PATH" AFTER printing that it
+# has started, which reads like the profiler is broken rather than the PATH.
+LLAMA_BIN=/home/nwokolo/projects/adtc-2026/work/llama.cpp/build/bin
+export PATH="$LLAMA_BIN:$PATH"
+command -v llama-bench > /dev/null || {
+  echo "llama-bench still not found. Expected it at $LLAMA_BIN"; exit 1; }
+echo "llama-bench: $(command -v llama-bench)"
+
 [ -x "$PROFILER" ] || { echo "profiler not found at $PROFILER"; exit 1; }
 [ -f "$MODEL" ]    || { echo "no weights at $MODEL"; exit 1; }
 
