@@ -108,10 +108,40 @@ def fix(merged: pathlib.Path) -> bool:
     try:
         from transformers import AutoTokenizer
         tok = AutoTokenizer.from_pretrained(str(merged))
-        hi = max(tok.vocab.values())
+        v = tok.get_vocab()
+        hi = max(v.values())
+        ok = hi < vs
         print(f"max token id now {hi}, vocab_size {vs} -> "
-              f"{'OK' if hi < vs else 'STILL FAILING'}")
-        return hi < vs
+              f"{'OK' if ok else 'STILL FAILING'}")
+        if not ok:
+            # Asking for a separate diagnostic script to be run did not work
+            # twice, so the failure path now reports everything itself.
+            print("\n--- where the over-range id actually comes from ---")
+            print(f"tokenizer class      : {tok.__class__.__name__}")
+            print(f"offending tokens     : {[t for t, i in v.items() if i >= vs]}")
+            print(f"additional_special   : {getattr(tok, 'additional_special_tokens', None)}")
+            print(f"all_special_tokens   : {getattr(tok, 'all_special_tokens', None)}")
+            tjm = json.loads(tj_path.read_text()) if tj_path.exists() else {}
+            bv = tjm.get("model", {}).get("vocab")
+            print(f"model.vocab type     : {type(bv).__name__}, "
+                  f"len {len(bv) if bv is not None else '-'}")
+            if isinstance(bv, dict):
+                print(f"  max id in base     : {max(bv.values()) if bv else '-'}")
+            print(f"added_tokens in tj   : "
+                  f"{[a['content'] for a in tjm.get('added_tokens', [])][-4:]}")
+            for fn in ("special_tokens_map.json", "tokenizer_config.json"):
+                fp = merged / fn
+                if not fp.exists():
+                    continue
+                d = json.loads(fp.read_text())
+                print(f"{fn}")
+                for k in ("additional_special_tokens", "extra_special_tokens",
+                          "boi_token", "eoi_token", "image_token"):
+                    if k in d:
+                        print(f"    {k} = {d[k]}")
+            print(f"files present        : "
+                  f"{sorted(f.name for f in merged.iterdir())}")
+        return ok
     except Exception as e:
         print(f"could not verify with transformers ({e}); files were still patched")
         return True
