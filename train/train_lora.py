@@ -286,11 +286,31 @@ def main() -> None:
 
     if torch.cuda.is_available():
         model = model.cuda()
+    elif os.environ.get("AGBE_ALLOW_CPU") == "1":
+        print("CUDA not available. Proceeding on CPU because AGBE_ALLOW_CPU=1.")
     else:
-        print("WARNING: CUDA not available, training on CPU. On Kaggle this usually "
-              "means torch was replaced by a CPU build. Restart the session and run "
-              "the cells in order: llama.cpp's convert requirements install pulls in "
-              "torch+cpu, so it must come AFTER training, never before.")
+        # Hard stop, not a warning.
+        #
+        # This used to print a warning and carry on, and a run duly started
+        # training 948 examples on CPU. It does not crash and it does not obviously
+        # hang: it just crawls, and from the outside a progress bar sitting at 0%
+        # looks identical to a deadlock. Roughly 40 minutes were lost deciding
+        # whether it was stuck before anyone read two cells up.
+        #
+        # A silent 30x slowdown is worse than a crash, so this now refuses.
+        raise SystemExit(
+            "\nSTOP: CUDA is not available, so this would train on CPU and take\n"
+            "hours rather than 15 minutes.\n\n"
+            f"  torch  : {torch.__version__}\n"
+            f"  cuda   : {torch.cuda.is_available()}\n\n"
+            "Cause: llama.cpp's requirements-convert_hf_to_gguf.txt installs a\n"
+            "torch+cpu wheel and pins transformers down with it. Once that has run\n"
+            "in a session, the GPU build is gone for the rest of that container.\n\n"
+            "Fix: Session -> Restart session (not just clear outputs), then Run All\n"
+            "top to bottom. Training is cell 6, the llama.cpp install is cell 8, so\n"
+            "the order is already correct as long as nothing is run out of turn.\n"
+            "Check that cell 1 prints 'cuda True' before continuing.\n\n"
+            "To train on CPU deliberately anyway, set AGBE_ALLOW_CPU=1.\n")
 
     peft_config = LoraConfig(
         r=LORA_R, lora_alpha=LORA_ALPHA, lora_dropout=LORA_DROPOUT,
