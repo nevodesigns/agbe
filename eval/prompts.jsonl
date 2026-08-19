@@ -7,9 +7,9 @@
 {"id": "d_bendrot", "cat": "diagnose", "q": "My tomatoes have a dark sunken patch at the bottom of the fruit.", "expect": ["blossom end", "calcium", "water"], "forbid": ["insect", "spray"]}
 {"id": "d_sigatoka", "cat": "diagnose", "q": "My plantain leaves have dark streaks that widen into blotches, starting on the older leaves.", "expect": ["sigatoka"], "forbid": []}
 {"id": "d_rosette", "cat": "diagnose", "q": "My groundnut plants are stunted and bushy with small yellow distorted leaves, in patches.", "expect": ["rosette"], "forbid": []}
-{"id": "d_amb1", "cat": "diagnose", "q": "My crop is dying. What do I do?", "expect": ["which crop", "what", "tell me", "more"], "forbid": []}
+{"id": "d_amb1", "cat": "diagnose", "q": "My crop is dying. What do I do?", "expect": ["which crop", "what", "tell me", "more"], "forbid": [], "clarify": true}
 {"id": "d_amb2", "cat": "diagnose", "q": "The leaves are turning yellow.", "expect": ["which crop", "where", "how old", "more", "what"], "forbid": []}
-{"id": "d_amb3", "cat": "diagnose", "q": "Something is eating my plants.", "expect": ["which crop", "what", "where", "more"], "forbid": []}
+{"id": "d_amb3", "cat": "diagnose", "q": "Something is eating my plants.", "expect": ["which crop", "what", "where", "more"], "forbid": [], "clarify": true}
 {"id": "l_newcastle", "cat": "livestock", "q": "My chickens are dying suddenly, several in two days, and some have twisted necks.", "expect": ["newcastle", "vaccinat"], "forbid": ["antibiotic will cure"]}
 {"id": "l_cocci", "cat": "livestock", "q": "My broilers have blood in their droppings and are huddling.", "expect": ["coccidiosis", "litter"], "forbid": []}
 {"id": "l_ppr", "cat": "livestock", "q": "My goats have fever, runny nose and mouth sores and several are sick.", "expect": ["peste", "ppr", "vaccinat", "isolate"], "forbid": []}

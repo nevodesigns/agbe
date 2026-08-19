@@ -125,6 +125,46 @@ SHORT += [
  "I understand, but an approximate figure from me is a guess dressed up as advice, and you would be adjusting from a number that was never anchored to your field.\n\nYour extension officer can give you a rate for your soil and zone, and that starting point is worth more than anything I could estimate. Tell me what you are growing and I will explain how to apply it and when, which is the part that changes the result most."),
 ]
 
+# --- confusable pairs the v11 battery caught ------------------------------
+#
+# All four remaining livestock failures were the same shape: two conditions that
+# share a slice, no exemplar contrasting them, so the model picked whichever was
+# more probable. This is the striga/armyworm lesson a second time. The fix is not
+# more coccidiosis examples, it is naming the alternative and rejecting it.
+#
+#   l_newcastle  twisted necks, sudden flock death -> "That is coccidiosis"
+#   l_brood2     chicks AT THE WALLS and PANTING   -> "That is huddling"
+#                (exactly inverted: spread out and panting is too HOT, huddling
+#                 under the lamp is too cold)
+#   l_shell      thin eggshells                     -> invented "aviary rot"
+#   l_vet        a downer cow                       -> refused as "not a plant"
+
+SHORT += [
+("newcastle_not_cocci", "discriminate",
+ "My chickens are dying suddenly, several in two days, and some have twisted necks.",
+ "That is Newcastle disease, not coccidiosis. The two get confused and the response is completely different.\n\nNewcastle: sudden death across the flock, twisted necks and other nervous signs, greenish droppings, laying stops abruptly.\nCoccidiosis: blood in the droppings, birds hunched and ruffled, usually younger birds, and deaths build over days rather than all at once.\n\nThere is no treatment for Newcastle once it is in the flock. Stop all movement of birds in or out, keep the healthy ones away from the sick, and speak to your veterinary or extension officer today. Vaccination on schedule is the only real control, and it has to be in place before an outbreak."),
+
+("cocci_not_newcastle", "discriminate",
+ "My broilers have blood in their droppings and are hunched with ruffled feathers.",
+ "That is coccidiosis, not Newcastle. Blood in the droppings is the sign that separates them.\n\nNewcastle kills across the whole flock in a day or two with twisted necks and nervous signs. Coccidiosis builds over days, hits younger birds hardest, and shows in the droppings first.\n\nCoccidiosis is treatable, so it is worth acting now. Keep litter dry, because wet litter is what carries it, thin out the stocking if birds are crowded, and ask your veterinary or agrovet for a coccidiostat registered for poultry. Follow the label rather than any dose I could give you."),
+
+("brooder_too_hot", "discriminate",
+ "My chicks are spread to the walls of the brooder and panting.",
+ "They are too hot, not too cold. Chicks tell you the temperature by where they stand, and this is the opposite of huddling.\n\n- Spread to the walls, away from the lamp, panting or with wings held out: too hot. Raise the lamp or reduce it.\n- Bunched in a tight ball under the lamp: too cold. Lower it or add heat.\n- All to one side: a draught coming from the other side.\n- Spread out evenly, moving about and feeding: correct.\n\nPanting chicks stop eating and dehydrate quickly, so fix it today and make sure clean water is within easy reach of the edges of the brooder."),
+
+("brooder_too_cold", "discriminate",
+ "My day old chicks are all huddling together under the heat lamp.",
+ "They are too cold. Huddling under the lamp is the classic sign, and the fix is simply more heat.\n\nLower the lamp or add a second one, and check for a draught at floor level, which is what usually causes it. Read the birds rather than a thermometer: evenly spread and active is right, bunched under the lamp is cold, pressed to the walls and panting is too hot.\n\nChicks that spend the night huddled do not feed properly and never fully catch up, so it is worth correcting on the first night."),
+
+("thin_shell_calcium", "correct_agronomy",
+ "My hens are laying eggs with very thin shells that break easily.",
+ "That is almost always calcium, not a disease.\n\n1. Layers need a layer ration, not grower or broiler feed. The calcium level is the whole difference between them.\n2. Offer oyster shell or crushed limestone separately, so each bird takes what she needs. Coarse pieces work better than fine powder because they stay in the gizzard longer overnight, which is when the shell forms.\n3. Older hens lay bigger eggs with the same calcium spread thinner, so late in the laying cycle this gets worse and is normal.\n\nIf shells are also misshapen or laying has dropped sharply at the same time, that points at disease instead, and that is one for your veterinary officer."),
+
+("downer_cow", "livestock",
+ "My cow has been down for two days and will not stand.",
+ "This needs a veterinary officer today. A cow down for two days is an emergency and the causes differ enough that guessing wastes the time she has.\n\nWhile you are arranging that:\n\n1. Get her onto soft dry bedding and out of the sun.\n2. Roll her from one side to the other every few hours. Lying on one side too long damages the muscle and the nerve underneath, and that alone can stop a cow standing again even after the original problem is fixed.\n3. Keep water and feed within reach of her head.\n4. If she calved recently, say so when you call, because milk fever is common then and is quickly treatable.\n\nDo not haul her up with a rope around the body."),
+]
+
 
 def as_records() -> list[dict]:
     return [{"messages": [{"role": "user", "content": u},

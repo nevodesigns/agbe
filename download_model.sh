@@ -14,11 +14,49 @@ MODEL_FILE="$MODEL_DIR/agbe-1b-q4_k_m.gguf"
 
 MODEL_URL="https://huggingface.co/NEVODESIGN/agbe-1b/resolve/main/agbe-1b-q4_k_m.gguf"
 
+# Exact expected identity of the shipped weights. Updated by tools/lock_model.sh
+# when a build is chosen, and checked by tools/check_submission.sh against the
+# live URL so these cannot silently drift from what is actually published.
+EXPECT_BYTES=814261088
+EXPECT_SHA256=f18c01f2410958c2a894281b38088722d53031dbbcbd89fd8458b5aab648c74f
+
+verify() {  # verify <path> -> 0 if this is exactly the shipped file
+  local f="$1" sz
+  sz=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null || echo 0)
+  [[ "$sz" == "$EXPECT_BYTES" ]] || return 1
+  if command -v sha256sum > /dev/null 2>&1; then
+    [[ "$(sha256sum "$f" | cut -d" " -f1)" == "$EXPECT_SHA256" ]] || return 1
+  elif command -v shasum > /dev/null 2>&1; then
+    [[ "$(shasum -a 256 "$f" | cut -d" " -f1)" == "$EXPECT_SHA256" ]] || return 1
+  fi
+  return 0
+}
+
 mkdir -p "$MODEL_DIR"
 
+# Idempotent, but only for a file that is actually correct. The previous version
+# skipped on mere existence, which would have made a corrupt or half-moved file
+# permanent: every later run reported success and llama.cpp reported only
+# "failed to load model".
 if [[ -f "$MODEL_FILE" ]]; then
-  echo "model already present at $MODEL_FILE — skipping download"
-  exit 0
+  if verify "$MODEL_FILE"; then
+    echo "model already present and verified at $MODEL_FILE — skipping download"
+    exit 0
+  fi
+  echo "existing file does not match the expected size or checksum, refetching…"
+  rm -f "$MODEL_FILE"
+fi
+
+# A resume target that is already at or past full length cannot be repaired by
+# appending: curl -C - simply has nothing to add and exits happy, leaving the old
+# content at exactly the right size. That is the one case where a size check
+# passes a wrong file, which is why the checksum above is not optional.
+if [[ -f "$MODEL_FILE.partial" ]]; then
+  PSZ=$(stat -c%s "$MODEL_FILE.partial" 2>/dev/null || stat -f%z "$MODEL_FILE.partial" 2>/dev/null || echo 0)
+  if [[ "$PSZ" -ge "$EXPECT_BYTES" ]]; then
+    echo "discarding an unusable partial file ($PSZ bytes)"
+    rm -f "$MODEL_FILE.partial"
+  fi
 fi
 
 echo "downloading $MODEL_URL → $MODEL_FILE (~0.8 GB)…"
@@ -42,12 +80,16 @@ fi
 # We hit exactly this during development: curl exited 0 on three partial models
 # and llama.cpp reported only "failed to load model".
 ACTUAL=$(stat -c%s "$MODEL_FILE.partial" 2>/dev/null || stat -f%z "$MODEL_FILE.partial" 2>/dev/null || echo 0)
-if [[ "$ACTUAL" -lt 800000000 ]]; then
-  echo "error: got $ACTUAL bytes, expected ~814 MB. The transfer was cut short." >&2
-  echo "The partial file is kept at $MODEL_FILE.partial — re-run this script and" >&2
-  echo "it will resume from where it stopped." >&2
+if ! verify "$MODEL_FILE.partial"; then
+  if [[ "$ACTUAL" -lt "$EXPECT_BYTES" ]]; then
+    echo "error: got $ACTUAL of $EXPECT_BYTES bytes. The transfer was cut short." >&2
+    echo "The partial file is kept — re-run this script and it resumes from here." >&2
+  else
+    echo "error: file is the wrong size or checksum ($ACTUAL bytes)." >&2
+    echo "Delete $MODEL_FILE.partial and re-run to fetch it cleanly." >&2
+  fi
   exit 1
 fi
 
 mv "$MODEL_FILE.partial" "$MODEL_FILE"
-echo "done: $MODEL_FILE ($ACTUAL bytes)"
+echo "done: $MODEL_FILE ($ACTUAL bytes, sha256 verified)"
