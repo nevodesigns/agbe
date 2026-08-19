@@ -27,7 +27,9 @@ from __future__ import annotations
 
 import collections
 import json
+import os
 import random
+import re
 import sys
 from pathlib import Path
 
@@ -140,10 +142,16 @@ def build_crops(rng: random.Random) -> list[dict]:
                                "crop_agronomy", crop, "howto", rng))
 
         if f.get("planting_time") or f.get("harvest"):
-            for tpl in ASK["when"][:3]:
+            # zones.planting_rule used to be welded into every timing answer. It
+            # says the same thing as a well-written per-crop planting_time, so it
+            # appeared 40 times and the model learned to emit it and then stop
+            # having anything left to say. Now it is occasional, and the crop's
+            # own calendar carries the answer.
+            for tpl in ASK["when"]:
                 out.append(rec(q(tpl),
                                compose_prose(rng, f.get("planting_time", ""),
-                                             FACTS["zones"]["planting_rule"],
+                                             FACTS["zones"]["planting_rule"]
+                                             if rng.random() < 0.2 else "",
                                              f.get("harvest", ""), f.get("storage", "")),
                                "crop_agronomy", crop, "when", rng))
 
@@ -386,6 +394,43 @@ def main() -> None:
         deduped.append(p)
 
     rng.shuffle(deduped)
+
+    # Sentence cap.
+    #
+    # v8 had 1,020 conversations built from 900 unique sentences: 5.6 reuses each,
+    # so at 3 epochs the model saw every sentence about 17 times and memorised it
+    # as a lexical unit. It then emitted those units by topic rather than by
+    # question, which is how "roughly 143 palms per hectare" ended up inside an
+    # answer about maize.
+    #
+    # Counting examples was measuring the wrong thing. What the model actually
+    # sees is sentences, so that is what gets budgeted. An example is dropped when
+    # any sentence in it has already been used SENT_CAP times. Shuffle happens
+    # first so the drops fall evenly across topics instead of starving whichever
+    # crop the generator happened to emit last.
+    #
+    # Gold and the hard behaviours (refusals, hijack, honest limits) are exempt:
+    # they are hand-written, they are deliberately oversampled, and they are the
+    # part of the corpus that fixed the child-fever failure.
+    cap = int(os.environ.get("AGBE_SENT_CAP", "4"))
+    used, capped, dropped = collections.Counter(), [], 0
+    for p in deduped:
+        sents = [re.sub(r"^\d+\.\s*", "", x.strip())
+                 for x in re.split(r"(?<=[.!?])\s+|\n",
+                                   " ".join(m["content"] for m in p["messages"]
+                                            if m["role"] == "assistant"))]
+        sents = [x for x in sents if len(x) > 25]
+        exempt = (p["_meta"]["slice"] == "gold"
+                  or p["_meta"].get("form") in HARD_FORMS)
+        if not exempt and sents and any(used[x] >= cap for x in sents):
+            dropped += 1
+            continue
+        used.update(sents)
+        capped.append(p)
+    print(f"sentence cap {cap}: kept {len(capped)}, dropped {dropped} "
+          f"over-repetitive examples")
+    deduped = capped
+
     n_hold = max(24, int(len(deduped) * 0.08))
     holdout, train = deduped[:n_hold], deduped[n_hold:]
 
@@ -423,6 +468,23 @@ def main() -> None:
     lens = sorted(word_count(a) for a in answers)
     print(f"answer words: p10={lens[len(lens)//10]} p50={lens[len(lens)//2]} "
           f"p90={lens[int(len(lens)*0.9)]}")
+    import re as _re
+    sents = []
+    for a in answers:
+        for sn in _re.split(r"(?<=[.!?])\s+|\n", a):
+            sn = _re.sub(r"^\d+\.\s*", "", sn.strip())
+            if len(sn) > 25:
+                sents.append(sn)
+    uniq = collections.Counter(sents)
+    heavy = sum(c for c in uniq.values() if c >= 5)
+    print(f"\nbody sentences: {len(sents)} total, {len(uniq)} unique "
+          f"({len(sents)/len(uniq):.1f}x average reuse)")
+    print(f"   in a sentence repeated 5+ times: {heavy}/{len(sents)} "
+          f"({heavy/len(sents)*100:.0f}%)   [v8 was 83%, and the model spliced "
+          f"oil palm spacing into a maize answer]")
+    for sn, c in uniq.most_common(5):
+        print(f"   {c:>3}x  {sn[:78]}")
+
     multi = sum(1 for r in train if r["_meta"].get("turns", 1) > 1)
     print(f"multi-turn: {multi}/{total} ({multi/total*100:.0f}%)")
     refusal_forms = {"refusal", "safety", "honest_limit", "boundary", "clarify"}

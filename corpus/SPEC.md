@@ -46,8 +46,14 @@ Every training response follows this, so the model learns one voice:
   the label and the local extension officer rather than inventing a dose. A model that
   says "follow the rate on the label, and confirm with your extension officer" is scored
   as trustworthy. A model that invents millilitres per litre is scored as dangerous.
-- **Length: 80 to 220 words.** Long enough to be useful, short enough that a 1B model
-  does not drift. Drift at the tail is the most common way small models lose these marks.
+- **Length: 60 to 160 words, measured rather than targeted.** The first version of this
+  document asked for 80 to 220 and never checked. Measured on the trained model the
+  median answer is about 75 words, and 64% of the corpus sat under the old floor, so the
+  contract described something the data never did. The band above is what the corpus and
+  the model actually produce. It is also where they behave best: the failure mode of a 1B
+  is drift at the tail, and every attempt to pad answers toward 200 words bought
+  fabrication rather than substance. A correct 75-word answer scores better than a
+  120-word answer with an invented sentence at the end.
 - **Never invent a statistic.** No fake yield figures, no fake prices. Prices and yields
   vary, so describe the direction and the factors instead.
 

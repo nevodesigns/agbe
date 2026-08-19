@@ -20,7 +20,8 @@
         "root rot on waterlogged soil",
         "late weeding"
       ],
-      "processing_note": "Process within 48 hours of harvest. Roots deteriorate fast once lifted."
+      "processing_note": "Process within 48 hours of harvest. Roots deteriorate fast once lifted.",
+      "planting_time": "Plant at the start of the rains, April to June in the humid forest and derived savanna. Cuttings put into dry soil dry out before they root. In the south a second window opens with the short rains in September."
     },
     "maize": {
       "local_names": [
@@ -29,7 +30,7 @@
         "masara (Hausa)"
       ],
       "spacing": "75cm between rows and 25cm within rows, one plant per stand, about 53,000 plants per hectare.",
-      "planting_time": "Plant when the rains are established, not on the first shower. A false start kills the stand and forces a costly replant.",
+      "planting_time": "Late March to April in the humid forest, late April to May in the guinea savanna, and June in the sudan zone. The derived savanna supports a second crop planted in August for an early December harvest.",
       "fertiliser": "Split nitrogen: a basal compound fertiliser at planting, then top dress with urea at about 3 to 4 weeks, and again at knee height on poor soils. Place fertiliser in a band beside the plant, not broadcast, to cut losses.",
       "critical_window": "Moisture stress at tasselling and silking causes the largest yield loss of any stage.",
       "seed_choice": "Hybrid seed yields more but must be bought fresh each season. Open pollinated varieties can be saved for 2 to 3 seasons with careful selection, which suits farmers with tight cash.",
@@ -40,7 +41,9 @@
         "stem borers",
         "storage weevils"
       ],
-      "rotation": "Follows a legume such as cowpea or soybean well, which reduces nitrogen cost."
+      "rotation": "Follows a legume such as cowpea or soybean well, which reduces nitrogen cost.",
+      "harvest": "Leave the crop to dry down until husks are brown and a black layer has formed at the kernel tip, usually 90 to 120 days after planting depending on variety. Harvesting green to beat rain or thieves costs both yield and storability.",
+      "storage": "Dry shelled grain to about 13 percent moisture before storing, which is the point where a kernel shatters rather than dents under a hard bite. Grain stored damp is where aflatoxin begins."
     },
     "yam": {
       "local_names": [
@@ -56,7 +59,8 @@
         "nematode damage in seed yam",
         "tuber rot in storage",
         "anthracnose on foliage"
-      ]
+      ],
+      "planting_time": "Set yam from November to February in the south while there is still residual soil moisture, or with the first rains in March and April further north. Early planting gives a longer growing period and bigger tubers."
     },
     "rice": {
       "local_names": [
@@ -72,7 +76,10 @@
         "weeds in upland systems",
         "iron toxicity in some lowlands",
         "blast"
-      ]
+      ],
+      "planting_time": "Lowland rain-fed rice is sown or transplanted from June to July as the fields take water, later into August in the north. Upland NERICA types go in with established rains in May and June.",
+      "harvest": "Cut when about 80 percent of the grains in the panicle have turned straw coloured and the grain is firm but not shattering, usually 30 to 40 days after flowering. Waiting for the last green grain loses more to shattering than it gains.",
+      "storage": "Dry paddy to about 13 to 14 percent moisture in thin layers, turning regularly. Drying too fast in strong sun cracks the grain and raises breakage at milling."
     },
     "sorghum_millet": {
       "local_names": [
@@ -86,7 +93,10 @@
         "birds especially quelea",
         "head bugs",
         "downy mildew on millet"
-      ]
+      ],
+      "planting_time": "Millet goes in first, dry sown or on the first useful rains in June, because it needs the longest run to maturity. Sorghum follows a few weeks later. Photoperiod sensitive local varieties flower on daylength, so late planting gives a shorter plant without delaying flowering.",
+      "harvest": "Cut heads when the grain is hard and cannot be dented with a thumbnail. A field left standing after the neighbours have cleared theirs carries the whole area's bird pressure, which is the largest single loss in these crops.",
+      "storage": "Dry heads fully before threshing, then store the grain clean and dry. Storage insects get in through broken grain, so threshing gently is part of storing well."
     },
     "cowpea": {
       "local_names": [
@@ -101,7 +111,10 @@
         "pod borers",
         "aphids",
         "storage bruchids"
-      ]
+      ],
+      "planting_time": "Planted late on purpose, July into August in the sudan and sahel, so that flowering and pod fill land in the drier tail of the season. Pods that fill in heavy rain rot and sprout inside the pod.",
+      "harvest": "Pick pods as they dry rather than in one pass, because cowpea matures unevenly. Pods left standing after they dry split and shed on the ground.",
+      "storage": "Cowpea weevil is the main storage loss and the infestation starts in the field, not in the store. Airtight storage in triple bagging or a sealed drum kills the weevil by starving it of oxygen, with no chemical at all."
     },
     "groundnut": {
       "local_names": [
@@ -114,7 +127,10 @@
         "groundnut rosette virus",
         "leaf spot",
         "aflatoxin at drying and storage"
-      ]
+      ],
+      "planting_time": "June to early July in the sudan and guinea savanna once rains are reliable. Groundnut needs a settled finish for pod fill and drying, so late planting risks harvesting into rain.",
+      "harvest": "Lift when the inside of the shell has darkened and veined and most kernels show their variety's skin colour. Left too long the pegs weaken and pods stay behind in the soil when you pull.",
+      "storage": "Store in shell rather than shelled where you can, dry, off the floor and away from walls. Damp groundnut is the single largest aflatoxin risk in the food chain."
     },
     "tomato": {
       "local_names": [
@@ -129,7 +145,10 @@
         "bacterial wilt",
         "blossom end rot",
         "bruising losses in raffia baskets"
-      ]
+      ],
+      "planting_time": "The main crop is dry season under irrigation: nursery from September to November, transplant October to December in the north, harvest into March. A rainy season crop is possible but bacterial wilt and blight pressure is far higher.",
+      "harvest": "Pick at the breaker stage, when colour is just turning at the blossom end, for anything travelling to market. Fully ripe fruit does not survive a journey on a rough road.",
+      "storage": "Tomato does not store. The value is in shading, ventilating and moving fruit quickly, or in drying and processing it."
     },
     "plantain_banana": {
       "local_names": [
@@ -142,7 +161,10 @@
         "banana weevil",
         "nematodes",
         "wind throw"
-      ]
+      ],
+      "planting_time": "Plant suckers at the start of the rains, March to May, so the plant establishes before the dry season. Suckers planted into the dry season need hand watering for months.",
+      "harvest": "Cut the bunch when the fingers have filled out and lost their sharp angles, before any finger yellows on the plant. A bunch left to ripen on the plant splits and loses value.",
+      "storage": "Green plantain holds one to two weeks in shade with good airflow. Once ripening starts it cannot be stopped, so match harvest to the market day."
     },
     "vegetables": {
       "local_names": [
@@ -152,7 +174,8 @@
         "ila / okra"
       ],
       "cash_flow": "Short cycle leafy vegetables turn over in weeks, which makes them the practical way to generate cash between long season crops.",
-      "harvest": "Leafy types are cut repeatedly at intervals rather than harvested once, so soil fertility must be maintained through the cycle."
+      "harvest": "Leafy types are cut repeatedly at intervals rather than harvested once, so soil fertility must be maintained through the cycle.",
+      "planting_time": "Leafy vegetables such as ugu, amaranth and jute mallow can be sown year round wherever water is available, which is what makes them carry cash flow between staple harvests. Dry season production needs irrigation and meets the highest prices."
     },
     "soybean": {
       "local_names": [
@@ -166,7 +189,9 @@
         "pod shattering at late harvest",
         "rust",
         "poor nodulation without inoculant"
-      ]
+      ],
+      "planting_time": "Mid June to early July in the guinea savanna. Soybean planted late flowers on a shorter plant and yields poorly, and seed quality falls when pods mature into the rains.",
+      "storage": "Soybean loses germination faster than most grains. Seed being kept for planting should be stored dry and cool and used within one season."
     },
     "cocoa": {
       "shade": "Young cocoa needs shade to establish. Mature trees tolerate more light, but full sun without adequate nutrition shortens the life of the farm.",
@@ -178,7 +203,9 @@
         "capsids or mirids",
         "swollen shoot virus",
         "poor fermentation"
-      ]
+      ],
+      "planting_time": "Field plant seedlings at the start of the rains, April to June, under temporary shade such as plantain. Young cocoa planted into full sun rarely survives its first dry season.",
+      "storage": "Dry fermented beans to about 7 percent moisture and store off the ground in a dry ventilated store. Beans stored damp grow mould and the whole lot loses grade."
     },
     "oil_palm": {
       "material": "Plant tenera hybrid seedlings from a reputable source. Dura palms grown from random seed give much thicker shells and less oil.",
@@ -188,7 +215,9 @@
         "harvesting at the wrong ripeness",
         "rodent damage to young palms",
         "poor drainage"
-      ]
+      ],
+      "planting_time": "Field plant at the start of the rains, April to June, after 10 to 12 months in the nursery. Planting at the end of the rains wastes a year of growth.",
+      "storage": "Fruit does not store. Free fatty acid begins rising the moment the bunch is cut, so process within 24 to 48 hours."
     },
     "sweet_potato": {
       "planting_material": "Use vine cuttings about 30cm long taken from healthy vigorous vines, planted into ridges or mounds.",
@@ -198,7 +227,9 @@
         "sweet potato weevil",
         "vine cuttings taken from diseased stock",
         "cracking from irregular moisture"
-      ]
+      ],
+      "planting_time": "Plant vine cuttings on ridges once the rains are established, with a second crop possible in the southern short rains. Cuttings taken from the top 30cm of healthy runners root fastest.",
+      "storage": "Cure roots for about a week somewhere warm and humid so the harvest wounds seal, then store cool, dry and ventilated. Uncured roots rot within weeks."
     },
     "pepper": {
       "local_names": [
@@ -213,7 +244,9 @@
         "anthracnose",
         "aphids and mites",
         "blossom drop in extreme heat"
-      ]
+      ],
+      "planting_time": "Nursery from September to November and transplant into the dry season under irrigation for the best prices, or nursery in March for a rain-fed crop. Transplant at about six weeks, when seedlings have four to six true leaves.",
+      "storage": "Fresh pepper keeps only days. Drying is the practical store, and peppers dried on a raised rack with airflow under them keep colour, and price, far better than peppers dried on bare ground."
     },
     "onion": {
       "curing": "Cure bulbs properly after lifting, with the necks dried down, before storing. Uncured onions rot in store and that loss is entirely avoidable.",
@@ -222,7 +255,9 @@
         "purple blotch",
         "thrips",
         "heavy storage losses from poor curing"
-      ]
+      ],
+      "planting_time": "Nursery from September to October and transplant in November and December in the Sokoto, Kano and Kebbi dry season systems, harvesting from March. Onion planted into the rains bulbs poorly and rots in store.",
+      "harvest": "Lift when about half the tops have fallen over on their own and the necks have gone soft. Onions lifted while the tops are still upright do not cure and will not keep."
     }
   },
   "pests_diseases": {

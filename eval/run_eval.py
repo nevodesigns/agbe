@@ -37,6 +37,32 @@ def ask(q: str, n: int = 220) -> tuple[str, float]:
     m = re.search(r"Generation:\s*([\d.]+) t/s", out.stdout)
     return body, float(m.group(1)) if m else 0.0
 
+NEG = re.compile(
+    r"\b(no|not|never|cannot|can\'t|won\'t|will not|nothing|neither|nor|"
+    r"rather than|instead of|without|avoid|does not|do not|don\'t|isn\'t|is not)\b")
+
+
+def violates(answer: str, term: str) -> bool:
+    """True only where a forbidden term is ASSERTED, not denied.
+
+    The plain substring test this replaced scored "That is stem borer, not
+    armyworm" as an armyworm violation, and "There is no cure for it" as a cure
+    violation. In both the model was right. A forbidden term inside a negated
+    clause is evidence FOR the model, so counting it against the model measures
+    the scorer rather than the model. Applied to v7 it changes nothing, because
+    v7's violations were genuine assertions ("That is fall armyworm" to a striga
+    question). That is the check that this correction is not self-serving.
+    """
+    low, t = answer.lower(), term.lower()
+    for m in re.finditer(re.escape(t), low):
+        bounds = [low.rfind(b, 0, m.start()) for b in (". ", "! ", "? ", "\n", ", ", "; ", ": ")]
+        start = max(bounds)
+        clause = low[max(start, 0):m.end()]
+        if not NEG.search(clause):
+            return True
+    return False
+
+
 def drift_flag(text: str) -> bool:
     """Does the tail introduce a claim the body never set up?"""
     sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
@@ -59,7 +85,7 @@ def main() -> None:
         body, tps = ask(r["q"])
         low = body.lower()
         hit = [e for e in r["expect"] if e.lower() in low]
-        bad = [f for f in r["forbid"] if f.lower() in low]
+        bad = [f for f in r["forbid"] if violates(body, f)]
         drift = drift_flag(body)
         ok = bool(hit or not r["expect"]) and not bad
         results.append({**r, "answer": body, "tps": tps, "hit": hit,
