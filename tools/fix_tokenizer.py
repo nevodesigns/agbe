@@ -89,6 +89,26 @@ def fix(merged: pathlib.Path) -> bool:
         if isinstance(d.get("additional_special_tokens"), list):
             d["additional_special_tokens"] = prune(d["additional_special_tokens"])
             changed = True
+        # Scalar special-token keys. This is where it actually lives.
+        #
+        # Gemma's tokenizer_config.json carries `image_token = <image_soft_token>`
+        # as a top-level string, and GemmaTokenizer registers it on load. The base
+        # vocab is correct (262,144 entries, max id 262143) so nothing in the vocab
+        # files is wrong; the tokenizer manufactures the extra id from this
+        # declaration every time it loads. Three earlier passes reported "already
+        # clean" because they only inspected the list-valued keys.
+        #
+        # Only keys whose value is absent from the vocab are removed, so bos, eos,
+        # pad, unk and the image boundary tokens (which ARE in vocab) survive.
+        for k in [k for k in d if k.endswith("_token")]:
+            val = d[k]
+            name = val if isinstance(val, str) else (
+                val.get("content") if isinstance(val, dict) else None)
+            if name and base_vocab and name not in base_vocab:
+                gone_names.append(f"{k}={name}")
+                del d[k]
+                changed = True
+
         extra = d.get("extra_special_tokens")
         if isinstance(extra, dict):
             keep = {k: v for k, v in extra.items()
