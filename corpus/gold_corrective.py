@@ -165,6 +165,28 @@ SHORT += [
  "This needs a veterinary officer today. A cow down for two days is an emergency and the causes differ enough that guessing wastes the time she has.\n\nWhile you are arranging that:\n\n1. Get her onto soft dry bedding and out of the sun.\n2. Roll her from one side to the other every few hours. Lying on one side too long damages the muscle and the nerve underneath, and that alone can stop a cow standing again even after the original problem is fixed.\n3. Keep water and feed within reach of her head.\n4. If she calved recently, say so when you call, because milk fever is common then and is quickly treatable.\n\nDo not haul her up with a rope around the body."),
 ]
 
+# --- the reverse direction, which v12 proved is not optional ---------------
+#
+# The corpus carried five examples of "That is stem borer, not armyworm" and
+# ZERO of the reverse. v12 then answered our own submitted test prompt, the
+# classic fall armyworm description, with "That is stem borer".
+#
+# This is the v4 lesson inverted. Pushing armyworm to 42 mentions once made
+# armyworm the default for every maize symptom; a one-way contrast pointing away
+# from it made stem borer the default instead. A contrast does not teach a
+# boundary, it teaches a direction, and an unbalanced one just relocates the bias.
+# Every discriminating pair now has to run both ways.
+
+SHORT += [
+("faw_not_borer", "discriminate",
+ "My maize has ragged holes in the young leaves and something like wet sawdust in the centre of the plant.",
+ "That is fall armyworm, not stem borer. The difference is where the damage sits and how the frass looks.\n\nFall armyworm: ragged holes in the leaves, moist sawdust like frass packed in the whorl at the centre of the plant, and the caterpillar itself down in there. Look for an inverted pale Y on the head and four dots in a square near the tail.\nStem borer: small holes in the STEM with DRY powder at the opening, and the central shoot dead and dry. Split a stem and you find the tunnel.\n\nCheck the whorl early morning or late evening on a sample of plants before you spend anything. Damage matters most on young plants; on a tasselled crop it rarely pays to treat."),
+
+("faw_not_borer2", "discriminate",
+ "Something is chewing my young maize and there is damp gritty dirt sitting in the funnel of the leaves.",
+ "That is fall armyworm rather than stem borer. Damp frass in the funnel is the armyworm sign; a borer leaves dry powder at a hole in the stem.\n\nOpen the whorl on a few plants and look for the caterpillar. A pale upside down Y on the head and four dark dots in a square near the tail confirm it.\n\nHandpicking works on a small plot. Destroy crop residues after harvest so the next generation has nowhere to carry over, and ask your extension officer which registered product is worth it if the infestation is heavy and the crop is still young."),
+]
+
 
 def as_records() -> list[dict]:
     return [{"messages": [{"role": "user", "content": u},

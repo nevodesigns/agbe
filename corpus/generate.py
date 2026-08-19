@@ -582,6 +582,30 @@ def main() -> None:
     for sn, c in uniq.most_common(5):
         print(f"   {c:>3}x  {sn[:78]}")
 
+    # Directional-contrast audit.
+    #
+    # A contrast exemplar does not teach a boundary, it teaches a DIRECTION. The
+    # corpus once carried five "That is stem borer, not armyworm" and none of the
+    # reverse, and the model duly answered the textbook fall armyworm description
+    # with "That is stem borer" -- on one of our own submitted test prompts. An
+    # unbalanced contrast does not remove a bias, it relocates it.
+    pat = _re.compile(r"that is ([a-z][a-z ]{2,26}?),\s*not\s+(?:a |an )?"
+                      r"([a-z][a-z ]{2,26}?)[.,\n]")
+    contrasts = collections.Counter()
+    for a in answers:
+        for m in pat.finditer(a.lower()):
+            contrasts[(m.group(1).strip(), m.group(2).strip())] += 1
+    if contrasts:
+        print("\ndirectional contrasts (asserted / rejected):")
+        for (x, y), n in sorted(contrasts.items(), key=lambda kv: -kv[1]):
+            # Names vary between the two directions ("armyworm" one way, "fall
+            # armyworm" the other; "newcastle" vs "newcastle disease"), so match
+            # on containment rather than equality.
+            rev = sum(v for (p1, p2), v in contrasts.items()
+                      if (y in p1 or p1 in y) and (x in p2 or p2 in x))
+            flag = "" if rev else "   <-- ONE WAY, add the reverse"
+            print(f"   {x:<24} not {y:<24} {n:>3}x  reverse {rev}x{flag}")
+
     multi = sum(1 for r in train if r["_meta"].get("turns", 1) > 1)
     print(f"multi-turn: {multi}/{total} ({multi/total*100:.0f}%)")
     refusal_forms = {"refusal", "safety", "honest_limit", "boundary", "clarify"}
