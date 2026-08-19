@@ -49,6 +49,58 @@ def fix(merged: pathlib.Path) -> bool:
         d["added_tokens_decoder"] = {k: v for k, v in dec.items() if int(k) < vs}
         tc.write_text(json.dumps(d, ensure_ascii=False))
 
+
+    # special_tokens_map.json and tokenizer_config's special-token lists.
+    #
+    # This is the one that actually mattered. The three files above were already
+    # clean, because the trainer strips them, and the assertion kept firing anyway:
+    # a special token listed HERE is re-registered by from_pretrained and handed
+    # the next free id, which is exactly vocab_size. Editing the vocab and leaving
+    # the declaration behind just meant the token was rebuilt on every load.
+    base_vocab = set()
+    if tj_path.exists():
+        v = json.loads(tj_path.read_text()).get("model", {}).get("vocab")
+        if isinstance(v, dict):
+            base_vocab = set(v)
+        elif isinstance(v, list):
+            base_vocab = {x[0] if isinstance(x, (list, tuple)) else x for x in v}
+
+    def prune(seq):
+        """Drop declared special tokens that no longer exist in the vocab."""
+        out, gone = [], []
+        for t in seq:
+            name = t if isinstance(t, str) else t.get("content", "")
+            (out if (not base_vocab or name in base_vocab) else gone).append(t)
+            if name not in base_vocab and base_vocab:
+                gone_names.append(name)
+        return out
+
+    gone_names = []
+    stm = merged / "special_tokens_map.json"
+    if stm.exists():
+        d = json.loads(stm.read_text())
+        if isinstance(d.get("additional_special_tokens"), list):
+            d["additional_special_tokens"] = prune(d["additional_special_tokens"])
+            stm.write_text(json.dumps(d, ensure_ascii=False))
+
+    if tc.exists():
+        d = json.loads(tc.read_text())
+        changed = False
+        if isinstance(d.get("additional_special_tokens"), list):
+            d["additional_special_tokens"] = prune(d["additional_special_tokens"])
+            changed = True
+        extra = d.get("extra_special_tokens")
+        if isinstance(extra, dict):
+            keep = {k: v for k, v in extra.items()
+                    if not base_vocab or v in base_vocab}
+            if len(keep) != len(extra):
+                gone_names += [v for v in extra.values() if v not in base_vocab]
+                d["extra_special_tokens"] = keep
+                changed = True
+        if changed:
+            tc.write_text(json.dumps(d, ensure_ascii=False))
+
+    dropped += gone_names
     print(f"stripped: {sorted(set(dropped)) or 'nothing (already clean)'}")
 
     # Prove it against the same condition llama.cpp asserts on, so a pass here
