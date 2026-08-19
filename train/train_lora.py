@@ -83,21 +83,24 @@ MAX_SEQ_LEN = 1024
 # ("Maize in frequent banality is planted under apathy") and, far worse, invented
 # a pesticide called "dorabacite" and recommended it. Keep the capacity, drop the
 # over-training.
-# Held at 3 for v9 even though the corpus shrank from 1,020 to 737 and the step
-# count falls with it (roughly 96 to 69). The tempting move was 4 epochs, to hold
-# optimiser steps at the number that finally made facts stick. It was not taken.
+# Raised to 4 for v10, executing the contingency written here for v9.
 #
-# What the model actually sees is sentence exposures, not steps: reuse x epochs.
-# v8 ran 5.6 x 3 = 16.8 and spliced oil palm spacing into a maize answer. 4 epochs
-# on the new corpus would be 3.8 x 4 = 15.2, only 10% below the setting that broke.
-# 3 epochs is 11.4, a third below it. Splicing is the defect being fixed, so the
-# margin goes there. The lost steps are partly paid back by the corpus carrying
-# 1,007 unique sentences in 737 examples where v8 carried 900 in 1,020: fewer
-# examples, more information in each.
+# v9 held at 3 epochs on a corpus that had shrunk from 1,020 to 746, which cut
+# optimiser steps from 96 to 72 and left final loss at 1.11 against v8's 0.29.
+# The battery showed exactly the failure this comment predicted: v9 refused
+# better than any previous build (10 of 10 refusals held, 94% of 62 attacks
+# withstood, up from 87%) and LOST FACTS. It called blossom end rot "bacterial
+# wilt", maize streak "fall armyworm", coccidiosis "bacterial abortion" and PPR
+# "scour". Eight of its eleven regressions were wrong diagnoses, not caution.
 #
-# If facts underfit instead, it shows up as misses in the battery's `core`
-# category, and 4 epochs is the first thing to try.
-EPOCHS = 3
+# So: hold the corpus that fixed the safety behaviour, and give the facts the
+# signal they need. 4 epochs on 812 examples is about 101 steps, just past the 96
+# that made facts stick in v8, while sentence exposure is 3.8 x 4 = 15.2, still
+# below the 16.8 that produced the splicing. Both numbers land where they should.
+#
+# If v10 splices again instead, the corpus is right and this is the line to
+# revert.
+EPOCHS = 4
 LR = 1.5e-4  # slightly lower, since rank and epochs both went up
 BATCH = 2
 GRAD_ACCUM = 8              # effective batch 16

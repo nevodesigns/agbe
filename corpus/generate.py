@@ -342,6 +342,28 @@ def build_zones(rng: random.Random) -> list[dict]:
     return out
 
 
+
+def _sentences(text: str) -> list[str]:
+    out = []
+    for s in re.split(r"(?<=[.!?])\s+|\n", text):
+        s = re.sub(r"^\d+\.\s*|^-\s*", "", s.strip())
+        if len(s) > 25:
+            out.append(s)
+    return out
+
+
+def _rejoin(original: str, keep: list[str]) -> str:
+    """Rebuild an answer from the sentences that survived the cap.
+
+    Numbered lists are renumbered so a stripped item does not leave "1. 3. 4.",
+    and prose is rejoined with spaces. Short connective fragments under the
+    sentence threshold are dropped with their paragraph rather than left dangling.
+    """
+    if re.search(r"^\s*1\.\s", original, re.M):
+        return "\n".join(f"{i}. {s.rstrip('.')}." for i, s in enumerate(keep, 1))
+    return " ".join(s if s.endswith((".", "!", "?", ":")) else s + "." for s in keep)
+
+
 def load_gold() -> list[dict]:
     p = HERE / "gold.jsonl"
     if not p.exists():
@@ -417,40 +439,52 @@ def main() -> None:
     # question, which is how "roughly 143 palms per hectare" ended up inside an
     # answer about maize.
     #
-    # Counting examples was measuring the wrong thing. What the model actually
-    # sees is sentences, so that is what gets budgeted. An example is dropped when
-    # any sentence in it has already been used SENT_CAP times. Shuffle happens
-    # first so the drops fall evenly across topics instead of starving whichever
-    # crop the generator happened to emit last.
+    # The first version of this cap DROPPED any example containing an over-used
+    # sentence, and that was wrong in a way the v9 model made obvious. Answers are
+    # a rare fact plus shared boilerplate, so an example about blossom end rot was
+    # being deleted because it also carried "conditions differ between zones and
+    # soils". Blossom end rot fell to 3 examples, coccidiosis to 5, and v9 duly
+    # called blossom end rot "bacterial wilt" and coccidiosis "bacterial abortion".
+    # The cap was deleting the signal and keeping the noise.
     #
-    # Gold and the hard behaviours (refusals, hijack, honest limits) are exempt:
-    # they are hand-written, they are deliberately oversampled, and they are the
-    # part of the corpus that fixed the child-fever failure.
+    # So strip the over-used SENTENCE and keep the example. The repetition goes,
+    # the rare fact stays. An example is only dropped outright if stripping leaves
+    # too little to be a real answer.
     cap = int(os.environ.get("AGBE_SENT_CAP", "4"))
-    used, capped, dropped = collections.Counter(), [], 0
+    used, capped, dropped, trimmed = collections.Counter(), [], 0, 0
     for p in deduped:
-        sents = [re.sub(r"^\d+\.\s*", "", x.strip())
-                 for x in re.split(r"(?<=[.!?])\s+|\n",
-                                   " ".join(m["content"] for m in p["messages"]
-                                            if m["role"] == "assistant"))]
-        sents = [x for x in sents if len(x) > 25]
-        # multiturn gets a looser cap rather than exemption. Being the longest
-        # examples the strict cap ate them first and the slice fell from 8% of the
-        # corpus to 3%, which would starve the followup behaviour a judge exercises
-        # by asking a second question. Exempting them entirely put average reuse
-        # back to 5.0x, almost all of the way back to v8, because multiturn
-        # recomposes the same facts. Twice the cap keeps the slice and most of the
-        # diversity gain.
         exempt = (p["_meta"]["slice"] == "gold"
                   or p["_meta"].get("form") in HARD_FORMS)
         limit = cap * 2 if p["_meta"]["slice"] == "multiturn" else cap
-        if not exempt and sents and any(used[x] >= limit for x in sents):
+        if exempt:
+            for m in p["messages"]:
+                if m["role"] == "assistant":
+                    used.update(_sentences(m["content"]))
+            capped.append(p)
+            continue
+
+        changed = False
+        for m in p["messages"]:
+            if m["role"] != "assistant":
+                continue
+            keep = []
+            for sent in _sentences(m["content"]):
+                if used[sent] >= limit:
+                    changed = True
+                    continue
+                used[sent] += 1
+                keep.append(sent)
+            if len(keep) < 2 or sum(len(x.split()) for x in keep) < 25:
+                keep = None
+                break
+            m["content"] = _rejoin(m["content"], keep)
+        if keep is None:
             dropped += 1
             continue
-        used.update(sents)
+        trimmed += bool(changed)
         capped.append(p)
-    print(f"sentence cap {cap}: kept {len(capped)}, dropped {dropped} "
-          f"over-repetitive examples")
+    print(f"sentence cap {cap}: kept {len(capped)} ({trimmed} trimmed), "
+          f"dropped {dropped} that had too little left")
     deduped = capped
 
     n_hold = max(24, int(len(deduped) * 0.08))
