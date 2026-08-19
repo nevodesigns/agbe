@@ -83,24 +83,34 @@ MAX_SEQ_LEN = 1024
 # ("Maize in frequent banality is planted under apathy") and, far worse, invented
 # a pesticide called "dorabacite" and recommended it. Keep the capacity, drop the
 # over-training.
-# Raised to 4 for v10, executing the contingency written here for v9.
+# Back to 3 for v11, reverting the v10 experiment exactly as this comment said to.
 #
-# v9 held at 3 epochs on a corpus that had shrunk from 1,020 to 746, which cut
-# optimiser steps from 96 to 72 and left final loss at 1.11 against v8's 0.29.
-# The battery showed exactly the failure this comment predicted: v9 refused
-# better than any previous build (10 of 10 refusals held, 94% of 62 attacks
-# withstood, up from 87%) and LOST FACTS. It called blossom end rot "bacterial
-# wilt", maize streak "fall armyworm", coccidiosis "bacterial abortion" and PPR
-# "scour". Eight of its eleven regressions were wrong diagnoses, not caution.
+# The v9/v10 pair separated two things that had been confounded all along:
 #
-# So: hold the corpus that fixed the safety behaviour, and give the facts the
-# signal they need. 4 epochs on 812 examples is about 101 steps, just past the 96
-# that made facts stick in v8, while sentence exposure is 3.8 x 4 = 15.2, still
-# below the 16.8 that produced the splicing. Both numbers land where they should.
+#   v9  (3 epochs, 746 ex)  lost facts. Read as underfitting at the time.
+#   v10 (4 epochs, 812 ex)  recovered some facts AND started inventing vocabulary:
+#                           it called coccidiosis "mortjacket" and opened an answer
+#                           with "Scarets on a plant". That is the v5 "dorabacite"
+#                           signature. It also contradicted itself inside one
+#                           answer ("that is stem borer, not armyworm ... that is
+#                           wilt and is armyworm"). On the hostile battery it went
+#                           BACKWARDS against v9, 77/92 to 81/92, and the legitimate
+#                           edge cases collapsed from 9/10 to 5/10.
 #
-# If v10 splices again instead, the corpus is right and this is the line to
-# revert.
-EPOCHS = 4
+# So epochs were never the constraint. The real cause of v9's lost facts was in the
+# corpus and this build fixes it there:
+#
+#   1. EVERY generated diagnosis question named the disease ("I think I have
+#      coccidiosis, how do I confirm it?"). The model was only ever trained to
+#      elaborate on a diagnosis it had been handed, never to map symptoms onto a
+#      name, which is the question a judge actually types. 58 symptom-first
+#      examples now exist and are exempt from the cap.
+#   2. The sentence cap had starved the rarest and most valuable slice: pests and
+#      diseases fell from 95 examples to 47, leaving striga on ONE. Diagnosis
+#      slices now get a higher cap and no disease sits below six examples.
+#
+# Fix the data, keep the setting that does not confabulate.
+EPOCHS = 3
 LR = 1.5e-4  # slightly lower, since rank and epochs both went up
 BATCH = 2
 GRAD_ACCUM = 8              # effective batch 16
