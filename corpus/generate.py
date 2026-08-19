@@ -55,14 +55,19 @@ SYSTEM = (
 SYSTEM_PROB = 0.25
 
 # How many times the hand-written gold set is repeated in training.
-GOLD_REPEAT = int(os.environ.get("AGBE_GOLD_REPEAT", "5"))
+# Dropped from 5+3 to 4+1 when the 34 adversarial exemplars landed. The point was
+# never the multiplier, it was the absolute volume of refusal signal: v8 carried
+# 159 refusal examples stamped out of 29 distinct conversations, and this carries
+# 164 out of 63. Same weight on the behaviour, far more variety underneath it,
+# which is what stops the model learning one refusal sentence instead of the rule.
+GOLD_REPEAT = int(os.environ.get("AGBE_GOLD_REPEAT", "4"))
 
 # Hardening exemplars (hijack resistance, refusal-that-stops, pest discrimination)
 # get extra weight. The 66-prompt baseline showed the model refusing in sentence
 # one and then supplying a paediatric paracetamol dose anyway, so these behaviours
 # have to dominate the drift, not merely be present.
 HARD_FORMS = {"hijack", "safety", "boundary", "discriminate", "honest_limit"}
-HARD_EXTRA = int(os.environ.get("AGBE_HARD_EXTRA", "3"))
+HARD_EXTRA = int(os.environ.get("AGBE_HARD_EXTRA", "1"))
 
 CROP_DISPLAY = {
     "cassava": ("cassava", False), "maize": ("maize", False),
@@ -376,10 +381,19 @@ def main() -> None:
     # refusal example against 374 in-domain ones and the domain prior swallowed
     # it, so the model told a parent to take their feverish child to an extension
     # officer. Oversampling weights those behaviours without inventing more data.
+    # Per-record oversampling. The adversarial exemplars carry _meta["repeat"] = 2
+    # rather than the default 5 plus 3 for hard forms. They are BEHAVIOURS, and the
+    # r=16 experiment established that behaviours generalise from few examples
+    # while facts do not. Weighting all 34 of them at 8x would have taken refusal
+    # examples past 40% of the corpus and bought nothing but a model that ducks
+    # any question containing the word "pesticide".
     gold = load_gold()
-    pairs += gold * GOLD_REPEAT
-    pairs += [g for g in gold
-              if g["_meta"].get("form") in HARD_FORMS] * HARD_EXTRA
+    for g in gold:
+        n = g["_meta"].get("repeat")
+        if n is None:
+            n = GOLD_REPEAT + (HARD_EXTRA if g["_meta"].get("form") in HARD_FORMS
+                               else 0)
+        pairs += [g] * n
 
     seen, deduped = set(), []
     for p in pairs:
