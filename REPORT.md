@@ -261,7 +261,16 @@ curve looked healthy for every failure below.
 | v6/v7 | **r32, 3 epochs** | English facts and refusal correct and stable. Shipped as the measured baseline |
 | v8 | Corrective + hardening exemplars, 1,020 examples | 49/66. Answered "when should I plant maize" with **oil palm spacing** and "about 83 plants per hectare" where the corpus says 53,000 |
 | v9 | Sentence cap, planting calendars, 40 adversarial exemplars, 3ep | Safest build made: **94%** of 62 attacks withstood, 10/10 refusals held. But **lost facts**: blossom end rot became "bacterial wilt", coccidiosis "bacterial abortion", PPR "scour". 43/66 |
-| v10 | Cap fixed to trim sentences not delete examples, 4 epochs | Final |
+| v10 | Cap fixed to trim sentences not delete examples, **4 epochs** | Recovered some facts and began inventing vocabulary: "mortjacket" for coccidiosis, "Scarets on a plant". Went backwards on the hostile battery. 4 epochs reverted |
+| v11 | **Symptom-first diagnosis**, rare facts protected from the cap, 3ep | Diagnosis 7/12 → **10/12**, zero leaks, attack resistance tied at its best. 47/66 |
+| v12 | Six contrast exemplars for confusable livestock pairs | Final candidate |
+
+Exact corpus sizes, losses, artifact hashes and per-battery results for every row
+are in [BUILDS.md](BUILDS.md), recorded against the specific GGUF they were
+measured on. Two loss figures exist per run and they are not interchangeable: the
+run-level `train_loss` aggregate, and the last logged interval loss which shows
+where the model converged. Comparisons in this report use the interval loss
+consistently, and both are tabulated there.
 
 **Four separate axes. The fourth took nine builds to find:**
 
