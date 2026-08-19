@@ -38,8 +38,16 @@ for hw in /sys/class/hwmon/hwmon*; do
   [ "$(cat "$hw/name" 2>/dev/null)" = "coretemp" ] || continue
   t=$(cat "$hw"/temp*_input 2>/dev/null | sort -n | tail -1)
   printf "cpu     : %d.%d C" $((t/1000)) $(((t%1000)/100))
-  if [ "$t" -gt 60000 ]; then
-    echo "   ← WARM. Wait a few minutes; a hot start costs 10 points."
+  if [ "$t" -gt 70000 ]; then
+    echo "   ← TOO HOT to start. This run would throttle and cost 10 points."
+    echo
+    echo "Close everything (VS Code especially), elevate the laptop, put a fan on"
+    echo "it, and wait until this reads under 60C. It can take 10 to 15 minutes"
+    echo "from a hot start. Re-run when it is cool."
+    echo "To profile anyway and accept the penalty: AGBE_FORCE_HOT=1 $0"
+    [ "${AGBE_FORCE_HOT:-0}" = "1" ] || exit 2
+  elif [ "$t" -gt 60000 ]; then
+    echo "   ← warm. Under 60C would be safer."
   else
     echo "   ← cold, good to go"
   fi
@@ -55,13 +63,23 @@ import json
 d = json.load(open("submission.json"))
 tps  = d["throughput"]["tokens_per_second_generation"]
 rss  = d["memory"]["peak_rss_mb"]
-therm = d.get("thermal", {})
+therm = d.get("cpu_thermal", {})
 s_perf = min(tps / 15.0, 1.0) * 100
 s_eff  = max(0.0, (7.0 - rss / 1024) / 7.0) * 100
 print(f"  throughput   {tps:.2f} tok/s      -> S_perf {s_perf:.1f}/100")
 print(f"  peak RSS     {rss:.0f} MB         -> S_eff  {s_eff:.1f}/100")
-print(f"  thermal      {therm if therm else 'no block reported'}")
-print(f"\n  engineering  {(0.30*s_perf + 0.20*s_eff):.2f} of the 50 available")
+# Read cpu_thermal, not thermal. The first version of this script looked for the
+# wrong key, printed "no block reported", and hid the fact that the run had
+# throttled at 99C: it reported 47.10 when the honest number was 37.10.
+peak = therm.get("core_temp_c_peak")
+thr  = therm.get("throttled")
+print(f"  peak temp    {peak} C   throttled={thr}")
+pen = -10.0 if (thr or (peak or 0) > 85) else 0.0
+eng = 0.30 * s_perf + 0.20 * s_eff
+print(f"\n  engineering  {eng:.2f} of the 50 available")
+if pen:
+    print(f"  THERMAL      {pen:.0f}  (throttled or over 85C)")
+    print(f"  net          {eng + pen:.2f}   <-- re-run cold to recover this")
 print(f"  team_id      {d['submission']['team_id']}")
 for p in d["submission"]["test_prompts"]:
     print(f"  {p['prompt_id']}        {p['prompt'][:66]}…")
