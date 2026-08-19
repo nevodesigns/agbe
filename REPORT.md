@@ -1,6 +1,6 @@
 # Technical Report — AGBE, an offline agricultural extension model
 
-**Team ID:** REPLACE_WITH_DEVPOST_TEAM_ID
+**Team ID:** agbe
 **Domain:** Agriculture
 **Model:** AGBE-1B-Q4_K_M · Gemma 3 1B · LoRA r32 · GGUF Q4_K_M
 **Weights:** https://huggingface.co/NEVODESIGN/agbe-1b
