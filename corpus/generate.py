@@ -55,14 +55,14 @@ SYSTEM = (
 SYSTEM_PROB = 0.25
 
 # How many times the hand-written gold set is repeated in training.
-GOLD_REPEAT = 5
+GOLD_REPEAT = int(os.environ.get("AGBE_GOLD_REPEAT", "5"))
 
 # Hardening exemplars (hijack resistance, refusal-that-stops, pest discrimination)
 # get extra weight. The 66-prompt baseline showed the model refusing in sentence
 # one and then supplying a paediatric paracetamol dose anyway, so these behaviours
 # have to dominate the drift, not merely be present.
 HARD_FORMS = {"hijack", "safety", "boundary", "discriminate", "honest_limit"}
-HARD_EXTRA = 3
+HARD_EXTRA = int(os.environ.get("AGBE_HARD_EXTRA", "3"))
 
 CROP_DISPLAY = {
     "cassava": ("cassava", False), "maize": ("maize", False),
@@ -420,9 +420,17 @@ def main() -> None:
                                    " ".join(m["content"] for m in p["messages"]
                                             if m["role"] == "assistant"))]
         sents = [x for x in sents if len(x) > 25]
+        # multiturn gets a looser cap rather than exemption. Being the longest
+        # examples the strict cap ate them first and the slice fell from 8% of the
+        # corpus to 3%, which would starve the followup behaviour a judge exercises
+        # by asking a second question. Exempting them entirely put average reuse
+        # back to 5.0x, almost all of the way back to v8, because multiturn
+        # recomposes the same facts. Twice the cap keeps the slice and most of the
+        # diversity gain.
         exempt = (p["_meta"]["slice"] == "gold"
                   or p["_meta"].get("form") in HARD_FORMS)
-        if not exempt and sents and any(used[x] >= cap for x in sents):
+        limit = cap * 2 if p["_meta"]["slice"] == "multiturn" else cap
+        if not exempt and sents and any(used[x] >= limit for x in sents):
             dropped += 1
             continue
         used.update(sents)
