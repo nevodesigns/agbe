@@ -26,7 +26,7 @@ which was imprecise.
 | v9  | 746   | 3 | 72  | 1.107  | 2.119 | Safest to date, lost facts (blossom end rot → "bacterial wilt") |
 | v10 | 812   | 4 | 104 | 0.38   | 1.556 | Recovered some facts, invented "mortjacket" and "Scarets" |
 | v11 | 924   | 3 | 87  | 0.7656 | 1.909 | Diagnosis 10/12, zero leaks, 94% attack resistance |
-| v12 | 948   | 3 | —   | —      | —     | v11 plus six contrast exemplars for confusable livestock pairs |
+| v12 | 948   | 3 | 90  | 0.7611 | 1.868 | Six livestock contrast exemplars. Bought +1 livestock, cost 3 leaks and 2 attacks. **Rejected** |
 
 ## Evaluation, identical scorer across all rows
 
@@ -38,7 +38,17 @@ compare like with like.
 | v8  | 49/66 | 7/12  | 0 | 76/92 | 54/62 | 19.7 |
 | v9  | 43/66 | 6/12  | 3 | 81/92 | 58/62 | 23.7 |
 | v10 | 46/66 | 5/12  | 3 | 77/92 | 57/62 | 21.7 |
-| v11 | 47/66 | **10/12** | **0** | 79/92 | **58/62** | 23.3 |
+| v11 | 47/66 | **10/12** | **0** | **79/92** | **58/62** | 23.3 |
+| v12 | 47/66 | **10/12** | 3 | 76/92 | 56/62 | 26.7 |
+
+**v11 is the shipped build.** v12 matched it on accuracy and diagnosis, gained one
+livestock prompt, and gave back three safety leaks and two attacks. Throughput is
+capped at 15 tok/s for scoring, so v12's speed advantage is worth nothing.
+
+v12's leaks were content failures, not scorer artifacts: blossom end rot became
+"blossom drop" described with insect symptoms, a catfish question returned "that
+is usually tilapia, not catfish", and a rainfall forecast returned "I only cover
+weather for Nigeria".
 
 v8 leads the 66-prompt total by two. That is not the deciding number: throughput
 is capped at 15 tok/s for scoring so v11's speed advantage is worth nothing, and
@@ -54,7 +64,8 @@ what the profiler was run against.
 |---|---|---|
 | v9  | `77a760fba0b01d0335dceba07775a060` | 814,261,088 |
 | v10 | `802bbabf844da09ed34c6a56e39557ff` | 814,261,088 |
-| v11 | `f18c01f2410958c2a894281b38088722` | 814,261,088 |
+| **v11 (SHIPPED)** | `f18c01f2410958c2a894281b38088722` | 814,261,088 |
+| v12 | `c675f16d3eb5033f331af128c0da0d81` | 814,261,088 |
 
 ## The export environment is load-bearing
 
@@ -99,3 +110,21 @@ measurement rather than an assumption: **158 prompts were generated through
 `llama-cli` against the exact published v11 GGUF** across the two batteries, at
 23 tok/s, with coherent output and no loader errors. A single smoke test would
 have been weaker evidence than that.
+
+
+## One-way contrasts
+
+v12's corpus carried five examples of "That is stem borer, not armyworm" and none
+of the reverse, and its smoke test answered the textbook fall armyworm description
+with "That is stem borer" — on our own submitted test prompt.
+
+A contrast exemplar does not teach a boundary, it teaches a **direction**. This is
+the v4 lesson inverted: pushing armyworm to 42 mentions once made armyworm the
+default for every maize symptom, and pointing a contrast away from it simply
+relocated the bias to stem borer. An unbalanced contrast moves a confusion rather
+than resolving it.
+
+`generate.py` now prints every `"That is X, not Y"` pair with its reverse count and
+flags any that run one way, matching on containment so "armyworm" and "fall
+armyworm" count as the same term. The reverse exemplars are committed. They are not
+in any shipped weights, because v11 predates the problem and does not have it.
