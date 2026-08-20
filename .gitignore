@@ -3,3 +3,9 @@ model/*.gguf
 out/
 __pycache__/
 .venv/
+
+# rendered video output: published to YouTube, not committed
+video/*.mp4
+video/*.srt
+video/*.ass
+video/frames/

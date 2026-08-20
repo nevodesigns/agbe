@@ -28,47 +28,36 @@ OUT = pathlib.Path(__file__).resolve().parent
 SCRIPT: dict[str, list[str]] = {
     "title": [
         "AGBE. Àgbẹ̀ means farmer in Yoruba.",
-        "A farming advisor that runs on an ordinary laptop,\nwith the internet switched off.",
+        "A farming advisor that runs on an ordinary laptop\nwith the internet switched off.",
     ],
     "problem": [
-        "Nigeria has about one agricultural extension officer\nfor every few thousand farming households.",
-        "The knowledge that would raise a smallholder's yield\nis not secret, and it is not new.",
-        "It sits in extension manuals.\nIt just never reaches the field.",
+        "A farmer walks out at first light and finds ragged\nholes in the young maize,",
+        "and wet sawdust in the centre of the plant.",
+        "They need to know what it is, and whether it is worth\nspending money on, today.",
+        "The nearest extension officer covers thousands of\nhouseholds, and there is no signal out here.",
     ],
     "ask": [
-        "So we asked it what farmers actually ask.",
-        "Holes in the young maize leaves, and something like\nwet sawdust in the centre of the plant.",
+        "So we asked it exactly that.",
         "It says fall armyworm.",
-        "Then it tells you how to check before you spend money:\na pale upside down Y on the head of the caterpillar,",
-        "and four dark dots near the tail.",
-        "That is real fall armyworm biology, not a guess.",
+        "Then it explains that the wet sawdust is frass,\nthe caterpillar's droppings, packed into the whorl.",
+        "And it tells you to open the whorl and count the damage\nacross the field before you spend anything.",
     ],
     "offline": [
-        "This is the part that matters.",
-        "Look at the status bar. That is aeroplane mode.",
+        "Now look at the status bar. That is aeroplane mode.",
         "No internet, no API key, no account, no data cost.\nThe model is on the laptop.",
     ],
     "refuse": [
         "Now something it should not answer.",
         "A child with a fever and vomiting.",
         "It declines. It says it does not give medical advice,",
-        "tells you to contact a doctor today, and not to give\nany medication without speaking to a professional.",
+        "tells you to contact a doctor today, and not to give\nany medication without speaking to a professional first.",
     ],
-    "refuse_hold": [
-        "Getting a one billion parameter model to say no\ntook four attempts.",
-        "For a tool used by people with no alternative,\nknowing where it stops matters as much as what it knows.",
-    ],
-    "chart": [
-        "The challenge publishes its scoring formula,\nso we read it before writing any code.",
-        "Throughput above fifteen tokens a second earns nothing,\nand memory is charged linearly.",
-        "That makes the obvious move, running the biggest model\nthat fits in eight gigabytes, exactly backwards.",
-        "The three billion model gives up fourteen and a half points\nbefore answering a single question.",
-        "So we measured five candidates, and built the one billion.",
-    ],
+    # refuse_hold is deliberately silent: the refusal reads better without a
+    # voice on top of it, so it carries no cue.
     "numbers": [
-        "Eight hundred and fourteen megabytes on disk.\nUnder a gigabyte of memory.",
-        "Twenty tokens a second on four CPU threads,\nwith no GPU at all.",
-        "Forty seven and a half of the fifty available\nengineering points, measured rather than estimated.",
+        "Eight hundred and fourteen megabytes on disk.\nAbout one gigabyte of memory.",
+        "Twenty six tokens a second on four CPU threads,\nwith no GPU.",
+        "Measured on the target hardware,\nnot taken off a spec sheet.",
     ],
     "close": [
         "Downloaded once. After that it works\nwith the cable pulled out.",
@@ -120,6 +109,15 @@ def main() -> None:
         m, sec = divmod(rem, 60)
         return f"{int(h)}:{int(m):02d}:{sec:05.2f}"
 
+    # MarginV 132, not 54: the card scenes carry a footer line at H-118 and at the
+    # old margin the caption sat straight on top of it, interleaving two texts so
+    # that "Challenge 2026" read as "Challenge 2023".
+    #
+    # Box alpha 20, not D0. In ASS the alpha byte runs 00 = OPAQUE to FF =
+    # transparent, which is backwards from every other format here. D0 was 82%
+    # transparent, so on the light cards the caption was effectively invisible;
+    # it only ever looked fine because it had been tuned against dark terminal
+    # frames where the text colour alone carried it.
     ass = OUT / "agbe-demo.ass"
     header = """[Script Info]
 ScriptType: v4.00+
@@ -130,7 +128,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,DejaVu Sans,38,&H00E9E4D5,&H000000FF,&HD0141712,&H00000000,0,0,0,0,100,100,0,0,3,10,0,2,140,140,54,1
+Style: Cap,DejaVu Sans,38,&H00E9E4D5,&H000000FF,&H20141712,&H00000000,0,0,0,0,100,100,0,0,3,12,0,2,140,140,132,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text

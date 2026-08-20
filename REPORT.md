@@ -214,11 +214,11 @@ planting calendar. Both gaps were filled.
 | | v8 | final |
 |---|---|---|
 | conversations | 1,020 | 812 |
-| unique sentences | 900 | 1,065 |
-| average sentence reuse | 5.6x | **3.8x** |
-| share in a 5+ repeat group | 83% | **30%** |
-| most-repeated single sentence | 40x | 13x |
-| refusals and honest limits | 15.6% | 21.1% |
+| unique sentences | 900 | 1,139 |
+| average sentence reuse | 5.6x | **4.0x** |
+| share in a 5+ repeat group | 83% | **45%** |
+| most-repeated single sentence | 40x | 17x |
+| refusals, limits and discriminating pairs | 15.6% | 29% |
 
 Fewer conversations, more information in each.
 

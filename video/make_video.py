@@ -122,35 +122,48 @@ def main() -> None:
     arm_end, ref_end = arm.duration, ref.duration
 
     scenes = [
-        ("title", 7.0, lambda p: card(
+        ("title", 8.0, lambda p: card(
             "AGBE",
             "A farming advisor that runs on an 8GB laptop with the internet switched off.",
             kicker="Àgbẹ̀ · farmer")),
-        ("problem", 9.0, lambda p: card(
-            "One extension officer per few thousand farms.",
-            "The advice exists. It just never reaches the field.",
-            kicker="The problem")),
+        # Opens on the farmer, not on a statistic. The QA session was clear that
+        # this is the only part a judge still remembers afterwards, so it gets the
+        # scene rather than a number.
+        ("problem", 22.0, lambda p: card(
+            "Ragged holes in the young maize. Wet sawdust in the centre of the plant.",
+            "What is it, and is it worth spending money on, today? The nearest "
+            "extension officer covers thousands of households, and there is no signal "
+            "out here.",
+            kicker="First light")),
         # real session, replayed at its recorded timing
-        ("ask", arm_end, lambda p: draw_frame(arm, p * arm_end,
+        ("ask", 20.0, lambda p: draw_frame(arm, p * arm_end,
                                              clock="Aug 17  00:44")),
         # Same completed answer, but the status bar now shows aeroplane mode.
         # Offline is the argument of the whole project, so it is shown in the
         # system tray the way a real machine shows it, not asserted in a caption.
-        ("offline", 9.0, lambda p: draw_frame(arm, arm_end, airplane=True,
-                                              clock="Aug 17  00:45")),
-        ("refuse", ref_end, lambda p: draw_frame(ref, p * ref_end, airplane=True,
-                                                 clock="Aug 17  00:46",
-                                                 banner="OUT OF SCOPE")),
-        ("refuse_hold", 5.0, lambda p: draw_frame(ref, ref_end, airplane=True,
-                                                  clock="Aug 17  00:46",
-                                                  banner="OUT OF SCOPE")),
-        ("chart", 15.0, lambda p: chart_slide()),
-        ("numbers", 12.0, lambda p: card(
-            "814 MB on disk. 0.88 GB of RAM. 20 tokens a second.",
-            "That is the run you just watched: four threads, no GPU, memory capped to "
-            "the target profile. 47.5 of the 50 available engineering points.",
+        ("offline", 11.0, lambda p: draw_frame(arm, arm_end, airplane=True,
+                                               clock="Aug 17  00:45")),
+        # No banner. The OUT OF SCOPE badge announced the conclusion before the
+        # viewer reached it, and a caption telling a judge what to think is weaker
+        # than the terminal simply doing it. The refusal needs no help.
+        # Replay compressed into the first 55% of the shot, then held. The
+        # narration's last line describes what the refusal SAYS, and at a linear
+        # scrub that line arrived while the model was still typing it. The viewer
+        # should read the sentence before hearing it summarised, not after.
+        ("refuse", 17.0, lambda p: draw_frame(ref, min(p / 0.55, 1.0) * ref_end,
+                                              airplane=True,
+                                              clock="Aug 17  00:46")),
+        ("refuse_hold", 3.0, lambda p: draw_frame(ref, ref_end, airplane=True,
+                                                  clock="Aug 17  00:46")),
+        # The chart slide is gone. It spent 22 of 94 seconds explaining the scoring
+        # formula to the people who wrote it, which belongs in REPORT.md. Those
+        # seconds went back to the demo.
+        ("numbers", 13.0, lambda p: card(
+            "814 MB on disk. 1.0 GB of memory. 26 tokens a second.",
+            "Four threads, no GPU. Read straight out of the official profiler's "
+            "own output, on the target hardware.",
             kicker="Measured, not estimated", accent=GREEN)),
-        ("close", 9.0, lambda p: card(
+        ("close", 10.0, lambda p: card(
             "Downloaded once. Then it works with the cable pulled out.",
             "huggingface.co/NEVODESIGN/agbe-1b   ·   agbe-farm.vercel.app",
             kicker="AGBE")),

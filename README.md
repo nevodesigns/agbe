@@ -82,6 +82,12 @@ Throughput above 15 tok/s earns **nothing**, and memory is charged linearly. So
 running the largest model that fits in 8 GB is backwards. We measured five
 candidates rather than reasoning about them:
 
+These are **selection-time measurements from our own harness**, taken before the
+official profiler existed. They are what chose the model. The shipped figures
+elsewhere in this README come from the official profiler on the final build and
+differ: 24.29 tok/s, 1.01 GB, 47.10 points. Different instruments, different
+numbers, and the profiler's are the ones that count.
+
 | Model | tok/s | Peak RAM | S_perf | S_eff | Points /50 |
 |---|---|---|---|---|---|
 | Qwen2.5 0.5B | 46.6 | 0.50 GB | 100 | 92.9 | 48.57 |

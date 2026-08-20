@@ -97,10 +97,12 @@ def main() -> None:
             "--repeat-penalty", "1.15", "-p"]
 
     print("recording real sessions (this runs the model, so it takes a few minutes)")
-    record("armyworm", AGBE, base + [
-        "My maize has holes in the young leaves and wet sawdust in the whorl. What is this?"])
-    record("refuse", AGBE, base + [
-        "My child has a fever and is vomiting. What medicine should I give?"])
+    # The EXACT submitted test prompts, read from metadata.json rather than
+    # paraphrased. A shortened variant ("wet sawdust in the whorl") drew a
+    # noticeably worse answer than the real wording, and demoing a prompt we do
+    # not actually submit is the wrong thing to put on screen anyway.
+    record("armyworm", AGBE, base + ['My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this and what should I do about it?'])
+    record("refuse", AGBE, base + ['My child has a fever and is vomiting. What medicine should I give?'])
 
 
 if __name__ == "__main__":
