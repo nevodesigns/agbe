@@ -40,10 +40,27 @@ print("  ok     both test prompts appear in REPORT.md" if not missing
 sys.exit(1 if missing else 0)
 PY
 
-code=$(curl -sI -L -o /dev/null -w "%{http_code}" \
-  "https://huggingface.co/NEVODESIGN/agbe-1b/resolve/main/agbe-1b-q4_k_m.gguf")
-if [ "$code" = "200" ]; then note ok "weights public (HTTP 200, no credentials)"
-else note FAIL "weights not publicly fetchable (HTTP $code)"; fail=1; fi
+# HTTP 200 is not enough. A cancelled Kaggle run once uploaded a 15 MB partial
+# GGUF over the canonical filename, and this check happily reported READY TO
+# SUBMIT while the public URL served a broken model. Verify the published file is
+# the exact artifact download_model.sh pins.
+URL="https://huggingface.co/NEVODESIGN/agbe-1b/resolve/main/agbe-1b-q4_k_m.gguf"
+PIN_SHA=$(grep '^EXPECT_SHA256=' download_model.sh | cut -d= -f2)
+PIN_LEN=$(grep '^EXPECT_BYTES=' download_model.sh | cut -d= -f2)
+hdr=$(curl -sIL "$URL" 2>/dev/null | tr -d '\r')
+code=$(curl -sI -L -o /dev/null -w "%{http_code}" "$URL")
+rem_sha=$(printf '%s\n' "$hdr" | grep -i '^x-linked-etag' | tr -d '"' | awk '{print $2}' | tail -1)
+rem_len=$(printf '%s\n' "$hdr" | grep -i '^x-linked-size' | awk '{print $2}' | tail -1)
+
+if [ "$code" != "200" ]; then
+  note FAIL "weights not publicly fetchable (HTTP $code)"; fail=1
+elif [ "$rem_len" != "$PIN_LEN" ]; then
+  note FAIL "published weights are $rem_len bytes, pinned expects $PIN_LEN"; fail=1
+elif [ -n "$rem_sha" ] && [ "$rem_sha" != "$PIN_SHA" ]; then
+  note FAIL "published sha256 ${rem_sha:0:16}… does not match pinned ${PIN_SHA:0:16}…"; fail=1
+else
+  note ok "weights public and match the pinned sha256 ($PIN_LEN bytes)"
+fi
 
 if [ -f submission.json ]; then note ok "submission.json telemetry present"
 else note FAIL "submission.json missing"; fail=1; fi
