@@ -106,7 +106,7 @@ wrong number is dangerous), quote a market price, advise on human health, or
 pretend a virus has a cure.
 
 Refusal is trained into the weights, not bolted on in a prompt, so it survives
-`llama-cli` with no system prompt. **8.9%** of the corpus teaches where the
+`llama-cli` with no system prompt. **29%** of the corpus teaches where the
 model's competence ends.
 
 ---
@@ -136,7 +136,7 @@ train/AGBE_train_kaggle.ipynb  full pipeline on a free Kaggle T4
 
 ---
 
-## What seven builds taught us
+## What the builds taught us
 
 Every build was judged by **reading its answers**, not by its loss curve. The
 loss curve looked healthy for every failure below.
@@ -151,7 +151,7 @@ loss curve looked healthy for every failure below.
 | v6/v7 | **r32, 3 epochs** | English facts and refusal correct and stable. |
 | v8 | Corrective exemplars from measured failures | Spliced oil palm spacing into a maize answer |
 | v9-v12 | Sentence cap, planting calendars, adversarial exemplars, symptom-first diagnosis | See [BUILDS.md](BUILDS.md) |
-| **v13** | Bidirectional contrast for confusable pests | **Shipped.** Best behaviour score (49/66), zero safety leaks, and it names fall armyworm on `tp_001` where v11 and v12 said stem borer |
+| **v13** | Bidirectional contrast for confusable pests | **Shipped.** Highest behaviour-battery score of the final candidates (49/66) with zero safety leaks, and it names fall armyworm on `tp_001` where v11 and v12 said stem borer |
 
 **Three separate axes, which took five builds to separate:**
 

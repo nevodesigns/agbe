@@ -23,10 +23,11 @@ laptop with the internet switched off. No cloud, no API key, no account, no data
 charges. You download it once and it never touches the network again.
 
 Ask it about that maize and it tells you it is fall armyworm, that the wet sawdust
-is frass, and how to be certain before you spend anything: open the whorl early
-morning when the larvae are active, look for a pale upside-down Y on the head and
-four dark dots near the tail. It covers crops, pests, livestock, soils, drying,
-storage and getting produce to market.
+is frass, the caterpillar's droppings, packed into the centre of the whorl. Then
+it tells you to open the whorl and count the damage across several plants before
+you spend anything, because on a crop that has already tasselled the spray rarely
+pays for itself. It covers crops, pests, livestock, soils, drying, storage and
+getting produce to market.
 
 It is grounded in West and Central African smallholder farming: cassava mosaic,
 striga, fall armyworm, aflatoxin, Newcastle disease, harmattan planting windows,
@@ -79,7 +80,7 @@ turbo ceiling; at four the all-core power limit caps clocks and spreads the same
 work cooler. Because the score caps throughput at 15 tok/s, the surplus speed was
 free to trade for cooling.
 
-**Eight model builds, and every failure had a healthy loss curve.**
+**Thirteen model builds, and every failure had a healthy loss curve.**
 
 - **v1** learned our answer *scaffolding* rather than the agronomy. Nearly half its
   answers opened with one of six sentences. It told a parent to take their
@@ -93,7 +94,26 @@ free to trade for cooling.
   called **"dorabacite"** and recommended buying it.
 - **v6 and v7** kept the rank and cut the epochs. Facts correct, coherent, refusal
   stable. This became our measured baseline.
-- **v8** was built from failures we found by testing, not guessing (below).
+- **v8** was built from failures we found by testing, not guessing (below). It
+  closed the jailbreak, then answered "when should I plant maize" with **oil palm
+  spacing**, because 15 of our 16 crops had no planting calendar at all.
+- **v9** was the safest build we made, withstanding 94% of 62 attacks. It also
+  *lost facts*: blossom end rot became "bacterial wilt". We had capped repeated
+  sentences and the cap deleted the rare diseases along with the boilerplate.
+- **v10** added an epoch to win those facts back. It won some, and started
+  inventing vocabulary again: **"mortjacket"** for coccidiosis. Reverted.
+- **v11** found the real cause. Every diagnosis question in the corpus *named the
+  disease* — "I think I have coccidiosis, how do I confirm it?" The model had
+  never been asked to map symptoms onto a name, which is the only thing a farmer
+  actually does. We wrote symptom-first questions for all 15 diseases and
+  diagnosis went from 7 of 12 to **10 of 12**.
+- **v12** added contrast exemplars for confusable livestock pairs. It gained one
+  livestock prompt and gave back three safety leaks. Rejected.
+- **v13** fixed what v12 revealed. Our corpus had five examples reading "that is
+  stem borer, not armyworm" and **none of the reverse**, so the model had learned
+  a direction rather than a boundary and answered our own submitted test prompt
+  with the wrong pest. Making the contrast bidirectional fixed it. **v13 ships**:
+  49 of 66 on the behaviour battery, 79 of 92 hostile, zero safety leaks.
 
 **Then we tried to break our own model, and succeeded.** We wrote a 66-prompt
 battery organised by *behaviour* rather than topic, including deliberate attempts
@@ -122,8 +142,11 @@ makes llama.cpp's converter fail *after* writing every tensor.
 
 ## Accomplishments that we're proud of
 
-**47 of 50 available engineering points**, measured with the official profiler on
-the target hardware rather than estimated.
+**47.1 of 50 available engineering points**, measured with the official profiler
+on the target hardware rather than estimated: 24.29 tokens per second against a
+15 tok/s reference, and 1039 MB of a 7 GB budget. A thermal penalty of ten
+points applies if the penalty is taken from our own telemetry, and we say so
+rather than quoting only the flattering figure.
 
 **A model that knows where its competence ends.** Getting a 1B model to decline a
 medical question instead of confidently answering it took four builds, and it is
