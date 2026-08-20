@@ -32,26 +32,49 @@ echo "llama-bench: $(command -v llama-bench)"
 
 echo "weights : $(du -h "$MODEL" | cut -f1)  sha256 $(sha256sum "$MODEL" | cut -c1-16)…"
 
-# coretemp only. Taking a max across every sensor sweeps in chipset, wifi and
-# ACPI zones that sit far above the CPU package at idle.
+# coretemp only, sampled over time rather than read once.
+#
+# Two separate mistakes are corrected here. First, an earlier version took the max
+# across every hwmon sensor, and acpitz idles near 73C on this machine, so the
+# reading was never usable. Second, and less obvious: core temperature swings
+# several degrees between consecutive reads, so a single instantaneous sample
+# catches spikes. This script reported 86C on a machine whose cores were sitting
+# at 62 to 71C, and told the user to go and cool a laptop that was already cool.
+#
+# Sample for a few seconds and use the MEDIAN. Same fix as the continuous sampler
+# in work/bench.py, which was written for exactly this reason and not reused here.
+CORE_HW=""
 for hw in /sys/class/hwmon/hwmon*; do
-  [ "$(cat "$hw/name" 2>/dev/null)" = "coretemp" ] || continue
-  t=$(cat "$hw"/temp*_input 2>/dev/null | sort -n | tail -1)
-  printf "cpu     : %d.%d C" $((t/1000)) $(((t%1000)/100))
-  if [ "$t" -gt 70000 ]; then
-    echo "   ← TOO HOT to start. This run would throttle and cost 10 points."
-    echo
-    echo "Close everything (VS Code especially), elevate the laptop, put a fan on"
-    echo "it, and wait until this reads under 60C. It can take 10 to 15 minutes"
-    echo "from a hot start. Re-run when it is cool."
-    echo "To profile anyway and accept the penalty: AGBE_FORCE_HOT=1 $0"
-    [ "${AGBE_FORCE_HOT:-0}" = "1" ] || exit 2
-  elif [ "$t" -gt 60000 ]; then
-    echo "   ← warm. Under 60C would be safer."
-  else
-    echo "   ← cold, good to go"
-  fi
+  [ "$(cat "$hw/name" 2>/dev/null)" = "coretemp" ] && CORE_HW="$hw" && break
 done
+[ -n "$CORE_HW" ] || { echo "no coretemp sensor found"; exit 1; }
+
+samples=""
+for i in $(seq 1 12); do
+  v=$(cat "$CORE_HW"/temp*_input 2>/dev/null | sort -n | tail -1)
+  samples="$samples $v"
+  sleep 0.25
+done
+t=$(echo $samples | tr ' ' '\n' | sort -n | awk '{a[NR]=$1} END{print a[int(NR/2)+1]}')
+peak=$(echo $samples | tr ' ' '\n' | sort -n | tail -1)
+printf "cpu     : %d.%d C median, %d.%d C peak over 3s" \
+  $((t/1000)) $(((t%1000)/100)) $((peak/1000)) $(((peak%1000)/100))
+
+# Report what is actually generating heat, since that is the actionable part.
+busy=$(ps -eo pcpu,comm --sort=-pcpu | awk 'NR>1 && $1>5 {printf "%s(%.0f%%) ", $2, $1}' | head -c 120)
+
+if [ "$t" -gt 75000 ]; then
+  echo "   <- TOO HOT to start; this run would throttle and cost 10 points."
+  [ -n "$busy" ] && echo "busy    : $busy"
+  echo "Close those, wait for the median to drop under 65C, and re-run."
+  echo "To profile anyway and accept the penalty: AGBE_FORCE_HOT=1 $0"
+  [ "${AGBE_FORCE_HOT:-0}" = "1" ] || exit 2
+elif [ "$t" -gt 65000 ]; then
+  echo "   <- warm but workable."
+  [ -n "$busy" ] && echo "busy    : $busy   <- closing these would help"
+else
+  echo "   <- cold, good to go"
+fi
 
 echo
 echo "running profiler, this takes a few minutes and the machine will get busy…"
