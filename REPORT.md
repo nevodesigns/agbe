@@ -464,6 +464,13 @@ same lesson as the striga fix: **contrast teaches a boundary, volume does not.**
 
 ---
 
+**On the commit recorded in `submission.json`.** It reads
+`61bced20ba47`, which is earlier than HEAD. That is
+correct rather than stale: the profiler ran at that commit, and every commit since
+has changed documentation and recorded analysis only. The weights, the corpus and
+the training configuration are untouched from that point, and the published GGUF's
+sha256 is pinned in `download_model.sh` and verified by `tools/check_submission.sh`.
+
 ## 15. Reproducing this
 
 ```bash
