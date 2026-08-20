@@ -16,14 +16,14 @@ profiler, participant mode, on the target profile:
 
 | Metric | Measured |
 |---|---|
-| Throughput | **26.23 tok/s** (reference 15.0) |
+| Throughput | **24.29 tok/s** (reference 15.0) |
 | Peak RSS | **1,039 MB** |
 | Steady RSS | 982 MB |
 | Model file | 814 MB |
-| `arc_easy`, 50 samples | **0.58** `acc_norm` |
+| `arc_easy`, 50 samples | **0.56** `acc_norm` |
 | S_perf | **100.00** |
 | S_eff | **85.15** |
-| Engineering subtotal | **47.03 / 50** |
+| Engineering subtotal | **47.10 / 50** before thermal, **37.10** with it |
 
 Raw telemetry is committed as [`submission.json`](submission.json). Every figure
 in this report comes from a tool in this repository that you can run.
@@ -165,7 +165,7 @@ environment, not by our laptop's reading.** We are not claiming it will be zero.
 
 | If P_thermal is judged | S_perf | S_eff | P_thermal | Total |
 |---|---|---|---|---|
-| in the audit sandbox | 100 | 85.15 | 0 | **47.03** |
+| in the audit sandbox | 100 | 85.50 | 0 | **47.10** |
 | from participant telemetry | 100 | 85.15 | −10 | **37.03** |
 
 ---
@@ -263,7 +263,8 @@ curve looked healthy for every failure below.
 | v9 | Sentence cap, planting calendars, 40 adversarial exemplars, 3ep | Safest build made: **94%** of 62 attacks withstood, 10/10 refusals held. But **lost facts**: blossom end rot became "bacterial wilt", coccidiosis "bacterial abortion", PPR "scour". 43/66 |
 | v10 | Cap fixed to trim sentences not delete examples, **4 epochs** | Recovered some facts and began inventing vocabulary: "mortjacket" for coccidiosis, "Scarets on a plant". Went backwards on the hostile battery. 4 epochs reverted |
 | v11 | **Symptom-first diagnosis**, rare facts protected from the cap, 3ep | Diagnosis 7/12 → **10/12**, zero leaks, attack resistance tied at its best. 47/66 |
-| v12 | Six contrast exemplars for confusable livestock pairs | Final candidate |
+| v12 | Six contrast exemplars for confusable livestock pairs | +1 livestock, but gave back safety leaks and attacks. Rejected |
+| **v13** | **Bidirectional** contrast for armyworm vs stem borer | **Shipped.** 49/66, zero leaks, and it names fall armyworm on `tp_001` |
 
 Exact corpus sizes, losses, artifact hashes and per-battery results for every row
 are in [BUILDS.md](BUILDS.md), recorded against the specific GGUF they were
@@ -455,7 +456,7 @@ same lesson as the striga fix: **contrast teaches a boundary, volume does not.**
 - **Open-domain agronomy is weaker than the drilled topics.** Strong on fall
   armyworm, refusals and post-harvest; weaker where the fact base is thin.
 - **English only.**
-- **`arc_easy` 0.58** is a general-knowledge benchmark, not an agriculture one. It
+- **`arc_easy` 0.56** is a general-knowledge benchmark, not an agriculture one. It
   indicates the model retains general ability after fine-tuning; it does not
   measure agricultural quality.
 - It is a knowledgeable extension pamphlet that holds a conversation. Not an
@@ -496,3 +497,55 @@ see immediately that this model knows where its competence ends.
 
 **Nwokolo Victor Oluebubechukwu**, Lagos · Africa Deep Tech Challenge 2026
 Base model Gemma 3 1B under the [Gemma Terms of Use](https://ai.google.dev/gemma/terms).
+
+
+---
+
+## 18. The engineering that does not show up in the model
+
+Five of the hardest days on this project produced no change to the weights at
+all. They are recorded because the failures were instructive and because a
+reproduction attempt will hit the same walls.
+
+**A silent CPU downgrade cost most of a day.** llama.cpp's
+`requirements-convert_hf_to_gguf.txt` installs a CPU-only torch wheel. Once it
+lands, the GPU build is gone for the rest of the container, and a later re-run of
+the training cell trains on CPU: no crash, no hang, just a 30x slowdown that is
+indistinguishable from a deadlock. Fixed by filtering torch out of that install,
+and by making the trainer **abort** rather than warn when CUDA is missing.
+
+**That same fix then broke GGUF export, and the diagnosis took seven attempts.**
+Writing the filtered requirements to `/tmp` broke a relative include inside the
+file, so pip aborted the whole install. Under `%%capture` the error was invisible.
+That install had been quietly doing a second job: pinning transformers **down**
+from 5.0 to 4.57. Losing the pin meant conversion died on
+`assert max(tokenizer.vocab.values()) < vocab_size`, because transformers 5.0's
+`GemmaTokenizer` injects `<image_soft_token>` at id 262144 while the text-only 1B
+declares `vocab_size` 262144.
+
+Five fixes were written for a tokenizer that was never broken. Its base vocab was
+correct at max id 262143 in every diagnostic. The token cannot be reached from the
+config at all: deleting the key lets a hardcoded class default take over, and
+remapping it leaves the string in `all_special_tokens`. **The lesson is the one
+the evaluation work got right and this did not: measure before fixing.** The
+diagnostic that named the cause took two minutes to write and was run only after
+five failed attempts. The notebook now asserts the transformers version
+immediately after the install, so a silent skip fails at that line instead of
+twenty minutes later inside the converter.
+
+**The thermal question was answered by measurement, not by effort.** Three
+profiler runs were made from 88 C, 44 C and 54 C. All three peaked at 99 to 100 C
+and all three throttled. Preparation does not change the outcome on this chassis.
+Along the way the cooling script itself was twice wrong: first it read the maximum
+across every hwmon sensor, and `acpitz` idles near 73 C here, so the condition was
+never satisfiable and the profiler sat unstarted for 36 minutes; then it read
+`coretemp` once rather than sampling, caught a spike, and reported 86 C on a
+machine whose cores were at 62 to 71 C. It now takes a median over three seconds
+and names the processes burning CPU, which is the actionable part.
+
+**A checksum caught a bug a size check would have passed.** Resuming a download
+onto a file already at full length appends nothing and exits successfully, leaving
+old content at exactly the right byte count. `download_model.sh` now pins the
+sha256 and verifies it, and the published weights were confirmed by downloading
+all 814,261,088 bytes from the public URL and hashing them locally rather than
+trusting a response header.
