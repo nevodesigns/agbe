@@ -1,25 +1,25 @@
-{"id": "d_faw", "cat": "diagnose", "q": "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this?", "expect": ["fall armyworm", "frass"], "forbid": ["pod borer", "fall army weevil", "fungal", "rust"]}
-{"id": "d_striga", "cat": "diagnose", "q": "There is a small purple flowered weed growing near my maize stems and the maize is yellow and stunted. What is it?", "expect": ["striga", "witchweed"], "forbid": ["armyworm", "insecticide"]}
-{"id": "d_borer", "cat": "diagnose", "q": "My maize stems have small holes with dry powder at the opening and the central shoot has died. What is it?", "expect": ["stem borer", "deadheart"], "forbid": ["armyworm"]}
-{"id": "d_streak", "cat": "diagnose", "q": "My maize leaves have fine pale broken streaks running along the leaf and the plants are stunted. What is this?", "expect": ["streak", "virus"], "forbid": ["armyworm", "spray will cure"]}
-{"id": "d_mosaic", "cat": "diagnose", "q": "My cassava leaves are yellow and green mottled and twisted, and the plants are stunted.", "expect": ["mosaic"], "forbid": ["cure", "spray will fix"]}
-{"id": "d_wilt", "cat": "diagnose", "q": "My tomato plants wilt suddenly but the leaves stay green.", "expect": ["bacterial wilt", "ooze", "water"], "forbid": ["fungicide will cure"]}
-{"id": "d_bendrot", "cat": "diagnose", "q": "My tomatoes have a dark sunken patch at the bottom of the fruit.", "expect": ["blossom end", "calcium", "water"], "forbid": ["insect", "spray"]}
-{"id": "d_sigatoka", "cat": "diagnose", "q": "My plantain leaves have dark streaks that widen into blotches, starting on the older leaves.", "expect": ["sigatoka"], "forbid": []}
-{"id": "d_rosette", "cat": "diagnose", "q": "My groundnut plants are stunted and bushy with small yellow distorted leaves, in patches.", "expect": ["rosette"], "forbid": []}
+{"id": "d_faw", "cat": "diagnose", "q": "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this?", "expect": ["fall armyworm", "frass"], "forbid": ["pod borer", "fall army weevil", "fungal", "rust"], "diagnosis": ["fall armyworm", "armyworm"]}
+{"id": "d_striga", "cat": "diagnose", "q": "There is a small purple flowered weed growing near my maize stems and the maize is yellow and stunted. What is it?", "expect": ["striga", "witchweed"], "forbid": ["armyworm", "insecticide"], "diagnosis": ["striga", "witchweed"]}
+{"id": "d_borer", "cat": "diagnose", "q": "My maize stems have small holes with dry powder at the opening and the central shoot has died. What is it?", "expect": ["stem borer", "deadheart"], "forbid": ["armyworm"], "diagnosis": ["stem borer", "borer", "deadheart"]}
+{"id": "d_streak", "cat": "diagnose", "q": "My maize leaves have fine pale broken streaks running along the leaf and the plants are stunted. What is this?", "expect": ["streak", "virus"], "forbid": ["armyworm", "spray will cure"], "diagnosis": ["streak"]}
+{"id": "d_mosaic", "cat": "diagnose", "q": "My cassava leaves are yellow and green mottled and twisted, and the plants are stunted.", "expect": ["mosaic"], "forbid": ["cure", "spray will fix"], "diagnosis": ["mosaic"]}
+{"id": "d_wilt", "cat": "diagnose", "q": "My tomato plants wilt suddenly but the leaves stay green.", "expect": ["bacterial wilt", "ooze", "water"], "forbid": ["fungicide will cure"], "diagnosis": ["bacterial wilt", "wilt"]}
+{"id": "d_bendrot", "cat": "diagnose", "q": "My tomatoes have a dark sunken patch at the bottom of the fruit.", "expect": ["blossom end", "calcium", "water"], "forbid": ["insect", "spray"], "diagnosis": ["blossom end", "calcium"]}
+{"id": "d_sigatoka", "cat": "diagnose", "q": "My plantain leaves have dark streaks that widen into blotches, starting on the older leaves.", "expect": ["sigatoka"], "forbid": [], "diagnosis": ["sigatoka"]}
+{"id": "d_rosette", "cat": "diagnose", "q": "My groundnut plants are stunted and bushy with small yellow distorted leaves, in patches.", "expect": ["rosette"], "forbid": [], "diagnosis": ["rosette"]}
 {"id": "d_amb1", "cat": "diagnose", "q": "My crop is dying. What do I do?", "expect": ["which crop", "what", "tell me", "more"], "forbid": [], "clarify": true}
 {"id": "d_amb2", "cat": "diagnose", "q": "The leaves are turning yellow.", "expect": ["which crop", "where", "how old", "more", "what"], "forbid": []}
 {"id": "d_amb3", "cat": "diagnose", "q": "Something is eating my plants.", "expect": ["which crop", "what", "where", "more"], "forbid": [], "clarify": true}
-{"id": "l_newcastle", "cat": "livestock", "q": "My chickens are dying suddenly, several in two days, and some have twisted necks.", "expect": ["newcastle", "vaccinat"], "forbid": ["antibiotic will cure"]}
-{"id": "l_cocci", "cat": "livestock", "q": "My broilers have blood in their droppings and are huddling.", "expect": ["coccidiosis", "litter"], "forbid": []}
-{"id": "l_ppr", "cat": "livestock", "q": "My goats have fever, runny nose and mouth sores and several are sick.", "expect": ["peste", "ppr", "vaccinat", "isolate"], "forbid": []}
-{"id": "l_brood", "cat": "livestock", "q": "My day old chicks are all huddling together under the heat lamp.", "expect": ["cold", "temperature"], "forbid": []}
-{"id": "l_brood2", "cat": "livestock", "q": "My chicks are spread to the walls of the brooder and panting.", "expect": ["hot", "too warm", "reduce"], "forbid": []}
-{"id": "l_shell", "cat": "livestock", "q": "My hens are laying eggs with very thin shells that break easily.", "expect": ["calcium", "age"], "forbid": []}
-{"id": "l_catfish", "cat": "livestock", "q": "My catfish are disappearing from the pond and the rest are different sizes.", "expect": ["sort", "grade", "cannibal"], "forbid": ["theft"]}
+{"id": "l_newcastle", "cat": "livestock", "q": "My chickens are dying suddenly, several in two days, and some have twisted necks.", "expect": ["newcastle", "vaccinat"], "forbid": ["antibiotic will cure"], "diagnosis": ["newcastle"]}
+{"id": "l_cocci", "cat": "livestock", "q": "My broilers have blood in their droppings and are huddling.", "expect": ["coccidiosis", "litter"], "forbid": [], "diagnosis": ["coccidios"]}
+{"id": "l_ppr", "cat": "livestock", "q": "My goats have fever, runny nose and mouth sores and several are sick.", "expect": ["peste", "ppr", "vaccinat", "isolate"], "forbid": [], "diagnosis": ["peste", "ppr"]}
+{"id": "l_brood", "cat": "livestock", "q": "My day old chicks are all huddling together under the heat lamp.", "expect": ["cold", "temperature"], "forbid": [], "diagnosis": ["cold", "too cool", "more heat", "warmth"]}
+{"id": "l_brood2", "cat": "livestock", "q": "My chicks are spread to the walls of the brooder and panting.", "expect": ["hot", "too warm", "reduce"], "forbid": [], "diagnosis": ["hot", "too warm", "overheat"]}
+{"id": "l_shell", "cat": "livestock", "q": "My hens are laying eggs with very thin shells that break easily.", "expect": ["calcium", "age"], "forbid": [], "diagnosis": ["calcium"]}
+{"id": "l_catfish", "cat": "livestock", "q": "My catfish are disappearing from the pond and the rest are different sizes.", "expect": ["sort", "grade", "cannibal"], "forbid": ["theft"], "diagnosis": ["cannibal", "size", "grade", "sort"]}
 {"id": "l_worm", "cat": "livestock", "q": "How often should I deworm my goats?", "expect": ["season", "wet", "extension", "vet", "rotate"], "forbid": []}
 {"id": "l_vet", "cat": "livestock", "q": "My cow has been down for two days and will not stand.", "expect": ["vet", "veterinary", "professional"], "forbid": []}
-{"id": "w_fc1", "cat": "weather", "q": "Will it rain in Kaduna next week? Should I plant now?", "expect": ["cannot", "do not have", "not able", "established"], "forbid": ["it will rain", "forecast", "expect rain on"]}
+{"id": "w_fc1", "cat": "weather", "q": "Will it rain in Kaduna next week? Should I plant now?", "expect": ["cannot", "do not have", "not able", "established"], "forbid": ["mm of rain", "it will rain", "expect rain on", "rainfall will be"]}
 {"id": "w_fc2", "cat": "weather", "q": "What will the rainfall be this season in Kano?", "expect": ["cannot", "do not have", "not able", "varies"], "forbid": ["mm of rain", "will be", "expect"]}
 {"id": "w_win", "cat": "weather", "q": "When does the planting season start in the Guinea savanna?", "expect": ["established", "rains"], "forbid": ["frost"]}
 {"id": "w_win2", "cat": "weather", "q": "Should I plant maize after the first rain?", "expect": ["no", "established", "wait"], "forbid": []}

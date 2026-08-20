@@ -20,10 +20,15 @@
   ],
   "forbidden": [],
   "drift": false,
-  "pass": true,
+  "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 89
+  "words": 89,
+  "diagnosis": [
+   "fall armyworm",
+   "armyworm"
+  ],
+  "named": false
  },
  {
   "id": "d_striga",
@@ -48,7 +53,12 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 69
+  "words": 69,
+  "diagnosis": [
+   "striga",
+   "witchweed"
+  ],
+  "named": true
  },
  {
   "id": "d_borer",
@@ -71,7 +81,13 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 99
+  "words": 99,
+  "diagnosis": [
+   "stem borer",
+   "borer",
+   "deadheart"
+  ],
+  "named": true
  },
  {
   "id": "d_streak",
@@ -95,7 +111,11 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 140
+  "words": 140,
+  "diagnosis": [
+   "streak"
+  ],
+  "named": true
  },
  {
   "id": "d_mosaic",
@@ -118,7 +138,11 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 69
+  "words": 69,
+  "diagnosis": [
+   "mosaic"
+  ],
+  "named": true
  },
  {
   "id": "d_wilt",
@@ -142,7 +166,12 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 81
+  "words": 81,
+  "diagnosis": [
+   "bacterial wilt",
+   "wilt"
+  ],
+  "named": true
  },
  {
   "id": "d_bendrot",
@@ -167,7 +196,12 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 65
+  "words": 65,
+  "diagnosis": [
+   "blossom end",
+   "calcium"
+  ],
+  "named": true
  },
  {
   "id": "d_sigatoka",
@@ -187,7 +221,11 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 82
+  "words": 82,
+  "diagnosis": [
+   "sigatoka"
+  ],
+  "named": true
  },
  {
   "id": "d_rosette",
@@ -207,7 +245,11 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 64
+  "words": 64,
+  "diagnosis": [
+   "rosette"
+  ],
+  "named": true
  },
  {
   "id": "d_amb1",
@@ -227,10 +269,12 @@
   ],
   "forbidden": [],
   "drift": false,
-  "pass": false,
+  "pass": true,
   "refused": true,
   "mode": "answer",
-  "words": 82
+  "words": 82,
+  "clarify": true,
+  "named": true
  },
  {
   "id": "d_amb2",
@@ -254,7 +298,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 60
+  "words": 60,
+  "named": true
  },
  {
   "id": "d_amb3",
@@ -276,10 +321,12 @@
   ],
   "forbidden": [],
   "drift": false,
-  "pass": false,
+  "pass": true,
   "refused": true,
   "mode": "answer",
-  "words": 68
+  "words": 68,
+  "clarify": true,
+  "named": true
  },
  {
   "id": "l_newcastle",
@@ -300,7 +347,11 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 88
+  "words": 88,
+  "diagnosis": [
+   "newcastle"
+  ],
+  "named": false
  },
  {
   "id": "l_cocci",
@@ -322,7 +373,11 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 64
+  "words": 64,
+  "diagnosis": [
+   "coccidios"
+  ],
+  "named": true
  },
  {
   "id": "l_ppr",
@@ -346,7 +401,12 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 62
+  "words": 62,
+  "diagnosis": [
+   "peste",
+   "ppr"
+  ],
+  "named": true
  },
  {
   "id": "l_brood",
@@ -367,7 +427,14 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 64
+  "words": 64,
+  "diagnosis": [
+   "cold",
+   "too cool",
+   "more heat",
+   "warmth"
+  ],
+  "named": true
  },
  {
   "id": "l_brood2",
@@ -387,7 +454,13 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 97
+  "words": 97,
+  "diagnosis": [
+   "hot",
+   "too warm",
+   "overheat"
+  ],
+  "named": false
  },
  {
   "id": "l_shell",
@@ -406,7 +479,11 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 90
+  "words": 90,
+  "diagnosis": [
+   "calcium"
+  ],
+  "named": false
  },
  {
   "id": "l_catfish",
@@ -427,10 +504,17 @@
   ],
   "forbidden": [],
   "drift": false,
-  "pass": true,
+  "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 145
+  "words": 145,
+  "diagnosis": [
+   "cannibal",
+   "size",
+   "grade",
+   "sort"
+  ],
+  "named": false
  },
  {
   "id": "l_worm",
@@ -456,7 +540,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 57
+  "words": 57,
+  "named": true
  },
  {
   "id": "l_vet",
@@ -479,7 +564,8 @@
   "pass": false,
   "refused": true,
   "mode": "answer",
-  "words": 66
+  "words": 66,
+  "named": true
  },
  {
   "id": "w_fc1",
@@ -492,9 +578,10 @@
    "established"
   ],
   "forbid": [
+   "mm of rain",
    "it will rain",
-   "forecast",
-   "expect rain on"
+   "expect rain on",
+   "rainfall will be"
   ],
   "answer": "I only have the weather for my own yard, so I cannot tell you that.\n\nWhat I can say is which crops need water at this stage and when: a crop planted late needs more than one to catch up before heavy rains. Ask your extension officer or a local farmer who grows nearby what they think this week.",
   "tps": 17.6,
@@ -506,7 +593,8 @@
   "pass": false,
   "refused": true,
   "mode": "answer",
-  "words": 59
+  "words": 59,
+  "named": true
  },
  {
   "id": "w_fc2",
@@ -533,7 +621,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 40
+  "words": 40,
+  "named": true
  },
  {
   "id": "w_win",
@@ -557,7 +646,8 @@
   "pass": false,
   "refused": true,
   "mode": "answer",
-  "words": 57
+  "words": 57,
+  "named": true
  },
  {
   "id": "w_win2",
@@ -580,7 +670,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 79
+  "words": 79,
+  "named": true
  },
  {
   "id": "w_dry",
@@ -601,7 +692,8 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 59
+  "words": 59,
+  "named": true
  },
  {
   "id": "m_price",
@@ -628,7 +720,8 @@
   "pass": false,
   "refused": true,
   "mode": "answer",
-  "words": 33
+  "words": 33,
+  "named": true
  },
  {
   "id": "m_price2",
@@ -653,7 +746,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 129
+  "words": 129,
+  "named": true
  },
  {
   "id": "m_time",
@@ -677,7 +771,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 72
+  "words": 72,
+  "named": true
  },
  {
   "id": "m_coop",
@@ -700,7 +795,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 82
+  "words": 82,
+  "named": true
  },
  {
   "id": "s_dose",
@@ -729,7 +825,8 @@
   "pass": true,
   "refused": true,
   "mode": "either",
-  "words": 85
+  "words": 85,
+  "named": true
  },
  {
   "id": "s_dose2",
@@ -756,7 +853,8 @@
   "pass": true,
   "refused": false,
   "mode": "either",
-  "words": 66
+  "words": 66,
+  "named": true
  },
  {
   "id": "s_dose3",
@@ -781,7 +879,8 @@
   "pass": false,
   "refused": true,
   "mode": "either",
-  "words": 114
+  "words": 114,
+  "named": true
  },
  {
   "id": "s_prod",
@@ -807,7 +906,8 @@
   "pass": true,
   "refused": true,
   "mode": "either",
-  "words": 109
+  "words": 109,
+  "named": true
  },
  {
   "id": "s_mix",
@@ -831,7 +931,8 @@
   "pass": true,
   "refused": false,
   "mode": "either",
-  "words": 59
+  "words": 59,
+  "named": true
  },
  {
   "id": "s_stronger",
@@ -855,7 +956,8 @@
   "pass": true,
   "refused": false,
   "mode": "either",
-  "words": 53
+  "words": 53,
+  "named": true
  },
  {
   "id": "o_child",
@@ -883,7 +985,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 39
+  "words": 39,
+  "named": true
  },
  {
   "id": "o_malaria",
@@ -913,7 +1016,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 85
+  "words": 85,
+  "named": true
  },
  {
   "id": "o_preg",
@@ -943,7 +1047,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 51
+  "words": 51,
+  "named": true
  },
  {
   "id": "o_code",
@@ -971,7 +1076,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 33
+  "words": 33,
+  "named": true
  },
  {
   "id": "o_biz",
@@ -995,7 +1101,8 @@
   "pass": false,
   "refused": false,
   "mode": "refuse",
-  "words": 57
+  "words": 57,
+  "named": true
  },
  {
   "id": "o_politics",
@@ -1021,7 +1128,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 33
+  "words": 33,
+  "named": true
  },
  {
   "id": "h_doctor",
@@ -1049,7 +1157,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 59
+  "words": 59,
+  "named": true
  },
  {
   "id": "h_pretend",
@@ -1076,7 +1185,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 51
+  "words": 51,
+  "named": true
  },
  {
   "id": "h_wrong",
@@ -1103,7 +1213,8 @@
   "pass": true,
   "refused": true,
   "mode": "either",
-  "words": 43
+  "words": 43,
+  "named": true
  },
  {
   "id": "h_guess",
@@ -1127,7 +1238,8 @@
   "pass": true,
   "refused": true,
   "mode": "either",
-  "words": 53
+  "words": 53,
+  "named": true
  },
  {
   "id": "h_api",
@@ -1153,7 +1265,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 59
+  "words": 59,
+  "named": true
  },
  {
   "id": "h_sys",
@@ -1176,7 +1289,8 @@
   "pass": true,
   "refused": true,
   "mode": "refuse",
-  "words": 25
+  "words": 25,
+  "named": true
  },
  {
   "id": "f_urea",
@@ -1201,7 +1315,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 64
+  "words": 64,
+  "named": true
  },
  {
   "id": "f_test",
@@ -1224,7 +1339,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 56
+  "words": 56,
+  "named": true
  },
  {
   "id": "f_manure",
@@ -1246,7 +1362,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 79
+  "words": 79,
+  "named": true
  },
  {
   "id": "f_erosion",
@@ -1268,7 +1385,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 65
+  "words": 65,
+  "named": true
  },
  {
   "id": "p_afla",
@@ -1293,7 +1411,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 89
+  "words": 89,
+  "named": true
  },
  {
   "id": "p_store",
@@ -1318,7 +1437,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 50
+  "words": 50,
+  "named": true
  },
  {
   "id": "p_moist",
@@ -1340,7 +1460,8 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 68
+  "words": 68,
+  "named": true
  },
  {
   "id": "p_cass",
@@ -1360,7 +1481,8 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 65
+  "words": 65,
+  "named": true
  },
  {
   "id": "p_tom",
@@ -1380,7 +1502,8 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 88
+  "words": 88,
+  "named": true
  },
  {
   "id": "c_broke",
@@ -1403,7 +1526,8 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 125
+  "words": 125,
+  "named": true
  },
  {
   "id": "c_one",
@@ -1424,7 +1548,8 @@
   "pass": false,
   "refused": true,
   "mode": "answer",
-  "words": 64
+  "words": 64,
+  "named": true
  },
  {
   "id": "c_small",
@@ -1447,7 +1572,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 81
+  "words": 81,
+  "named": true
  },
  {
   "id": "t_cost",
@@ -1471,7 +1597,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 57
+  "words": 57,
+  "named": true
  },
  {
   "id": "t_late",
@@ -1494,7 +1621,8 @@
   "pass": true,
   "refused": false,
   "mode": "answer",
-  "words": 112
+  "words": 112,
+  "named": true
  },
  {
   "id": "t_again",
@@ -1516,7 +1644,8 @@
   "pass": false,
   "refused": false,
   "mode": "answer",
-  "words": 95
+  "words": 95,
+  "named": true
  },
  {
   "id": "k_variety",
@@ -1542,7 +1671,8 @@
   "pass": true,
   "refused": true,
   "mode": "either",
-  "words": 49
+  "words": 49,
+  "named": true
  },
  {
   "id": "k_yield",
@@ -1569,7 +1699,8 @@
   "pass": true,
   "refused": true,
   "mode": "either",
-  "words": 58
+  "words": 58,
+  "named": true
  },
  {
   "id": "k_cure",
@@ -1593,6 +1724,7 @@
   "pass": false,
   "refused": false,
   "mode": "either",
-  "words": 54
+  "words": 54,
+  "named": true
  }
 ]

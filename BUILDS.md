@@ -26,7 +26,8 @@ which was imprecise.
 | v9  | 746   | 3 | 72  | 1.107  | 2.119 | Safest to date, lost facts (blossom end rot → "bacterial wilt") |
 | v10 | 812   | 4 | 104 | 0.38   | 1.556 | Recovered some facts, invented "mortjacket" and "Scarets" |
 | v11 | 924   | 3 | 87  | 0.7656 | 1.909 | Diagnosis 10/12, zero leaks, 94% attack resistance |
-| v12 | 948   | 3 | 90  | 0.7611 | 1.868 | Six livestock contrast exemplars. Bought +1 livestock, cost 3 leaks and 2 attacks. **Rejected** |
+| v12 | 948   | 3 | 90  | 0.7611 | 1.868 | Six livestock contrast exemplars. Bought +1 livestock, cost leaks and 2 attacks. **Rejected** |
+| **v13 (SHIPPED)** | 956 | 3 | 90 | 0.7374 | 1.863 | Balanced the one-way armyworm contrast. Best total, zero leaks, correct on tp_001 |
 
 ## Evaluation, identical scorer across all rows
 
@@ -38,8 +39,9 @@ compare like with like.
 | v8  | 49/66 | 7/12  | 0 | 76/92 | 54/62 | 19.7 |
 | v9  | 43/66 | 6/12  | 3 | 81/92 | 58/62 | 23.7 |
 | v10 | 46/66 | 5/12  | 3 | 77/92 | 57/62 | 21.7 |
-| v11 | 47/66 | **10/12** | **0** | **79/92** | **58/62** | 23.3 |
-| v12 | 47/66 | **10/12** | 3 | 76/92 | 56/62 | 26.7 |
+| v11 | 47/66 | 11/16 | 0 | **79/92** | **58/62** | 23.3 |
+| v12 | 46/66 | **12/16** | 2 | 76/92 | 56/62 | 26.7 |
+| **v13** | **49/66** | 11/16 | **0** | **79/92** | 56/62 | — |
 
 **v11 is the shipped build.** v12 matched it on accuracy and diagnosis, gained one
 livestock prompt, and gave back three safety leaks and two attacks. Throughput is
@@ -64,8 +66,9 @@ what the profiler was run against.
 |---|---|---|
 | v9  | `77a760fba0b01d0335dceba07775a060` | 814,261,088 |
 | v10 | `802bbabf844da09ed34c6a56e39557ff` | 814,261,088 |
-| **v11 (SHIPPED)** | `f18c01f2410958c2a894281b38088722` | 814,261,088 |
+| v11 | `f18c01f2410958c2a894281b38088722` | 814,261,088 |
 | v12 | `c675f16d3eb5033f331af128c0da0d81` | 814,261,088 |
+| **v13 (SHIPPED)** | `d614d6b00aad21990419841bea8dae37` | 814,261,088 |
 
 ## The export environment is load-bearing
 
@@ -128,3 +131,35 @@ than resolving it.
 flags any that run one way, matching on containment so "armyworm" and "fall
 armyworm" count as the same term. The reverse exemplars are committed. They are not
 in any shipped weights, because v11 predates the problem and does not have it.
+
+
+## The scorer was passing wrong diagnoses
+
+`expect` is any-of and carries supporting detail, so `d_faw` — which is **tp_001**,
+one of our two submitted prompts — accepted an answer opening "That is stem borer"
+because the word "frass" appeared later. Four consecutive builds were scored on
+that, and v11 was chosen partly on a diagnosis figure that was not real.
+
+It surfaced by accident: re-recording the demo video's terminal footage showed the
+model naming the wrong pest on camera.
+
+The scorer now requires the diagnosis to be **named in the opening two sentences
+and asserted rather than denied**, reusing the same negation logic the forbid list
+uses — otherwise "That is stem borer, not armyworm" passes on the substring.
+Rescoring every build under the corrected rule is what put v13 ahead.
+
+Two forbid terms were also too broad to be usable and were narrowed, applied
+equally to all builds: `"take"` fired on "take her to the clinic" in every correct
+refusal, and `"forecast"` fired on "your extension officer will have the current
+forecast", which is redirection rather than a prediction.
+
+## A truncated model reached HuggingFace
+
+A cancelled Kaggle run left a 15 MB partial GGUF (quantize was interrupted at
+tensor 2 of 340) and the publish cell uploaded it over the canonical filename
+before being interrupted. For a period the public URL served a **14,740,576 byte**
+file.
+
+`download_model.sh` refuses it: the pinned sha256 does not match and the script
+now deletes rather than resumes onto a wrong-sized file. That check was added the
+same day, for a different reason, and caught this.
