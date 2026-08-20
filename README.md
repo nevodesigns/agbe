@@ -48,14 +48,14 @@ Official `adtc-profiler`, participant mode, on the target profile
 
 | Metric | Value |
 |---|---|
-| Throughput | **26.23 tok/s** (reference is 15.0) |
+| Throughput | **24.29 tok/s** (reference is 15.0) |
 | Peak RSS | **1,039 MB** |
 | Steady RSS | 982 MB |
 | Model file | 814 MB |
-| `arc_easy` (50 samples) | **0.58** `acc_norm` |
+| `arc_easy` (50 samples) | **0.56** `acc_norm` |
 | S_perf | **100.00** |
 | S_eff | **85.15** |
-| Engineering subtotal | **47.03 / 50** |
+| Engineering subtotal | **47.10 / 50** before thermal, **37.10** with the penalty |
 
 Raw output is committed as [`submission.json`](submission.json).
 
@@ -122,7 +122,7 @@ having a large model write the answers would both have been faster, and both put
 claims into training data nobody can trace. Agronomists notice invented
 chemistry.
 
-**697 conversations**, 9% multi-turn, 8.9% refusals and honest limits.
+**956 conversations**, 7% multi-turn, 29% refusals, honest limits and discriminating pairs.
 
 ```
 corpus/facts.json        curated fact base, the single source of truth
@@ -149,7 +149,9 @@ loss curve looked healthy for every failure below.
 | v4 | 42 fall-armyworm mentions | Invented "fall army weevil". More examples do not fix a confusion. |
 | v5 | **r32**, 5 epochs | Facts finally correct. Coherence broke: word salad, invented a pesticide called "dorabacite". |
 | v6/v7 | **r32, 3 epochs** | English facts and refusal correct and stable. |
-| v8 | Corrective exemplars from measured failures | Current. |
+| v8 | Corrective exemplars from measured failures | Spliced oil palm spacing into a maize answer |
+| v9-v12 | Sentence cap, planting calendars, adversarial exemplars, symptom-first diagnosis | See [BUILDS.md](BUILDS.md) |
+| **v13** | Bidirectional contrast for confusable pests | **Shipped.** Best behaviour score (49/66), zero safety leaks, and it names fall armyworm on `tp_001` where v11 and v12 said stem borer |
 
 **Three separate axes, which took five builds to separate:**
 

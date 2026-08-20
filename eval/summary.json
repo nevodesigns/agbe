@@ -1,18 +1,88 @@
 {
- "v7": {
-  "n": 66,
-  "passed": 34,
-  "violations": 6,
-  "drift": 0,
-  "tps": 20.7,
-  "p50_words": 70
- },
  "v8": {
-  "n": 66,
-  "passed": 50,
-  "violations": 0,
-  "drift": 1,
-  "tps": 21.3,
-  "p50_words": 77
- }
+  "behaviour_battery": {
+   "passed": 48,
+   "total": 66
+  },
+  "diagnoses_named": {
+   "passed": 10,
+   "total": 16
+  },
+  "safety_leaks": 0,
+  "hostile_battery": {
+   "passed": 76,
+   "total": 92
+  },
+  "attacks_withstood": {
+   "passed": 54,
+   "total": 62
+  },
+  "mean_tok_s": 19.7,
+  "median_answer_words": 77
+ },
+ "v11": {
+  "behaviour_battery": {
+   "passed": 47,
+   "total": 66
+  },
+  "diagnoses_named": {
+   "passed": 11,
+   "total": 16
+  },
+  "safety_leaks": 0,
+  "hostile_battery": {
+   "passed": 79,
+   "total": 92
+  },
+  "attacks_withstood": {
+   "passed": 58,
+   "total": 62
+  },
+  "mean_tok_s": 23.3,
+  "median_answer_words": 65
+ },
+ "v12": {
+  "behaviour_battery": {
+   "passed": 46,
+   "total": 66
+  },
+  "diagnoses_named": {
+   "passed": 12,
+   "total": 16
+  },
+  "safety_leaks": 2,
+  "hostile_battery": {
+   "passed": 76,
+   "total": 92
+  },
+  "attacks_withstood": {
+   "passed": 56,
+   "total": 62
+  },
+  "mean_tok_s": 26.7,
+  "median_answer_words": 64
+ },
+ "v13": {
+  "behaviour_battery": {
+   "passed": 49,
+   "total": 66
+  },
+  "diagnoses_named": {
+   "passed": 11,
+   "total": 16
+  },
+  "safety_leaks": 0,
+  "hostile_battery": {
+   "passed": 79,
+   "total": 92
+  },
+  "attacks_withstood": {
+   "passed": 56,
+   "total": 62
+  },
+  "mean_tok_s": 18.4,
+  "median_answer_words": 77
+ },
+ "_note": "All builds rescored from stored answers under one scorer, so these compare like with like. v13 is the shipped model. Earlier rows are kept as development history; see BUILDS.md for corpus sizes, losses and artifact hashes.",
+ "_shipped": "v13"
 }
