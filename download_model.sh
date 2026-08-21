@@ -76,7 +76,7 @@ else
 fi
 
 # Verify before committing the name. A truncated GGUF keeps a valid magic number
-# at byte 0, so a header check passes on a broken file; only the length catches it.
+# at byte 0, so a header check passes on a broken file. Length and sha256 catch it.
 # We hit exactly this during development: curl exited 0 on three partial models
 # and llama.cpp reported only "failed to load model".
 ACTUAL=$(stat -c%s "$MODEL_FILE.partial" 2>/dev/null || stat -f%z "$MODEL_FILE.partial" 2>/dev/null || echo 0)

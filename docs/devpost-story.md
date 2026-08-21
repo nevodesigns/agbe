@@ -67,7 +67,7 @@ not in that file, it cannot appear in the corpus.
 **956 conversations. 29% of them teach the model to refuse, admit a limit, or tell two confusable problems apart.**
 
 Then LoRA rank 32 on Gemma 3 1B, merged, converted with llama.cpp's own tooling
-and quantised to Q4_K_M. 814 MB on disk, about 1 GB in memory, 26 tokens a second
+and quantised to Q4_K_M. 814 MB on disk, about 1 GB in memory, 24.29 tokens a second
 on four CPU threads with no GPU at all.
 
 ## Challenges we ran into

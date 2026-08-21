@@ -43,9 +43,9 @@ compare like with like.
 | v12 | 46/66 | **12/16** | 2 | 76/92 | 56/62 | 26.7 |
 | **v13** | **49/66** | 11/16 | **0** | **79/92** | 56/62 | — |
 
-**v11 is the shipped build.** v12 matched it on accuracy and diagnosis, gained one
+**v11 was the leading candidate at that point.** v12 matched it on accuracy and diagnosis, gained one
 livestock prompt, and gave back three safety leaks and two attacks. Throughput is
-capped at 15 tok/s for scoring, so v12's speed advantage is worth nothing.
+was then believed to cap at 15 tok/s, so v12's speed advantage looked worthless.
 
 v12's leaks were content failures, not scorer artifacts: blossom end rot became
 "blossom drop" described with insect symptoms, a catfish question returned "that
@@ -53,7 +53,8 @@ is usually tilapia, not catfish", and a rainfall forecast returned "I only cover
 weather for Nigeria".
 
 v8 leads the 66-prompt total by two. That is not the deciding number: throughput
-is capped at 15 tok/s for scoring so v11's speed advantage is worth nothing, and
+was then believed to cap at 15 tok/s, so v11's speed advantage looked worthless. Under
+the published formula it is not, though the trade below still favours v11 over v12.
 the trade is +3 diagnosis and +4 attacks against 2 livestock prompts. Symptom-first
 diagnosis is the likeliest hidden prompt there is, so the trade is worth taking.
 
@@ -111,7 +112,7 @@ Conversion emits `Unknown RoPE type: default` and several
 `Duplicated key name 'gemma3.*'` warnings. Both are benign here, and that is a
 measurement rather than an assumption: **158 prompts were generated through
 `llama-cli` against the exact published v11 GGUF** across the two batteries, at
-23 tok/s, with coherent output and no loader errors. A single smoke test would
+about 24.29 tok/s, with coherent output and no loader errors. A single smoke test would
 have been weaker evidence than that.
 
 

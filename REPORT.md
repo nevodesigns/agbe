@@ -251,7 +251,7 @@ planting calendar. Both gaps were filled.
 
 | | v8 | final |
 |---|---|---|
-| conversations | 1,020 | 812 |
+| conversations | 1,020 | 956 |
 | unique sentences | 900 | 1,139 |
 | average sentence reuse | 5.6x | **4.0x** |
 | share in a 5+ repeat group | 83% | **45%** |
@@ -487,8 +487,8 @@ same lesson as the striga fix: **contrast teaches a boundary, volume does not.**
   simultaneously lost facts it had known since v6. The shipped build accepts
   slightly weaker headline safety for materially better accuracy, because accuracy
   is 50% of the score and a confident wrong diagnosis is worse than caution.
-- **Sentence reuse is reduced, not solved.** 3.8x average, down from 5.6x. With
-  roughly 1,000 unique sentences carrying 4,000 instances, the corpus is diverse in
+- **Sentence reuse is reduced, not solved.** 4.0x average, down from 5.6x. With
+  1,139 unique sentences carrying the corpus, the corpus is diverse in
   questions and still thin in content. Capping removes duplicates; it does not
   create variety. The rarest facts (blossom end rot, coccidiosis) sit at 4 to 7
   examples each and are the first things to fail.

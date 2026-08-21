@@ -1,0 +1,31 @@
+{
+  "_comment": "Single source of truth for the shipped build. tools/check_submission.sh validates every public document against this. Update here first, never in prose.",
+  "build": "v13",
+  "corpus_conversations": 956,
+  "corpus_unique_sentences": 1139,
+  "corpus_sentence_reuse": 4.0,
+  "corpus_refusal_share_pct": 29,
+  "epochs": 3,
+  "optimiser_steps": 90,
+  "base_model": "Gemma 3 1B",
+  "quantisation": "GGUF Q4_K_M",
+  "runtime": "llama.cpp",
+  "model_bytes": 814261088,
+  "model_sha256": "d614d6b00aad21990419841bea8dae37502f8c57f1b3a25730ec15c3480d9851",
+  "tokens_per_second": 24.29,
+  "peak_rss_mb": 1039.06,
+  "arc_easy": 0.56,
+  "s_perf_provisional": 100.0,
+  "s_eff": 85.5,
+  "engineering_points": 47.1,
+  "engineering_points_with_thermal_penalty": 37.1,
+  "behaviour_battery": "49/66",
+  "hostile_battery": "79/92",
+  "attacks_withstood": "56/62",
+  "safety_leaks": 0,
+  "language_scope": [
+    "en"
+  ],
+  "demo_video": "https://youtu.be/iQCgCXdy6Ww",
+  "team_id": "agbe"
+}

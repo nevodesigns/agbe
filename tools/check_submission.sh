@@ -65,6 +65,19 @@ fi
 if [ -f submission.json ]; then note ok "submission.json telemetry present"
 else note FAIL "submission.json missing"; fail=1; fi
 
+# Documents, not just the artifact. The artifact checks below proved the model's
+# identity while README, REPORT, BUILDS and the site quietly drifted apart, and
+# this script still printed READY TO SUBMIT. FINAL.json is now the single source
+# of truth and tools/check_docs.py rejects any public file that contradicts it.
+if python3 "$(dirname "$0")/check_docs.py" > /tmp/agbe-docs.$$ 2>&1; then
+  echo "  ok     public documents agree with FINAL.json"
+else
+  echo "  FAIL   public documents contradict FINAL.json:"
+  sed 's/^/  /' /tmp/agbe-docs.$$ | head -20
+  FAILED=1
+fi
+rm -f /tmp/agbe-docs.$$
+
 echo
 if [ "$fail" -eq 0 ]; then echo "  READY TO SUBMIT"; else echo "  NOT READY: fix the FAIL lines above"; fi
 exit $fail

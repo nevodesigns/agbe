@@ -150,7 +150,7 @@ corpus/facts.json        curated fact base, the single source of truth
 corpus/generate.py       composes conversations from facts
 corpus/gold*.py          hand-written exemplars (refusals, Pidgin, corrections)
 corpus/build/train.jsonl generated training set
-eval/                    22-prompt battery + automatic scorer
+eval/                    66-prompt behaviour + 92-prompt hostile batteries
 train/train_lora.py      LoRA trainer, no trl
 train/AGBE_train_kaggle.ipynb  full pipeline on a free Kaggle T4
 ```
@@ -207,7 +207,7 @@ was the mistake: rank was the missing variable the whole time.
 ```bash
 python corpus/generate.py                       # rebuild the corpus from facts
 python train/train_lora.py --train corpus/build/train.jsonl --out out --merge
-python eval/run_eval.py                         # 22-prompt battery, scored
+python eval/run_eval.py                         # 66-prompt behaviour battery
 adtc-profiler run --submission . --mode participant --output submission.json
 ```
 
