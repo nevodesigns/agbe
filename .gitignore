@@ -9,3 +9,6 @@ video/*.mp4
 video/*.srt
 video/*.ass
 video/frames/
+
+# internal engineering notes, not for publication
+internal/

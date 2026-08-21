@@ -136,10 +136,10 @@ Q4_K_M gives 814 MB on disk and 1.01 GB peak RSS under the official profiler.
 Our own harness measured 0.88 GB; where the two disagreed we report the
 profiler's number.
 
-Gemma 3 1B has an embedding dimension of 1152, which is not divisible by 256, so
-`llama.cpp` falls back to `q5_0` and `q8_0` on several tensors. That is expected,
-applies equally to the reference build, and is why the file is larger than a naive
-Q4 estimate.
+The file is larger than a naive 4-bit estimate would suggest. That is expected
+for this architecture under `llama-quantize`'s Q4_K_M preset, applies equally to
+any Q4_K_M build of the same model, and is accounted for in the memory figure
+above, which is measured rather than derived.
 
 ---
 
