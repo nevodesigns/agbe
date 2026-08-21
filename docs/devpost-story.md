@@ -42,8 +42,8 @@ cassava mosaic can be cured, it says no, because it cannot.
 ## How we built it
 
 **We read the scoring function before writing any code**, and it told us to build
-something smaller than instinct suggested. Throughput above 15 tokens per second
-earns nothing, and memory is charged linearly, so running the biggest model that
+something smaller than instinct suggested. Memory is charged linearly, so every
+gigabyte is paid for, and running the biggest model that
 fits in 8 GB is exactly backwards. We measured five candidates on the target
 hardware instead of arguing about them:
 

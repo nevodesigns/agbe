@@ -109,7 +109,7 @@ S_perf  = 100 × (TPS_act ÷ TPS_max)      [15.0 provisional]
 S_eff   = max(0, (7.0 − peak RAM GB) ÷ 7.0) × 100
 ```
 
-Throughput above 15 tok/s earns **nothing**. Memory is charged linearly. So the
+Memory is charged linearly, so every gigabyte is paid for. So the
 instinct to run the largest model that fits inside 8 GB is precisely backwards.
 
 We built a harness that holds the machine to the Standard Laptop profile (four
@@ -127,6 +127,33 @@ The 3B concedes **14.5 points** before answering a single question, and would ha
 to be twenty-nine accuracy points better to break even. We took Gemma 3 1B over
 the 0.5B for about one point, judging that a 0.5B would not hold enough agronomy,
 and over Llama 3.2 1B at identical file size purely on memory.
+
+---
+
+**What the misread cost, stated plainly.** The selection table above was computed
+under the capped reading, where anything past 15 tok/s scored a flat 100. Under
+the published formula the same measurements give very different engineering
+subtotals:
+
+| candidate | tok/s | peak RAM | subtotal, capped reading | subtotal, published formula |
+|---|---|---|---|---|
+| Qwen2.5 0.5B | 46.6 | 0.50 GB | 48.57 | **48.57** |
+| **Gemma 3 1B** | 26.9 | 0.88 GB | 47.49 | **34.80** |
+| Llama 3.2 1B | 24.4 | 1.26 GB | 46.40 | 32.11 |
+| Qwen2.5 1.5B | 17.9 | 1.31 GB | 46.26 | 27.78 |
+| Qwen2.5 3B | 11.5 | 3.26 GB | 33.69 | 18.09 |
+
+We chose the 1B over the 0.5B believing it cost **1.08 points**. It costs
+**13.77**. The conclusion that a 3B is the wrong shape survives, and survives more
+strongly, but the margin over the 0.5B does not.
+
+We are not switching. Accuracy is 50% of the total and speed is 30%, so recovering
+13.77 engineering points would need the 0.5B to lose fewer than 27.5 points of
+panel accuracy against the 1B. Thirteen builds of this report are an account of
+how hard facts were to get into a 1B at all; a 0.5B losing more than 27 points on
+agronomy is the likely case, not the unlikely one. The decision stands, but it
+stands on a different and more expensive trade than we originally documented, and
+saying so is more useful than quietly restating the conclusion.
 
 ---
 
@@ -158,7 +185,8 @@ counts produced a result that runs against intuition:
 **Fewer threads ran hotter.** With two or three cores loaded the CPU boosts toward
 its single-core turbo ceiling and per-core temperature spikes; at four or more the
 all-core power limit caps clocks and spreads the same work cooler. Because
-`S_perf` caps at 15 tok/s, surplus throughput can be traded for thermal headroom
+we then believed `S_perf` capped at 15 tok/s, we treated surplus throughput as
+tradeable for thermal headroom
 at no cost to the score.
 
 **The official profiler then took the penalty back.** It runs a 512-token
@@ -239,7 +267,7 @@ Fewer conversations, more information in each.
 | Setting | Value | Why |
 |---|---|---|
 | LoRA rank / alpha | 32 / 64 | Rank 16 transferred style but not facts (§10) |
-| Epochs | 4 | 5 destroyed coherence, 3 underfitted the reduced corpus (§10) |
+| Epochs | 3 | 5 destroyed coherence; 4 produced invented vocabulary in v10 (§10) |
 | LR | 1.5e-4, cosine | Lowered when rank and epochs both rose |
 | Precision | fp16 | T4 is Turing; bf16 is emulated and slow |
 | Loss masking | assistant turns only | User turns masked to −100. Training on questions teaches question generation |
@@ -250,7 +278,8 @@ loss is computed on is visible rather than assumed.
 
 **Epochs are set against sentence exposure, not step count.** What the model sees
 is reuse x epochs. v8 ran 5.6 x 3 = 16.8 and spliced topics together. v9 ran
-3.8 x 3 = 11.4 and lost facts. The final build runs 3.8 x 4 = **15.2**, between the
+3.8 x 3 = 11.4 and lost facts. The shipped build, v13, runs 4.0 x 3 = **12.1** on a
+larger corpus, between the
 two measured failure points and nearer the fit level that made facts stick, at 104
 optimiser steps against v8's 96.
 

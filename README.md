@@ -48,7 +48,7 @@ Official `adtc-profiler`, participant mode, on the target profile
 
 | Metric | Value |
 |---|---|
-| Throughput | **24.29 tok/s** (reference is 15.0) |
+| Throughput | **24.29 tok/s** (15.0 is the provisional reference; the real denominator is the fastest submission) |
 | Peak RSS | **1,039 MB** |
 | Steady RSS | 982 MB |
 | Model file | 814 MB |
@@ -88,8 +88,8 @@ S_perf  = 100 × (TPS_act ÷ TPS_max)      [15.0 provisional]
 S_eff   = max(0, (7.0 − peak RAM GB) ÷ 7.0) × 100
 ```
 
-Throughput above 15 tok/s earns **nothing**, and memory is charged linearly. So
-running the largest model that fits in 8 GB is backwards. We measured five
+Memory is charged linearly, so every gigabyte is paid for, and running the largest
+model that fits in 8 GB is backwards on that term alone. We measured five
 candidates rather than reasoning about them:
 
 These are **selection-time measurements from our own harness**, taken before the
