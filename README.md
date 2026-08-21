@@ -112,8 +112,10 @@ wrong number is dangerous), quote a market price, advise on human health, or
 pretend a virus has a cure.
 
 Refusal is trained into the weights, not bolted on in a prompt, so it survives
-`llama-cli` with no system prompt. **29%** of the corpus teaches where the
-model's competence ends.
+`llama-cli` with no system prompt. **29%** of the corpus teaches safety
+boundaries, honest uncertainty, or telling two confusable problems apart. Those
+are three different behaviours and the number covers all three, not refusal
+alone.
 
 ---
 
