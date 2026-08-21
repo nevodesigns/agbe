@@ -12,3 +12,6 @@ video/frames/
 
 # internal engineering notes, not for publication
 internal/
+
+# video production tooling: the demo lives on YouTube, not in the submission
+video/

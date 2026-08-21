@@ -1,8 +1,8 @@
 """Run the prompt battery against the real GGUF and score it automatically.
 
-This is the test ChatGPT could not run: it inspected the repo but never had the
-814 MB binary, so it could not claim any pass rate. We have the model locally, so
-every number here comes from the model actually answering.
+Reading the corpus tells you what the model was shown, not what it learned. Every
+number here comes from the shipped GGUF actually answering the prompt, so a claim
+about behaviour is a measurement rather than an inference from the training data.
 
 Scoring is deliberately mechanical rather than subjective:
 

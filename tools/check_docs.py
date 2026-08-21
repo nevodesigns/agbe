@@ -18,8 +18,7 @@ F = json.loads((ROOT / "FINAL.json").read_text())
 
 DOCS = ["README.md", "REPORT.md", "BUILDS.md", "docs/devpost-story.md",
         "corpus/SPEC.md", "metadata.json",
-        "../agbe-site/index.html", "../agbe-site/notes/index.html",
-        "../adtc-2026/video/TRANSCRIPT-v2.md"]
+        "../agbe-site/index.html", "../agbe-site/notes/index.html"]
 
 # Strings that contradict the shipped build wherever they appear as a claim.
 # The value is why it is wrong, printed on a hit.
