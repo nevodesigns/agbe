@@ -25,6 +25,16 @@ profiler, participant mode, on the target profile:
 | S_eff | **85.15** |
 | Engineering subtotal | **47.10 / 50** before thermal, **37.10** with it |
 
+> **Correction, checked against the official rules.** Earlier drafts of this
+> document treated `S_perf` as capped: `100 × (TPS_act ÷ TPS_max)`. The
+> challenge page states **`S_perf = 100 × (TPS_act ÷ TPS_max)`** with
+> `TPS_REFERENCE = 15.0 provisional`, and the rules page says throughput is
+> "evaluated relative to the maximum observed tokens per second". So 15.0 is a
+> placeholder for the fastest submission, not a ceiling. Our 24.29 tok/s is
+> therefore **not** a guaranteed 100: it is 100 only if nothing faster is
+> submitted, and falls proportionally otherwise. Every engineering subtotal in
+> this document assumes the provisional reference and is stated as such.
+
 Raw telemetry is committed as [`submission.json`](submission.json). Every figure
 in this report comes from a tool in this repository that you can run.
 
@@ -95,7 +105,7 @@ a first-class capability to be trained and tested, not as a disclaimer.
 
 ```
 S_total = 0.50·S_acc + 0.30·S_perf + 0.20·S_eff − P_thermal
-S_perf  = min(TPS ÷ 15.0, 1.0) × 100
+S_perf  = 100 × (TPS_act ÷ TPS_max)      [15.0 provisional]
 S_eff   = max(0, (7.0 − peak RAM GB) ÷ 7.0) × 100
 ```
 
