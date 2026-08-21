@@ -5,9 +5,12 @@ to this.
 
 ## The scoring reality
 
-`S_acc` is 50% of the total and is **judged by humans reading generated answers**. We
-submit 2 test prompts; organisers add 2 hidden prompts in the agriculture domain. There
-is no official dataset and no automated accuracy metric in the scoring path.
+`S_acc` is 50% of the total and is a **weighted combination of an automated
+benchmark and a judge panel reading generated answers**. We submit 2 test prompts;
+organisers add 2 hidden prompts in the agriculture domain, and a judge chats with
+the model live in a sandbox capped to the Standard Laptop profile. There is no
+published agricultural accuracy dataset, so the qualitative half is the part this
+corpus can move.
 
 Three consequences:
 
