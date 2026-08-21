@@ -49,10 +49,22 @@ BANNED = {
 # and is still a false present-tense claim, which an earlier version of this
 # regex waved through. Present-tense assertions are checked first and never
 # exempted.
-PRESENT_CLAIM = re.compile(r"\bis the shipped\b|\bis shipped\b|\bwe ship\b", re.I)
+# A claim about the SHIPPED build is never exempt, however it is phrased.
+PRESENT_CLAIM = re.compile(
+    r"\bis the shipped\b|\bis shipped\b|\bwe ship\b|\bthe shipped (model|build)\b|"
+    r"\bfinal (model|build)\b|\bv13\b", re.I)
+
+# Historical exemptions must NAME the past explicitly. A bare "was" or "were" is
+# not enough: "the shipped model was trained on 812 conversations" is a false
+# present-tense claim wearing a past-tense verb, and an earlier version of this
+# regex passed exactly that, along with "throughput was capped at 15 tok/s".
+# Both were caught only by deliberately injecting them and watching this script
+# say DOCS CONSISTENT.
 HISTORICAL_OK = re.compile(
-    r"originally|at the time|we then believed|historic|selection-time|"
-    r"earlier|misread|first version|used to|previously|\bwas\b|\bwere\b", re.I)
+    r"originally|at the time|we then believed|we (then |initially )?read|historic|"
+    r"selection-time|misread|first version|used to|previously|"
+    r"\bv[1-9]\b|\bv1[0-2]\b|earlier (version|draft|build|reading)|"
+    r"no longer|until|before we|turned out", re.I)
 
 def main() -> int:
     bad = 0
