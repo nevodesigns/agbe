@@ -212,3 +212,7 @@ llama-cli -m agbe.gguf -t 4 -ngl 0 -c 2048 -st \
 ```
 
 Then disconnect your network and run it again. Nothing changes.
+
+---
+
+**Demo video:** https://youtu.be/iQCgCXdy6Ww

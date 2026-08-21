@@ -11,6 +11,9 @@ and getting produce to market.
 
 ---
 
+
+**Demo video:** https://youtu.be/iQCgCXdy6Ww (105 seconds, real terminal sessions against the published weights)
+
 ## Try it in two commands
 
 ```bash
