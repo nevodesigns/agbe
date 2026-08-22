@@ -103,7 +103,7 @@ a first-class capability to be trained and tested, not as a disclaimer.
 |---|---|
 | `llama.cpp` | The runtime the challenge scores through. Building against anything else would measure something judges never run |
 | GGUF Q4_K_M | Best measured balance of file size, memory and quality (§6) |
-| LoRA via `peft` | Full fine-tuning a 1B on a free T4 is not feasible; LoRA is, at 13M trainable of 1,012M |
+| LoRA via `peft` | Full fine-tuning a 1B on a free T4 is not feasible; LoRA is, at 26.1M trainable of 1,026M |
 | Plain `transformers.Trainer` | We started with `trl`'s `SFTTrainer` and it broke inside its own chunked cross-entropy path on a PEFT-wrapped causal LM. Replacing it removed a dependency and made label masking explicit and auditable |
 | Kaggle free T4 | The Udutech GPU grant had closed by the time we entered. Kaggle's 30 free hours a week covered every run |
 | `adtc-profiler` | The official measurement, used in preference to our own numbers wherever the two disagreed |
@@ -289,7 +289,7 @@ Fewer conversations, more information in each.
 | LR | 1.5e-4, cosine | Lowered when rank and epochs both rose |
 | Precision | fp16 | T4 is Turing; bf16 is emulated and slow |
 | Loss masking | assistant turns only | User turns masked to −100. Training on questions teaches question generation |
-| Trainable | 13.0M of 1,012.9M (1.29%) | |
+| Trainable | 26.1M of 1,026.0M (2.54%) | rank 32 across seven projection groups |
 
 Label masking is implemented explicitly and printed before every run, so what the
 loss is computed on is visible rather than assumed.
@@ -298,8 +298,9 @@ loss is computed on is visible rather than assumed.
 is reuse x epochs. v8 ran 5.6 x 3 = 16.8 and spliced topics together. v9 ran
 3.8 x 3 = 11.4 and lost facts. The shipped build, v13, runs 4.0 x 3 = **12.1** on a
 larger corpus, between the
-two measured failure points and nearer the fit level that made facts stick, at 104
-optimiser steps against v8's 96.
+two measured failure points and nearer the fit level that made facts stick, at 90
+optimiser steps against v8's 96. (104 was v10's step count and appeared here by
+mistake; the ledger and the manifest both say 90.)
 
 ---
 

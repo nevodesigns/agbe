@@ -77,14 +77,36 @@ def main() -> int:
         p = ROOT / rel
         if not p.exists():
             print(f"  MISSING  {rel}"); bad += 1; continue
-        lines = p.read_text().split("\n")
+        raw = p.read_text()
+        lines = raw.split("\n")
+        # Match against the line AND against the line joined to the next one with
+        # its newline collapsed to a space. A banned phrase that wraps across a
+        # line break was invisible to a per-line scan: "104 optimiser steps" sat
+        # in REPORT.md for three audits with "104" ending one line and
+        # "optimiser" starting the next, while this script printed CONSISTENT.
+        seen = set()
         for i, line in enumerate(lines, 1):
+            nxt = lines[i] if i < len(lines) else ""
+            window = line + " " + nxt.lstrip()
             for needle, why in BANNED.items():
-                if needle not in line:
+                # Judge the exemption against the SAME text the needle matched.
+                # Judging a wrapped hit against only the first line strips the
+                # "we then believed" that sits on the second and reports a
+                # correctly-hedged sentence as a contradiction.
+                if needle in line:
+                    subject, at = line, i
+                elif needle in window:
+                    subject, at = window, i
+                else:
                     continue
-                if PRESENT_CLAIM.search(line) or not HISTORICAL_OK.search(line):
-                    print(f"  FAIL  {rel}:{i}  '{needle}': {why}")
-                    print(f"        {line.strip()[:100]}")
+                if (at, needle) in seen:
+                    continue
+                if PRESENT_CLAIM.search(subject) or not HISTORICAL_OK.search(subject):
+                    # a wrapped hit is reported once, at the line it starts on
+                    if needle in window and needle not in line:
+                        seen.add((i + 1, needle))
+                    print(f"  FAIL  {rel}:{at}  '{needle}': {why}")
+                    print(f"        {subject.strip()[:100]}")
                     bad += 1
     # Arithmetic, not strings. The banned-substring pass cannot catch a document
     # whose numbers are individually plausible and jointly impossible: REPORT.md

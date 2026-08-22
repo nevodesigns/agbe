@@ -90,6 +90,21 @@ else
 fi
 rm -f /tmp/agbe-ledger.$$
 
+# check_docs.py bans strings already known to be wrong, which only ever catches
+# a mistake after a human has found it. It caught neither of the two that
+# mattered: "104 optimiser steps" wrapped across a line break, and "13.0M
+# trainable" was simply never on the banned list. consistency.py inverts the
+# test and asserts the manifest's values against every number stated in their
+# context, so it fails on wrong values nobody has seen yet.
+if python3 "$(dirname "$0")/consistency.py" > /tmp/agbe-consist.$$ 2>&1; then
+  echo "  ok     no document number contradicts FINAL.json"
+else
+  echo "  FAIL   a document number contradicts FINAL.json:"
+  sed 's/^/  /' /tmp/agbe-consist.$$ | tail -12
+  fail=1
+fi
+rm -f /tmp/agbe-consist.$$
+
 echo
 if [ "$fail" -eq 0 ]; then echo "  READY TO SUBMIT"; else echo "  NOT READY: fix the FAIL lines above"; fi
 exit $fail
