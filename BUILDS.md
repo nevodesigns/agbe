@@ -157,7 +157,7 @@ where it did not belong.
 
 v12's corpus carried five examples of "That is stem borer, not armyworm" and none
 of the reverse, and its smoke test answered the textbook fall armyworm description
-with "That is stem borer" — on our own submitted test prompt.
+with "That is stem borer", on our own submitted test prompt.
 
 A contrast exemplar does not teach a boundary, it teaches a **direction**. This is
 the v4 lesson inverted: pushing armyworm to 42 mentions once made armyworm the
@@ -173,8 +173,8 @@ the shipped weights: balancing that contrast is the only change v13 makes over v
 
 ## The scorer was passing wrong diagnoses
 
-`expect` is any-of and carries supporting detail, so `d_faw` — which is **tp_001**,
-one of our two submitted prompts — accepted an answer opening "That is stem borer"
+`expect` is any-of and carries supporting detail, so `d_faw`, which is **tp_001**,
+one of our two submitted prompts, accepted an answer opening "That is stem borer"
 because the word "frass" appeared later. Four consecutive builds were scored on
 that, and v11 was chosen partly on a diagnosis figure that was not real.
 
@@ -183,7 +183,7 @@ model naming the wrong pest on camera.
 
 The scorer now requires the diagnosis to be **named in the opening two sentences
 and asserted rather than denied**, reusing the same negation logic the forbid list
-uses — otherwise "That is stem borer, not armyworm" passes on the substring.
+uses, otherwise "That is stem borer, not armyworm" passes on the substring.
 Rescoring every build under the corrected rule is what put v13 ahead.
 
 Two forbid terms were also too broad to be usable and were narrowed, applied

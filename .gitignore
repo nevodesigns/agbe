@@ -1,4 +1,7 @@
-model/*.gguf
+# the weights are fetched by download_model.sh, never committed.
+# download_model.sh creates model/ with mkdir -p, so nothing needs to
+# hold the directory open in git.
+model/
 *.gguf
 out/
 __pycache__/

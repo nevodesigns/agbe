@@ -1,4 +1,4 @@
-# AGBE — an offline agricultural extension model for 8 GB laptops
+# AGBE, an offline agricultural extension model for 8 GB laptops
 
 **Àgbẹ̀** is Yoruba for *farmer*. AGBE answers farming questions on an ordinary
 laptop with the internet switched off: crops, pests, livestock, soils, storage

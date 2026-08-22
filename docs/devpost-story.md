@@ -103,7 +103,7 @@ free to trade for cooling.
 - **v10** added an epoch to win those facts back. It won some, and started
   inventing vocabulary again: **"mortjacket"** for coccidiosis. Reverted.
 - **v11** found the real cause. Every diagnosis question in the corpus *named the
-  disease* — "I think I have coccidiosis, how do I confirm it?" The model had
+  disease*, "I think I have coccidiosis, how do I confirm it?" The model had
   never been asked to map symptoms onto a name, which is the only thing a farmer
   actually does. We wrote symptom-first questions for all 15 diseases and
   diagnosis went from 7 of 12 to **10 of 12**.
