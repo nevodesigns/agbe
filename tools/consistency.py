@@ -51,6 +51,9 @@ CHECKS = [
     ("trainable params", r"(\d+\.\d+)M\s+trainable", num(F["trainable_params"]) / 1e6, 0.05),
     ("trainable params", r"trainable\s*\|\s*(\d+\.\d+)M", num(F["trainable_params"]) / 1e6, 0.05),
     ("base params", r"of\s+([\d,]+(?:\.\d+)?)M\b", num(F["base_params"]) / 1e6, 15),
+    # "Gemma 3 1B banks 47.5 of 50" sat in a site caption through three
+    # audits because no pattern looked at engineering subtotals at all.
+    ("engineering points", r"(\d{2}\.\d)\s*(?:of|/)\s*50\b", num(F["engineering_points"]), 0.05),
 ]
 
 # Fractions must match exactly wherever they appear as a battery result.
@@ -75,7 +78,10 @@ HISTORICAL = re.compile(
     r"from \d[\d,]* to \d[\d,]*|grew|growing|made the model worse|made it worse|"
     r"fell to|rose to|dropped to|down from|up from|instead of|"
     # a named side experiment whose result is deliberately not the shipped figure
-    r"pinn(?:ed|ing)|thread|safest build|best hostile|per-core|four physical cores",
+    r"pinn(?:ed|ing)|thread|safest build|best hostile|per-core|four physical cores|"
+    # a candidate comparison: "of 50" there is a rival model's selection-time
+    # subtotal, not the shipped model's engineering points
+    r"Qwen|Llama|candidate|selection table",
     re.I)
 
 
