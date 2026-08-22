@@ -18,7 +18,7 @@ profiler, participant mode, on the target profile:
 |---|---|
 | Throughput | **24.29 tok/s** (reference 15.0) |
 | Peak RSS | **1,039 MB** |
-| Steady RSS | 982 MB |
+| Steady RSS | 988 MB |
 | Model file | 814 MB |
 | `arc_easy`, 50 samples | **0.56** `acc_norm` |
 | S_perf | **100.00** |
@@ -127,22 +127,28 @@ threads, `-ngl 0`, memory capped to 7 GB) and measured five candidates:
 | Model | tok/s | Peak RAM | S_perf | S_eff | Points /50 |
 |---|---|---|---|---|---|
 | Qwen2.5 0.5B | 46.6 | 0.50 GB | 100 | 92.9 | 48.57 |
-| **Gemma 3 1B** | **26.9** | **0.88 GB** | **100** | **87.4** | **47.48** |
-| Llama 3.2 1B | 22.8 | 1.26 GB | 100 | 82.0 | 46.39 |
-| Qwen2.5 1.5B | 24.9 | 1.69 GB | 100 | 75.9 | 45.19 |
-| Qwen2.5 3B | 11.5 | 3.26 GB | 76.4 | 53.4 | 32.94 |
+| **Gemma 3 1B** | **26.9** | **0.88 GB** | **100** | **87.4** | **47.49** |
+| Llama 3.2 1B | 24.4 | 1.26 GB | 100 | 82.0 | 46.40 |
+| Qwen2.5 1.5B | 17.9 | 1.31 GB | 100 | 81.3 | 46.26 |
+| Qwen2.5 3B | 11.5 | 3.26 GB | 76.7 | 53.4 | 33.69 |
 
-The 3B concedes **14.5 points** before answering a single question, and would have
-to be twenty-nine accuracy points better to break even. We took Gemma 3 1B over
-the 0.5B for about one point, judging that a 0.5B would not hold enough agronomy,
-and over Llama 3.2 1B at identical file size purely on memory.
+The 3B concedes **13.8 points** under this reading before answering a single
+question, and would have to be about twenty-eight accuracy points better to break
+even. **Under our original interpretation** we took Gemma 3 1B over the 0.5B for
+about one point, judging that a 0.5B would not hold enough agronomy, and over
+Llama 3.2 1B at identical file size purely on memory. The next block corrects that
+one-point figure, and it is the correction that matters.
 
 ---
 
 **What the misread cost, stated plainly.** The selection table above was computed
 under the capped reading, where anything past 15 tok/s scored a flat 100. Under
 the published formula the same measurements give very different engineering
-subtotals:
+subtotals. (An earlier draft of the table above carried 22.8 tok/s for Llama and
+24.9 tok/s at 1.69 GB for the 1.5B, which disagreed with the figures here while
+claiming to be the same run, and its 3B subtotal did not follow from its own
+inputs. A 1.5B cannot outrun a 1B on one machine; the figures below are the
+measurements, and the table above now matches them.)
 
 | candidate | tok/s | peak RAM | subtotal, capped reading | subtotal, published formula |
 |---|---|---|---|---|
@@ -181,7 +187,7 @@ above, which is measured rather than derived.
 
 ## 7. Thermal investigation
 
-Our first clean run lost the full ten-point penalty at 91°C. Sweeping thread
+Our first clean run triggered the full ten-point penalty at 91°C. Sweeping thread
 counts produced a result that runs against intuition:
 
 | Threads | tok/s | Peak °C | Penalty | Points |

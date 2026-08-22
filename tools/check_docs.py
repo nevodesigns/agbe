@@ -38,6 +38,9 @@ BANNED = {
     "23 tok/s": "stale throughput",
     "3.8x average": "final sentence reuse is %sx" % F["corpus_sentence_reuse"],
     "85.15": "S_eff is 85.50 on the binary reading, 85.16 on the decimal; 85.15 is neither",
+    "982 MB": "steady RSS is 987.86 in submission.json, so 988",
+    "22.8 | 1.26": "stale Llama selection figure; the measured run is 24.4",
+    "24.9 | 1.69": "stale 1.5B selection figure; a 1.5B cannot outrun a 1B",
     "REPLACE_WITH": "placeholder",
     "q5_0": "internal tensor detail, not for publication",
     "q8_0": "internal tensor detail, not for publication",
@@ -100,6 +103,20 @@ def main() -> int:
         print(f"  FAIL  FINAL.json: peak {F['peak_rss_mb']} MB gives S_eff"
               f" {derived:.2f}, but s_eff says {F['s_eff']}")
         bad += 1
+
+    # FINAL.json is the source of truth for the docs, but nothing checked it
+    # against the telemetry it summarises. Memory figures come from the profiler,
+    # so they must match submission.json exactly or the manifest is fiction.
+    telem = json.loads((ROOT / "submission.json").read_text())
+    for key, path in (("peak_rss_mb", ("memory", "peak_rss_mb")),
+                      ("steady_rss_mb", ("memory", "steady_state_rss_mb")),
+                      ("tokens_per_second", ("throughput", "tokens_per_second_generation"))):
+        node = telem
+        for step in path:
+            node = node[step]
+        if abs(node - F[key]) > 0.011:
+            print(f"  FAIL  FINAL.json {key}={F[key]} but submission.json says {node}")
+            bad += 1
 
     # positive checks: the shipped facts must actually appear where they matter
     readme = (ROOT / "README.md").read_text()

@@ -53,7 +53,7 @@ Official `adtc-profiler`, participant mode, on the target profile
 |---|---|
 | Throughput | **24.29 tok/s** (15.0 is the provisional reference; the real denominator is the fastest submission) |
 | Peak RSS | **1,039 MB** |
-| Steady RSS | 982 MB |
+| Steady RSS | 988 MB |
 | Model file | 814 MB |
 | `arc_easy` (50 samples) | **0.56** `acc_norm` |
 | S_perf | **100.00** |
@@ -101,15 +101,23 @@ elsewhere in this README come from the official profiler on the final build and
 differ: 24.29 tok/s, 1.01 GB, 47.10 points. Different instruments, different
 numbers, and the profiler's are the ones that count.
 
-| Model | tok/s | Peak RAM | S_perf | S_eff | Points /50 |
+> **Historical calculation, kept to document the decision.** The `S_perf` column
+> below uses our original misreading, in which anything past the provisional
+> 15 tok/s reference scored a flat 100. It is **not** the current ADTC score.
+> Under the published formula, throughput is relative to the fastest submission,
+> and the right-hand column changes a great deal. Both readings are set side by
+> side in [REPORT.md](REPORT.md).
+
+| Model | tok/s | Peak RAM | S_perf, as misread | S_eff | Points /50, as misread |
 |---|---|---|---|---|---|
 | Qwen2.5 0.5B | 46.6 | 0.50 GB | 100 | 92.9 | 48.57 |
-| **Gemma 3 1B** | **26.9** | **0.88 GB** | **100** | **87.4** | **47.48** |
-| Llama 3.2 1B | 22.8 | 1.26 GB | 100 | 82.0 | 46.39 |
-| Qwen2.5 1.5B | 24.9 | 1.69 GB | 100 | 75.9 | 45.19 |
-| Qwen2.5 3B | 11.5 | 3.26 GB | 76.4 | 53.4 | 32.94 |
+| **Gemma 3 1B** | **26.9** | **0.88 GB** | **100** | **87.4** | **47.49** |
+| Llama 3.2 1B | 24.4 | 1.26 GB | 100 | 82.0 | 46.40 |
+| Qwen2.5 1.5B | 17.9 | 1.31 GB | 100 | 81.3 | 46.26 |
+| Qwen2.5 3B | 11.5 | 3.26 GB | 76.7 | 53.4 | 33.69 |
 
-A 3B concedes **14.5 points** before answering a single question.
+A 3B concedes **13.8 points** under that reading, and **16.7** under the published
+formula, before answering a single question.
 
 ---
 
@@ -208,6 +216,9 @@ was the mistake: rank was the missing variable the whole time.
 python corpus/generate.py                       # rebuild the corpus from facts
 python train/train_lora.py --train corpus/build/train.jsonl --out out --merge
 python eval/run_eval.py                         # 66-prompt behaviour battery
+AGBE_PROMPTS=adversarial.jsonl AGBE_OUT=adversarial.json \
+  python eval/run_eval.py                       # 92-prompt hostile battery
+python tools/ledger.py --check                  # ledger vs the stored answers
 adtc-profiler run --submission . --mode participant --output submission.json
 ```
 

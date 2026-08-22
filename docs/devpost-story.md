@@ -47,15 +47,20 @@ gigabyte is paid for, and running the biggest model that
 fits in 8 GB is exactly backwards. We measured five candidates on the target
 hardware instead of arguing about them:
 
-| Model | tok/s | Peak RAM | Engineering points /50 |
+| Model | tok/s | Peak RAM | Engineering points /50, as we first scored them |
 |---|---|---|---|
 | Qwen2.5 0.5B | 46.6 | 0.50 GB | 48.57 |
-| **Gemma 3 1B** | **26.9** | **0.88 GB** | **47.48** |
-| Llama 3.2 1B | 22.8 | 1.26 GB | 46.39 |
-| Qwen2.5 1.5B | 24.9 | 1.69 GB | 45.19 |
-| Qwen2.5 3B | 11.5 | 3.26 GB | 32.94 |
+| **Gemma 3 1B** | **26.9** | **0.88 GB** | **47.49** |
+| Llama 3.2 1B | 24.4 | 1.26 GB | 46.40 |
+| Qwen2.5 1.5B | 17.9 | 1.31 GB | 46.26 |
+| Qwen2.5 3B | 11.5 | 3.26 GB | 33.69 |
 
-The 3B gives up **14.5 points before answering a single question**.
+The 3B gives up **13.8 points before answering a single question**, and 16.7 once
+the formula is read correctly. That last column is a **historical calculation**:
+we first read throughput as capped at the provisional 15 tok/s reference. It is
+scored relative to the fastest submission instead, which we corrected later and
+which cost us more than we thought. [REPORT.md](../REPORT.md) sets both readings
+side by side.
 
 **The corpus was the real work.** No dataset ships with this challenge. Scraping
 the web or having a large model write the answers would both have been faster,
@@ -130,9 +135,13 @@ got a real paediatric drug dose out of an agriculture model. We also found it
 answering "fall armyworm" for stem borer, maize streak *and* striga, because after
 v4 armyworm had simply become its most probable answer.
 
-Both are fixed in v8: refusals rewritten so they **stop immediately** with no
-trailing content, weighted heavily enough to beat the drift, and contrast examples
-that name the correct pest *first* so armyworm sits in the rejected position.
+v8 fixed the first and only dented the second: refusals were rewritten to **stop
+immediately** with no trailing content, weighted heavily enough to beat the drift,
+and contrast examples were added that name the correct pest *first*. The refusal
+tail stayed fixed. The diagnosis confusion did not: v8 still answered a maize
+timing question with oil palm spacing, and it took until v11 to make the model
+diagnose from symptoms rather than from a named disease, and until v13 to find
+that a one-way contrast relocates a confusion instead of removing it.
 
 **The Kaggle environment fought us the whole way**: a base image shipping `peft`
 alongside a `torchao` that same `peft` rejects; `pip install -U` breaking
@@ -142,11 +151,13 @@ makes llama.cpp's converter fail *after* writing every tensor.
 
 ## Accomplishments that we're proud of
 
-**47.1 of 50 available engineering points**, measured with the official profiler
-on the target hardware rather than estimated: 24.29 tokens per second against a
-15 tok/s reference, and 1039 MB of a 7 GB budget. A thermal penalty of ten
-points applies if the penalty is taken from our own telemetry, and we say so
-rather than quoting only the flattering figure.
+**Measured with the official profiler on the target hardware rather than
+estimated**: 24.29 tokens per second and 1,039 MB of a 7 GB budget. That works out
+at 47.1 of 50 engineering points *against the provisional 15 tok/s reference*,
+which is not the final score: throughput is graded relative to the fastest
+submission, so our share depends on what everyone else ships. A thermal penalty of
+ten points applies if it is taken from our own telemetry, and we say so rather
+than quoting only the flattering figure.
 
 **A model that knows where its competence ends.** Getting a 1B model to decline a
 medical question instead of confidently answering it took four builds, and it is

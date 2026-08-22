@@ -6,17 +6,25 @@ to this.
 ## The scoring reality
 
 `S_acc` is 50% of the total and is a **weighted combination of an automated
-benchmark and a judge panel reading generated answers**. We submit 2 test prompts;
-organisers add 2 hidden prompts in the agriculture domain, and a judge chats with
-the model live in a sandbox capped to the Standard Laptop profile. There is no
-published agricultural accuracy dataset, so the qualitative half is the part this
-corpus can move.
+benchmark and a judge panel reading generated answers**. We submit 2 test prompts
+and the organisers add hidden ones in the agriculture domain, then a judge chats
+with the model live in a sandbox capped to the Standard Laptop profile. There is
+no published agricultural accuracy dataset, so the qualitative half is the part
+this corpus can move.
+
+> **The hidden prompt count is not settled, so we design for the larger number.**
+> The submission template says "2 additional hidden prompts ... all 4 are used for
+> scoring"; the challenge page FAQ says the organisers "generate three additional
+> hidden prompts". Both are official and they disagree. Nothing below depends on
+> which is right: more unseen prompts only strengthens the case for breadth, so we
+> plan against three and would be no worse off at two.
 
 Three consequences:
 
-1. **Breadth beats depth.** We cannot predict the 2 hidden prompts. A model that answers
-   any reasonable smallholder question competently scores better than one that is
-   excellent on cassava and lost on poultry.
+1. **Breadth beats depth.** We cannot predict the hidden prompts, and there may be
+   three rather than two. A model that answers any reasonable smallholder question
+   competently scores better than one that is excellent on cassava and lost on
+   poultry.
 2. **Style is scored, not just facts.** A judge reading a 1B model's answer is grading
    usefulness. Structure, specificity and honest hedging read as competence.
 3. **Overfitting is explicitly tested.** The hidden prompts exist to catch models tuned

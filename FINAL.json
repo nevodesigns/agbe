@@ -14,6 +14,7 @@
   "model_sha256": "d614d6b00aad21990419841bea8dae37502f8c57f1b3a25730ec15c3480d9851",
   "tokens_per_second": 24.29,
   "peak_rss_mb": 1039.06,
+  "steady_rss_mb": 987.86,
   "arc_easy": 0.56,
   "s_perf_provisional": 100.0,
   "s_eff": 85.5,
