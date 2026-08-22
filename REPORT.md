@@ -22,7 +22,7 @@ profiler, participant mode, on the target profile:
 | Model file | 814 MB |
 | `arc_easy`, 50 samples | **0.56** `acc_norm` |
 | S_perf | **100.00** |
-| S_eff | **85.15** |
+| S_eff | **85.50** |
 | Engineering subtotal | **47.10 / 50** before thermal, **37.10** with it |
 
 > **Correction, checked against the official rules.** Earlier drafts of this
@@ -37,6 +37,15 @@ profiler, participant mode, on the target profile:
 
 Raw telemetry is committed as [`submission.json`](submission.json). Every figure
 in this report comes from a tool in this repository that you can run.
+
+> **On `S_eff`.** The formula is `100 x ((7 GB - peak RAM) / 7 GB)`, and the
+> result depends on whether the 7 GB budget is read as 7,168 MB or 7,000 MB.
+> Our measured peak is 1,039 MB either way. On the binary reading `S_eff` is
+> **85.50** and the engineering subtotal is **47.10**; on the decimal reading
+> they are **85.16** and **47.03**. This document uses the binary reading
+> throughout. The difference is 0.07 points and the measurement itself does
+> not change. An earlier draft printed the decimal `S_eff` beside the binary
+> subtotal, which could not both be right.
 
 ---
 
@@ -204,7 +213,7 @@ environment, not by our laptop's reading.** We are not claiming it will be zero.
 | If P_thermal is judged | S_perf | S_eff | P_thermal | Total |
 |---|---|---|---|---|
 | in the audit sandbox | 100 | 85.50 | 0 | **47.10** |
-| from participant telemetry | 100 | 85.15 | −10 | **37.03** |
+| from participant telemetry | 100 | 85.50 | −10 | **37.10** |
 
 ---
 

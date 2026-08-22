@@ -1,7 +1,12 @@
-# the weights are fetched by download_model.sh, never committed.
-# download_model.sh creates model/ with mkdir -p, so nothing needs to
-# hold the directory open in git.
+# Model weights, never committed. The evaluator fetches them with
+# download_model.sh. Rule 2 of the submission template asks for both
+# *.gguf and model/ to be ignored; the template itself also commits
+# model/.gitkeep so the directory exists on clone. Both hold at once,
+# because .gitignore does not untrack a file that is already tracked.
 model/
+model/*.gguf
+model/*.bin
+model/*.safetensors
 *.gguf
 out/
 __pycache__/

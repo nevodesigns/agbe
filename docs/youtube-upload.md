@@ -1,4 +1,4 @@
-# YouTube upload sheet — AGBE demo
+# YouTube upload sheet: AGBE demo
 
 Everything to paste when uploading. Video file: `agbe-demo-captioned.mp4`
 (or `agbe-demo.mp4` plus `agbe-demo.srt` as a caption track).
@@ -11,7 +11,7 @@ Pick one. The first is strongest: it leads with the surprising claim rather than
 the project name, which nobody has heard of yet.
 
 ```
-AGBE — a farming advisor that runs offline on an 8GB laptop
+AGBE, a farming advisor that runs offline on an 8GB laptop
 ```
 
 ```

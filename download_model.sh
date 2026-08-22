@@ -40,7 +40,7 @@ mkdir -p "$MODEL_DIR"
 # "failed to load model".
 if [[ -f "$MODEL_FILE" ]]; then
   if verify "$MODEL_FILE"; then
-    echo "model already present and verified at $MODEL_FILE — skipping download"
+    echo "model already present and verified at $MODEL_FILE, skipping download"
     exit 0
   fi
   echo "existing file does not match the expected size or checksum, refetching…"
@@ -83,7 +83,7 @@ ACTUAL=$(stat -c%s "$MODEL_FILE.partial" 2>/dev/null || stat -f%z "$MODEL_FILE.p
 if ! verify "$MODEL_FILE.partial"; then
   if [[ "$ACTUAL" -lt "$EXPECT_BYTES" ]]; then
     echo "error: got $ACTUAL of $EXPECT_BYTES bytes. The transfer was cut short." >&2
-    echo "The partial file is kept — re-run this script and it resumes from here." >&2
+    echo "The partial file is kept. Re-run this script and it resumes from here." >&2
   else
     echo "error: file is the wrong size or checksum ($ACTUAL bytes)." >&2
     echo "Delete $MODEL_FILE.partial and re-run to fetch it cleanly." >&2

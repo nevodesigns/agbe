@@ -13,7 +13,7 @@ MD = "markdown"
 CODE = "code"
 
 CELLS = [
-(MD, """# AGBE — LoRA fine-tune of Gemma 3 1B
+(MD, """# AGBE: LoRA fine-tune of Gemma 3 1B
 
 Trains the agriculture advisor for the **Africa Deep Tech Challenge 2026** and exports
 a `Q4_K_M` GGUF ready for `llama.cpp`.
@@ -123,7 +123,7 @@ judges run."""),
 (MD, """## Smoke test
 
 Four prompts. The first two are in-domain, the third is Pidgin, and the fourth is
-deliberately **out of scope** — a small model that answers a medical question confidently
+deliberately **out of scope**. A small model that answers a medical question confidently
 is a model that will lose accuracy marks in front of a judge."""),
 
 (CODE, """# Flags matter here:

@@ -57,7 +57,7 @@ Official `adtc-profiler`, participant mode, on the target profile
 | Model file | 814 MB |
 | `arc_easy` (50 samples) | **0.56** `acc_norm` |
 | S_perf | **100.00** |
-| S_eff | **85.15** |
+| S_eff | **85.50** |
 | Engineering subtotal | **47.10 / 50** before thermal, **37.10** with the penalty |
 
 > **Correction, checked against the official rules.** Earlier drafts of this

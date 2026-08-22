@@ -37,6 +37,7 @@ BANNED = {
     "29.29": "v11 throughput",
     "23 tok/s": "stale throughput",
     "3.8x average": "final sentence reuse is %sx" % F["corpus_sentence_reuse"],
+    "85.15": "S_eff is 85.50 on the binary reading, 85.16 on the decimal; 85.15 is neither",
     "REPLACE_WITH": "placeholder",
     "q5_0": "internal tensor detail, not for publication",
     "q8_0": "internal tensor detail, not for publication",
@@ -78,9 +79,28 @@ def main() -> int:
                 if needle not in line:
                     continue
                 if PRESENT_CLAIM.search(line) or not HISTORICAL_OK.search(line):
-                    print(f"  FAIL  {rel}:{i}  '{needle}' — {why}")
+                    print(f"  FAIL  {rel}:{i}  '{needle}': {why}")
                     print(f"        {line.strip()[:100]}")
                     bad += 1
+    # Arithmetic, not strings. The banned-substring pass cannot catch a document
+    # whose numbers are individually plausible and jointly impossible: REPORT.md
+    # printed S_eff 85.15 directly above an engineering subtotal of 47.10, and
+    # 85.15 implies 47.03. FINAL.json is the source, so its own sums must close.
+    eng = 0.30 * F["s_perf_provisional"] + 0.20 * F["s_eff"]
+    if abs(eng - F["engineering_points"]) > 0.05:
+        print(f"  FAIL  FINAL.json: 0.30*{F['s_perf_provisional']} + 0.20*{F['s_eff']}"
+              f" = {eng:.2f}, but engineering_points says {F['engineering_points']}")
+        bad += 1
+    if abs((F["engineering_points"] - 10) - F["engineering_points_with_thermal_penalty"]) > 0.05:
+        print("  FAIL  FINAL.json: the thermal penalty is not exactly 10 points apart")
+        bad += 1
+    # S_eff must follow from the measured peak on the binary reading of 7 GB
+    derived = (7168.0 - F["peak_rss_mb"]) / 7168.0 * 100
+    if abs(derived - F["s_eff"]) > 0.05:
+        print(f"  FAIL  FINAL.json: peak {F['peak_rss_mb']} MB gives S_eff"
+              f" {derived:.2f}, but s_eff says {F['s_eff']}")
+        bad += 1
+
     # positive checks: the shipped facts must actually appear where they matter
     readme = (ROOT / "README.md").read_text()
     for label, val in (("throughput", str(F["tokens_per_second"])),
