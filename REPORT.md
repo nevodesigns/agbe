@@ -174,7 +174,10 @@ saying so is more useful than quietly restating the conclusion.
 
 ## 6. Quantization
 
-Q4_K_M gives 814 MB on disk and 1.01 GB peak RSS under the official profiler.
+Q4_K_M gives 814 MB on disk and 1,039 MB peak RSS under the official profiler.
+Memory is quoted in MB throughout, the profiler's own unit, because 1,039 MB is
+1.04 GB decimal and 1.01 GiB binary and this document already turns on that
+distinction once, for `S_eff`. One unit, no conversions to check.
 Our own harness measured 0.88 GB; where the two disagreed we report the
 profiler's number.
 

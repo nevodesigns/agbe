@@ -8,6 +8,12 @@ The story: the 50 points that are not human-judged split into a throughput term
 (30%) and a memory term (20%). Stacking them shows the total AND why the 3B
 loses, which is the point: it fails on both terms at once, not just one.
 
+Scored under the published formula, where S_perf is relative to the fastest
+candidate. An earlier render used the capped misreading of the provisional
+15 tok/s reference and carried a subtitle asserting it, along with a third set of
+candidate figures older than either table in the report. curve.jsonl was missing
+from the tree, so the data is rebuilt here from the corrected selection figures.
+
 Form: horizontal stacked bar, sorted by total. The job is magnitude comparison
 across a small set of named entities with a two-part composition.
 
@@ -95,7 +101,7 @@ def main() -> None:
     # titles
     p.append(txt(70, 108, "The biggest model that fits is the wrong answer",
                  size=40, weight="bold"))
-    p.append(txt(70, 152, "S_perf caps at 15 tok/s, so surplus speed scores nothing.",
+    p.append(txt(70, 152, "Throughput is scored against the fastest submission, so speed and memory compound.",
                  size=19, fill=INK_SOFT))
     p.append(txt(70, 180, "Memory is paid for linearly. Both terms punish size.",
                  size=19, fill=INK_SOFT))

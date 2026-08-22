@@ -98,7 +98,7 @@ candidates rather than reasoning about them:
 These are **selection-time measurements from our own harness**, taken before the
 official profiler existed. They are what chose the model. The shipped figures
 elsewhere in this README come from the official profiler on the final build and
-differ: 24.29 tok/s, 1.01 GB, 47.10 points. Different instruments, different
+differ: 24.29 tok/s, 1,039 MB, 47.10 points. Different instruments, different
 numbers, and the profiler's are the ones that count.
 
 > **Historical calculation, kept to document the decision.** The `S_perf` column

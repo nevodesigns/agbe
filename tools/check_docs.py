@@ -39,6 +39,7 @@ BANNED = {
     "3.8x average": "final sentence reuse is %sx" % F["corpus_sentence_reuse"],
     "85.15": "S_eff is 85.50 on the binary reading, 85.16 on the decimal; 85.15 is neither",
     "982 MB": "steady RSS is 987.86 in submission.json, so 988",
+    "1.01 GB": "quote memory in MB; 1,039 MB is 1.01 GiB, not 1.01 GB",
     "22.8 | 1.26": "stale Llama selection figure; the measured run is 24.4",
     "24.9 | 1.69": "stale 1.5B selection figure; a 1.5B cannot outrun a 1B",
     "REPLACE_WITH": "placeholder",

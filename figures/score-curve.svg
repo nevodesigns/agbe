@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000">
 <rect width="1500" height="1000" fill="#F7F2E7"/>
 <text x="70.0" y="108.0" font-family="DejaVu Sans" font-size="40" fill="#22271F" text-anchor="start" font-weight="bold">The biggest model that fits is the wrong answer</text>
-<text x="70.0" y="152.0" font-family="DejaVu Sans" font-size="19" fill="#5A6154" text-anchor="start" font-weight="normal">S_perf caps at 15 tok/s, so surplus speed scores nothing.</text>
+<text x="70.0" y="152.0" font-family="DejaVu Sans" font-size="19" fill="#5A6154" text-anchor="start" font-weight="normal">Throughput is scored against the fastest submission, so speed and memory compound.</text>
 <text x="70.0" y="180.0" font-family="DejaVu Sans" font-size="19" fill="#5A6154" text-anchor="start" font-weight="normal">Memory is paid for linearly. Both terms punish size.</text>
 <line x1="300.0" y1="270" x2="300.0" y2="806" stroke="#E2DAC6" stroke-width="1"/>
 <text x="300.0" y="834.0" font-family="DejaVu Sans" font-size="15" fill="#8A8877" text-anchor="middle" font-weight="normal">0</text>
@@ -18,40 +18,39 @@
 <text x="740.0" y="872.0" font-family="DejaVu Sans" font-size="16" fill="#5A6154" text-anchor="middle" font-weight="normal">Points banked of the 50 available before human accuracy judging</text>
 <text x="278.0" y="356.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Qwen2.5 0.5B</text>
 <rect x="300" y="327.0" width="507.7" height="46" fill="#2a78d6"/>
-<rect x="811.7" y="327.0" width="308.1" height="46" fill="#eb6834" rx="4" ry="4"/>
+<rect x="811.7" y="327.0" width="310.3" height="46" fill="#eb6834" rx="4" ry="4"/>
 <text x="553.8" y="357.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
-<text x="965.7" y="357.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">18.4</text>
-<text x="1137.8" y="358.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">48.4</text>
-<text x="1199.8" y="357.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">57 tok/s   0.55 GB</text>
-<text x="278.0" y="456.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="bold">Gemma 3 1B</text>
-<text x="278.0" y="477.0" font-family="DejaVu Sans" font-size="12" fill="#2E4633" text-anchor="end" font-weight="bold">selected</text>
-<rect x="300" y="427.0" width="507.7" height="46" fill="#2a78d6"/>
-<rect x="811.7" y="427.0" width="291.8" height="46" fill="#eb6834" rx="4" ry="4"/>
-<text x="553.8" y="457.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
-<text x="957.6" y="457.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">17.5</text>
-<text x="1121.5" y="458.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">47.5</text>
-<text x="1183.5" y="457.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">27 tok/s   0.88 GB</text>
+<text x="966.8" y="357.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">18.6</text>
+<text x="1140.0" y="358.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">48.6</text>
+<text x="1202.0" y="357.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">47 tok/s   0.50 GB</text>
+<text x="278.0" y="456.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Gemma 3 1B</text>
+<rect x="300" y="427.0" width="293.1" height="46" fill="#2a78d6"/>
+<rect x="597.1" y="427.0" width="291.9" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="446.5" y="457.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">17.3</text>
+<text x="743.0" y="457.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">17.5</text>
+<text x="907.0" y="458.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">34.8</text>
+<text x="969.0" y="457.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">27 tok/s   0.88 GB</text>
 <text x="278.0" y="556.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Llama 3.2 1B</text>
-<rect x="300" y="527.0" width="507.7" height="46" fill="#2a78d6"/>
-<rect x="811.7" y="527.0" width="273.5" height="46" fill="#eb6834" rx="4" ry="4"/>
-<text x="553.8" y="557.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
-<text x="948.5" y="557.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">16.4</text>
-<text x="1103.2" y="558.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">46.4</text>
-<text x="1165.2" y="557.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">33 tok/s   1.26 GB</text>
+<rect x="300" y="527.0" width="265.8" height="46" fill="#2a78d6"/>
+<rect x="569.8" y="527.0" width="273.5" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="432.9" y="557.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">15.7</text>
+<text x="706.6" y="557.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">16.4</text>
+<text x="861.4" y="558.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">32.1</text>
+<text x="923.4" y="557.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">24 tok/s   1.26 GB</text>
 <text x="278.0" y="656.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Qwen2.5 1.5B</text>
-<rect x="300" y="627.0" width="507.7" height="46" fill="#2a78d6"/>
-<rect x="811.7" y="627.0" width="252.9" height="46" fill="#eb6834" rx="4" ry="4"/>
-<text x="553.8" y="657.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">30.0</text>
-<text x="938.1" y="657.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">15.2</text>
-<text x="1082.6" y="658.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">45.2</text>
-<text x="1144.6" y="657.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">25 tok/s   1.69 GB</text>
+<rect x="300" y="627.0" width="195.0" height="46" fill="#2a78d6"/>
+<rect x="499.0" y="627.0" width="271.1" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="397.5" y="657.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">11.5</text>
+<text x="634.6" y="657.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">16.3</text>
+<text x="788.1" y="658.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">27.8</text>
+<text x="850.1" y="657.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">18 tok/s   1.31 GB</text>
 <text x="278.0" y="756.0" font-family="DejaVu Sans" font-size="19" fill="#22271F" text-anchor="end" font-weight="normal">Qwen2.5 3B</text>
-<rect x="300" y="727.0" width="376.7" height="46" fill="#2a78d6"/>
-<rect x="680.7" y="727.0" width="176.7" height="46" fill="#eb6834" rx="4" ry="4"/>
-<text x="488.4" y="757.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">22.3</text>
-<text x="769.1" y="757.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">10.7</text>
-<text x="875.4" y="758.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">32.9</text>
-<text x="937.4" y="757.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">11 tok/s   3.26 GB</text>
+<rect x="300" y="727.0" width="125.3" height="46" fill="#2a78d6"/>
+<rect x="429.3" y="727.0" width="176.8" height="46" fill="#eb6834" rx="4" ry="4"/>
+<text x="362.6" y="757.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">7.4</text>
+<text x="517.7" y="757.0" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="bold">10.7</text>
+<text x="624.1" y="758.0" font-family="DejaVu Sans" font-size="22" fill="#22271F" text-anchor="start" font-weight="bold">18.1</text>
+<text x="686.1" y="757.0" font-family="DejaVu Sans" font-size="14" fill="#8A8877" text-anchor="start" font-weight="normal">12 tok/s   3.26 GB</text>
 <rect x="70" y="905" width="16" height="16" fill="#2a78d6"/>
 <text x="96.0" y="918.0" font-family="DejaVu Sans" font-size="16" fill="#5A6154" text-anchor="start" font-weight="normal">Throughput   0.30 x S_perf</text>
 <rect x="360" y="905" width="16" height="16" fill="#eb6834" rx="3"/>

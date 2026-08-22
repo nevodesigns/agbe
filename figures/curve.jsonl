@@ -1,0 +1,5 @@
+{"model": "Qwen2.5 0.5B", "tps": 46.6, "peak_rss_gb": 0.5, "S_perf": 100.0, "S_eff": 92.86}
+{"model": "Gemma 3 1B", "tps": 26.9, "peak_rss_gb": 0.88, "S_perf": 57.73, "S_eff": 87.43}
+{"model": "Llama 3.2 1B", "tps": 24.4, "peak_rss_gb": 1.26, "S_perf": 52.36, "S_eff": 82.0}
+{"model": "Qwen2.5 1.5B", "tps": 17.9, "peak_rss_gb": 1.31, "S_perf": 38.41, "S_eff": 81.29}
+{"model": "Qwen2.5 3B", "tps": 11.5, "peak_rss_gb": 3.26, "S_perf": 24.68, "S_eff": 53.43}
