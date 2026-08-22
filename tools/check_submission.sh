@@ -74,9 +74,21 @@ if python3 "$(dirname "$0")/check_docs.py" > /tmp/agbe-docs.$$ 2>&1; then
 else
   echo "  FAIL   public documents contradict FINAL.json:"
   sed 's/^/  /' /tmp/agbe-docs.$$ | head -20
-  FAILED=1
+  fail=1
 fi
 rm -f /tmp/agbe-docs.$$
+
+# The build ledger is a second kind of drift: FINAL.json only describes the shipped
+# model, so a stale historical row in BUILDS.md passes check_docs.py while
+# contradicting the stored eval answers. It did, for three rows.
+if python3 "$(dirname "$0")/ledger.py" --check > /tmp/agbe-ledger.$$ 2>&1; then
+  echo "  ok     build ledger agrees with the stored eval answers"
+else
+  echo "  FAIL   BUILDS.md contradicts eval/*.json:"
+  sed 's/^/  /' /tmp/agbe-ledger.$$ | tail -10
+  fail=1
+fi
+rm -f /tmp/agbe-ledger.$$
 
 echo
 if [ "$fail" -eq 0 ]; then echo "  READY TO SUBMIT"; else echo "  NOT READY: fix the FAIL lines above"; fi
