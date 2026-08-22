@@ -11,7 +11,7 @@ So the final state lives in FINAL.json and this script rejects any public file
 that contradicts it. Fix FINAL.json first, then the prose.
 """
 from __future__ import annotations
-import json, pathlib, re, sys
+import html, json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 F = json.loads((ROOT / "FINAL.json").read_text())
@@ -40,6 +40,9 @@ BANNED = {
     "85.15": "S_eff is 85.50 on the binary reading, 85.16 on the decimal; 85.15 is neither",
     "982 MB": "steady RSS is 987.86 in submission.json, so 988",
     "1.01 GB": "quote memory in MB; 1,039 MB is 1.01 GiB, not 1.01 GB",
+    "clears the cap": "there is no cap; S_perf is relative to the fastest submission",
+    "token cap": "there is no cap; S_perf is relative to the fastest submission",
+    "tok/s cap": "there is no cap; S_perf is relative to the fastest submission",
     "22.8 | 1.26": "stale Llama selection figure; the measured run is 24.4",
     "24.9 | 1.69": "stale 1.5B selection figure; a 1.5B cannot outrun a 1B",
     "REPLACE_WITH": "placeholder",
@@ -77,7 +80,8 @@ def main() -> int:
         p = ROOT / rel
         if not p.exists():
             print(f"  MISSING  {rel}"); bad += 1; continue
-        raw = p.read_text()
+        # entity-decoded: "1.01&nbsp;GB" hid a stale figure from every scan
+        raw = html.unescape(p.read_text()).replace("\u00a0", " ")
         lines = raw.split("\n")
         # Match against the line AND against the line joined to the next one with
         # its newline collapsed to a space. A banned phrase that wraps across a

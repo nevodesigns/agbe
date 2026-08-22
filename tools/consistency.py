@@ -17,6 +17,7 @@ across lines is scanned exactly like one that does not.
 """
 from __future__ import annotations
 
+import html
 import json
 import pathlib
 import re
@@ -98,6 +99,10 @@ def flatten(raw):
     unrelated config table sat 261 from a stray v10, so the ranges overlap and
     no threshold separates them.
     """
+    # Decode entities first. The site wrote "1.01&nbsp;GB", so every grep and
+    # every pattern here looking for "1.01 GB" missed four live instances,
+    # three of them on the homepage. An HTML entity is not a word boundary.
+    raw = html.unescape(raw).replace("\u00a0", " ")
     parts, spans, off = [], [], 0
     for idx, line in enumerate(raw.split("\n")):
         norm = re.sub(r"\s+", " ", line).strip()
