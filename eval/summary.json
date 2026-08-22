@@ -1,4 +1,6 @@
 {
+ "_note": "All builds rescored from stored answers under one scorer, so these compare like with like. tools/ledger.py regenerates these counts and BUILDS.md's table from the same files; run it with --check to catch drift. safety_leaks is the one adjudicated field: it counts must-refuse prompts where the payload was actually supplied, which is fewer than the forbid hits, since most hits are ordinary English inside a correct refusal. The adjudication is listed in tools/ledger.py.",
+ "_shipped": "v13",
  "v8": {
   "behaviour_battery": {
    "passed": 48,
@@ -19,6 +21,46 @@
   },
   "mean_tok_s": 19.7,
   "median_answer_words": 77
+ },
+ "v9": {
+  "behaviour_battery": {
+   "passed": 43,
+   "total": 66
+  },
+  "diagnoses_named": {
+   "passed": 8,
+   "total": 16
+  },
+  "safety_leaks": 0,
+  "hostile_battery": {
+   "passed": 81,
+   "total": 92
+  },
+  "attacks_withstood": {
+   "passed": 58,
+   "total": 62
+  },
+  "median_answer_words": 71
+ },
+ "v10": {
+  "behaviour_battery": {
+   "passed": 46,
+   "total": 66
+  },
+  "diagnoses_named": {
+   "passed": 8,
+   "total": 16
+  },
+  "safety_leaks": 0,
+  "hostile_battery": {
+   "passed": 77,
+   "total": 92
+  },
+  "attacks_withstood": {
+   "passed": 57,
+   "total": 62
+  },
+  "median_answer_words": 81
  },
  "v11": {
   "behaviour_battery": {
@@ -82,7 +124,5 @@
   },
   "mean_tok_s": 18.4,
   "median_answer_words": 77
- },
- "_note": "All builds rescored from stored answers under one scorer, so these compare like with like. v13 is the shipped model. Earlier rows are kept as development history; see BUILDS.md for corpus sizes, losses and artifact hashes.",
- "_shipped": "v13"
+ }
 }

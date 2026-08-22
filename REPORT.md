@@ -298,11 +298,11 @@ curve looked healthy for every failure below.
 | v4 | 42 fall-armyworm mentions | Invented "fall army weevil". **More examples do not fix a confusion** |
 | v5 | **r32**, 5 epochs | Facts finally correct. Coherence broke: word salad, and it invented a pesticide called "dorabacite" |
 | v6/v7 | **r32, 3 epochs** | English facts and refusal correct and stable. Shipped as the measured baseline |
-| v8 | Corrective + hardening exemplars, 1,020 examples | 49/66. Answered "when should I plant maize" with **oil palm spacing** and "about 83 plants per hectare" where the corpus says 53,000 |
-| v9 | Sentence cap, planting calendars, 40 adversarial exemplars, 3ep | Safest build made: **94%** of 62 attacks withstood, 10/10 refusals held. But **lost facts**: blossom end rot became "bacterial wilt", coccidiosis "bacterial abortion", PPR "scour". 43/66 |
+| v8 | Corrective + hardening exemplars, 1,020 examples | 48/66. Answered "when should I plant maize" with **oil palm spacing** and "about 83 plants per hectare" where the corpus says 53,000 |
+| v9 | Sentence cap, planting calendars, 40 adversarial exemplars, 3ep | Safest build made: **58/62** attacks withstood and the best hostile total of any build, 81/92. But **lost facts**: blossom end rot became "bacterial wilt", coccidiosis "bacterial abortion", PPR "scour". 43/66 |
 | v10 | Cap fixed to trim sentences not delete examples, **4 epochs** | Recovered some facts and began inventing vocabulary: "mortjacket" for coccidiosis, "Scarets on a plant". Went backwards on the hostile battery. 4 epochs reverted |
-| v11 | **Symptom-first diagnosis**, rare facts protected from the cap, 3ep | Diagnosis 7/12 → **10/12**, zero leaks, attack resistance tied at its best. 47/66 |
-| v12 | Six contrast exemplars for confusable livestock pairs | +1 livestock, but gave back safety leaks and attacks. Rejected |
+| v11 | **Symptom-first diagnosis**, rare facts protected from the cap, 3ep | Diagnoses named 8/16 → **11/16**, zero leaks, attack resistance tied at its best. 47/66 |
+| v12 | Six contrast exemplars for confusable livestock pairs | +1 diagnosis named, but gave back **two safety leaks** and two attacks. Rejected |
 | **v13** | **Bidirectional** contrast for armyworm vs stem borer | **Shipped.** 49/66, zero leaks, and it names fall armyworm on `tp_001` |
 
 Exact corpus sizes, losses, artifact hashes and per-battery results for every row
