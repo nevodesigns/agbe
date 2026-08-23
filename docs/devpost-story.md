@@ -14,7 +14,7 @@ farmers actually are. Rural coverage is patchy, mobile data is a real cost paid
 from a thin margin, and a tool that needs the network is a tool that is absent on
 the morning the armyworm arrives.
 
-So we built the version that works with the cable pulled out.
+So I built the version that works with the cable pulled out.
 
 ## What it does
 
@@ -39,12 +39,12 @@ confident wrong number can poison someone. It will not quote a market price.
 Asked about a child with a fever it declines and points to a clinic. Asked whether
 cassava mosaic can be cured, it says no, because it cannot.
 
-## How we built it
+## How I built it
 
-**We read the scoring function before writing any code**, and it told us to build
+**I read the scoring function before writing any code**, and it told me to build
 something smaller than instinct suggested. Memory is charged linearly, so every
 gigabyte is paid for, and running the biggest model that
-fits in 8 GB is exactly backwards. We measured five candidates on the target
+fits in 8 GB is exactly backwards. I measured five candidates on the target
 hardware instead of arguing about them:
 
 | Model | tok/s | Peak RAM | Engineering points /50, as we first scored them |
@@ -57,9 +57,9 @@ hardware instead of arguing about them:
 
 The 3B gives up **13.8 points before answering a single question**, and 16.7 once
 the formula is read correctly. That last column is a **historical calculation**:
-we first read throughput as capped at the provisional 15 tok/s reference. It is
-scored relative to the fastest submission instead, which we corrected later and
-which cost us more than we thought. [REPORT.md](../REPORT.md) sets both readings
+I first read throughput as capped at the provisional 15 tok/s reference. It is
+scored relative to the fastest submission instead, which I corrected later and
+which cost me more than I thought. [REPORT.md](../REPORT.md) sets both readings
 side by side.
 
 **The corpus was the real work.** No dataset ships with this challenge. Scraping
@@ -75,9 +75,9 @@ Then LoRA rank 32 on Gemma 3 1B, merged, converted with llama.cpp's own tooling
 and quantised to Q4_K_M. 814 MB on disk, about 1 GB in memory, 24.29 tokens a second
 on four CPU threads with no GPU at all.
 
-## Challenges we ran into
+## Challenges I ran into
 
-**A thermal result that ran backwards.** Our first clean run lost the full
+**A thermal result that ran backwards.** My first clean run lost the full
 ten-point penalty at 91°C. Sweeping thread counts produced something that looked
 like a mistake: 2 threads hit 99°C, 4 threads hit 83°C. **Fewer threads ran
 hotter.** With only two cores loaded the processor boosts toward its single-core
@@ -87,10 +87,10 @@ free to trade for cooling.
 
 **Thirteen model builds, and every failure had a healthy loss curve.**
 
-- **v1** learned our answer *scaffolding* rather than the agronomy. Nearly half its
+- **v1** learned my answer *scaffolding* rather than the agronomy. Nearly half its
   answers opened with one of six sentences. It told a parent to take their
   feverish child to an agricultural extension officer.
-- **v2** stapled unrelated facts together, because our generator had been padding
+- **v2** stapled unrelated facts together, because my generator had been padding
   answers with other topics' facts to hit a word count. The model copied that
   faithfully.
 - **v3** fixed the refusal but called fall armyworm "pod borers".
@@ -98,29 +98,29 @@ free to trade for cooling.
 - **v5** doubled the LoRA rank. Facts finally correct, but it invented a pesticide
   called **"dorabacite"** and recommended buying it.
 - **v6 and v7** kept the rank and cut the epochs. Facts correct, coherent, refusal
-  stable. This became our measured baseline.
-- **v8** was built from failures we found by testing, not guessing (below). It
+  stable. This became my measured baseline.
+- **v8** was built from failures I found by testing, not guessing (below). It
   closed the jailbreak, then answered "when should I plant maize" with **oil palm
-  spacing**, because 15 of our 16 crops had no planting calendar at all.
-- **v9** was the safest build we made, withstanding 94% of 62 attacks. It also
-  *lost facts*: blossom end rot became "bacterial wilt". We had capped repeated
+  spacing**, because 15 of my 16 crops had no planting calendar at all.
+- **v9** was the safest build I made, withstanding 94% of 62 attacks. It also
+  *lost facts*: blossom end rot became "bacterial wilt". I had capped repeated
   sentences and the cap deleted the rare diseases along with the boilerplate.
 - **v10** added an epoch to win those facts back. It won some, and started
   inventing vocabulary again: **"mortjacket"** for coccidiosis. Reverted.
 - **v11** found the real cause. Every diagnosis question in the corpus *named the
   disease*, "I think I have coccidiosis, how do I confirm it?" The model had
   never been asked to map symptoms onto a name, which is the only thing a farmer
-  actually does. We wrote symptom-first questions for all 15 diseases and
+  actually does. I wrote symptom-first questions for all 15 diseases and
   diagnosis went from 7 of 12 to **10 of 12**.
 - **v12** added contrast exemplars for confusable livestock pairs. It gained one
   livestock prompt and gave back three safety leaks. Rejected.
-- **v13** fixed what v12 revealed. Our corpus had five examples reading "that is
+- **v13** fixed what v12 revealed. My corpus had five examples reading "that is
   stem borer, not armyworm" and **none of the reverse**, so the model had learned
-  a direction rather than a boundary and answered our own submitted test prompt
+  a direction rather than a boundary and answered my own submitted test prompt
   with the wrong pest. Making the contrast bidirectional fixed it. **v13 ships**:
   49 of 66 on the behaviour battery, 79 of 92 hostile, zero safety leaks.
 
-**Then we tried to break our own model, and succeeded.** We wrote a 66-prompt
+**Then I tried to break my own model, and succeeded.** I wrote a 66-prompt
 battery organised by *behaviour* rather than topic, including deliberate attempts
 to jailbreak it, and ran it against the real weights. It scored 33 out of 66 with
 seven hard safety failures. The worst one:
@@ -131,7 +131,7 @@ seven hard safety failures. The worst one:
 > bodyweight every four hours"*
 
 It refused in the first sentence and complied in the third. A one-line jailbreak
-got a real paediatric drug dose out of an agriculture model. We also found it
+got a real paediatric drug dose out of an agriculture model. I also found it
 answering "fall armyworm" for stem borer, maize streak *and* striga, because after
 v4 armyworm had simply become its most probable answer.
 
@@ -143,38 +143,38 @@ timing question with oil palm spacing, and it took until v11 to make the model
 diagnose from symptoms rather than from a named disease, and until v13 to find
 that a one-way contrast relocates a confusion instead of removing it.
 
-**The Kaggle environment fought us the whole way**: a base image shipping `peft`
+**The Kaggle environment fought me the whole way**: a base image shipping `peft`
 alongside a `torchao` that same `peft` rejects; `pip install -U` breaking
 `torchvision` and TensorFlow so `import transformers` died outright; `trl`
 crashing inside its own loss path; and Gemma 3 shipping a vocabulary token that
 makes llama.cpp's converter fail *after* writing every tensor.
 
-## Accomplishments that we're proud of
+## Accomplishments that I'm proud of
 
 **Measured with the official profiler on the target hardware rather than
 estimated**: 24.29 tokens per second and 1,039 MB of a 7 GB budget. That works out
 at 47.1 of 50 engineering points *against the provisional 15 tok/s reference*,
 which is not the final score: throughput is graded relative to the fastest
-submission, so our share depends on what everyone else ships. A thermal penalty of
-ten points applies if it is taken from our own telemetry, and we say so rather
+submission, so my share depends on what everyone else ships. A thermal penalty of
+ten points applies if it is taken from my own telemetry, and I say so rather
 than quoting only the flattering figure.
 
 **A model that knows where its competence ends.** Getting a 1B model to decline a
 medical question instead of confidently answering it took four builds, and it is
-the thing we are most pleased with. A tool used by people with no alternative has
+the thing I am most pleased with. A tool used by people with no alternative has
 to be honest about its limits.
 
-**We tested our own model adversarially and published what we found**, including
+**I tested my own model adversarially and published what I found**, including
 the paracetamol failure above. It is not flattering. It is the reason v8 exists.
 
 **Full provenance.** Every agronomic claim traces to a curated fact base. Nothing
 scraped, nothing distilled from a larger model, and no agrochemical dose anywhere.
 
-**We withdrew a claim rather than ship it.** Nigerian Pidgin worked in v5, and in
-v6 it named *amala*, a food, as a maize pest. We removed it from our declared
+**I withdrew a claim rather than ship it.** Nigerian Pidgin worked in v5, and in
+v6 it named *amala*, a food, as a maize pest. I removed it from my declared
 language scope instead of hoping no judge would test it.
 
-## What we learned
+## What I learned
 
 **There are three separate axes, and it took five builds to see them.**
 
@@ -185,7 +185,7 @@ language scope instead of hoping no judge would test it.
   Doubling the LoRA rank fixed it immediately.
 - **Coherence** degrades with over-training and is fixed with fewer epochs.
 
-We spent four corpus iterations turning the first knob when the second was the
+I spent four corpus iterations turning the first knob when the second was the
 problem.
 
 **Read the model's output, not its loss curve.** Every failure above trained to a

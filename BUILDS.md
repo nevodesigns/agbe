@@ -157,7 +157,7 @@ where it did not belong.
 
 v12's corpus carried five examples of "That is stem borer, not armyworm" and none
 of the reverse, and its smoke test answered the textbook fall armyworm description
-with "That is stem borer", on our own submitted test prompt.
+with "That is stem borer", on my own submitted test prompt.
 
 A contrast exemplar does not teach a boundary, it teaches a **direction**. This is
 the v4 lesson inverted: pushing armyworm to 42 mentions once made armyworm the
@@ -174,7 +174,7 @@ the shipped weights: balancing that contrast is the only change v13 makes over v
 ## The scorer was passing wrong diagnoses
 
 `expect` is any-of and carries supporting detail, so `d_faw`, which is **tp_001**,
-one of our two submitted prompts, accepted an answer opening "That is stem borer"
+one of my two submitted prompts, accepted an answer opening "That is stem borer"
 because the word "frass" appeared later. Four consecutive builds were scored on
 that, and v11 was chosen partly on a diagnosis figure that was not real.
 

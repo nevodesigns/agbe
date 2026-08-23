@@ -1,37 +1,37 @@
 # Corpus specification
 
-What we are optimising for, stated precisely, because every later decision refers back
+What I am optimising for, stated precisely, because every later decision refers back
 to this.
 
 ## The scoring reality
 
 `S_acc` is 50% of the total and is a **weighted combination of an automated
-benchmark and a judge panel reading generated answers**. We submit 2 test prompts
+benchmark and a judge panel reading generated answers**. I submit 2 test prompts
 and the organisers add hidden ones in the agriculture domain, then a judge chats
 with the model live in a sandbox capped to the Standard Laptop profile. There is
 no published agricultural accuracy dataset, so the qualitative half is the part
 this corpus can move.
 
-> **The hidden prompt count is not settled, so we design for the larger number.**
+> **The hidden prompt count is not settled, so I design for the larger number.**
 > The submission template says "2 additional hidden prompts ... all 4 are used for
 > scoring"; the challenge page FAQ says the organisers "generate three additional
 > hidden prompts". Both are official and they disagree. Nothing below depends on
-> which is right: more unseen prompts only strengthens the case for breadth, so we
+> which is right: more unseen prompts only strengthens the case for breadth, so I
 > plan against three and would be no worse off at two.
 
 Three consequences:
 
-1. **Breadth beats depth.** We cannot predict the hidden prompts, and there may be
+1. **Breadth beats depth.** I cannot predict the hidden prompts, and there may be
    three rather than two. A model that answers any reasonable smallholder question
    competently scores better than one that is excellent on cassava and lost on
    poultry.
 2. **Style is scored, not just facts.** A judge reading a 1B model's answer is grading
    usefulness. Structure, specificity and honest hedging read as competence.
 3. **Overfitting is explicitly tested.** The hidden prompts exist to catch models tuned
-   to their own submitted prompts. So we train general agronomic reasoning patterns, not
+   to their own submitted prompts. So I train general agronomic reasoning patterns, not
    memorised pairs.
 
-## The reader we are writing for
+## The reader I am writing for
 
 A Nigerian smallholder farmer or a agricultural extension officer, on a $400 laptop, with
 no internet. They need an answer they can act on this week, using inputs they can
@@ -95,10 +95,10 @@ on language.
 
 ## Anti-overfitting design
 
-- No training pair may duplicate either of our 2 submitted test prompts.
+- No training pair may duplicate either of my 2 submitted test prompts.
 - Each topic appears in several question *forms* (what, why, how, when, troubleshooting,
   comparison, cost) so the model generalises across phrasing.
-- A held-out slice is kept unseen for our own qualitative checks, standing in for the
+- A held-out slice is kept unseen for my own qualitative checks, standing in for the
   judges' hidden prompts.
 
 ## Composition targets
@@ -114,5 +114,5 @@ on language.
 | General instruction replay | 7% | Guards against catastrophic forgetting |
 
 The replay slice matters. LoRA on a narrow domain will damage general instruction
-following, and a judge whose hidden prompt is phrased conversationally will notice. We
+following, and a judge whose hidden prompt is phrased conversationally will notice. I
 mix in general data to hold the base model's manners.

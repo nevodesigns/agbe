@@ -38,7 +38,7 @@ where farmers actually are. Rural coverage is patchy, mobile data is a real cost
 paid from a thin margin, and a tool that needs the network is absent on the
 morning the armyworm arrives.
 
-**Offline is not a feature we added. It is the shape of the whole thing.** If it
+**Offline is not a feature I added. It is the shape of the whole thing.** If it
 cannot answer with the cable pulled, on hardware a farmer or co-operative already
 owns, it does not count.
 
@@ -65,19 +65,19 @@ Official `adtc-profiler`, participant mode, on the target profile
 > challenge page states **`S_perf = 100 × (TPS_act ÷ TPS_max)`** with
 > `TPS_REFERENCE = 15.0 provisional`, and the rules page says throughput is
 > "evaluated relative to the maximum observed tokens per second". So 15.0 is a
-> placeholder for the fastest submission, not a ceiling. Our 24.29 tok/s is
+> placeholder for the fastest submission, not a ceiling. My 24.29 tok/s is
 > therefore **not** a guaranteed 100: it is 100 only if nothing faster is
 > submitted, and falls proportionally otherwise. Every engineering subtotal in
 > this document assumes the provisional reference and is stated as such.
 
 Raw output is committed as [`submission.json`](submission.json).
 
-**Thermal, stated honestly.** Our development laptop (i7-10850H, thin chassis)
+**Thermal, stated honestly.** My development laptop (i7-10850H, thin chassis)
 reaches 100°C and throttles during the profiler's 512-token prompt-processing
 pass, so the participant run carries the flag. In generation alone at four
 threads it peaks at 83°C. The profiler measures thermals again during audit
 (`measured_on = "audit_cloud_vm"`), so the final penalty is determined by the
-evaluation environment, not by this number. We are not claiming it will be zero.
+evaluation environment, not by this number. I am not claiming it will be zero.
 
 ---
 
@@ -92,17 +92,17 @@ S_eff   = max(0, (7.0 − peak RAM GB) ÷ 7.0) × 100
 ```
 
 Memory is charged linearly, so every gigabyte is paid for, and running the largest
-model that fits in 8 GB is backwards on that term alone. We measured five
+model that fits in 8 GB is backwards on that term alone. I measured five
 candidates rather than reasoning about them:
 
-These are **selection-time measurements from our own harness**, taken before the
+These are **selection-time measurements from my own harness**, taken before the
 official profiler existed. They are what chose the model. The shipped figures
 elsewhere in this README come from the official profiler on the final build and
 differ: 24.29 tok/s, 1,039 MB, 47.10 points. Different instruments, different
 numbers, and the profiler's are the ones that count.
 
 > **Historical calculation, kept to document the decision.** The `S_perf` column
-> below uses our original misreading, in which anything past the provisional
+> below uses my original misreading, in which anything past the provisional
 > 15 tok/s reference scored a flat 100. It is **not** the current ADTC score.
 > Under the published formula, throughput is relative to the fastest submission,
 > and the right-hand column changes a great deal. Both readings are set side by
@@ -165,14 +165,14 @@ train/AGBE_train_kaggle.ipynb  full pipeline on a free Kaggle T4
 
 ---
 
-## What the builds taught us
+## What the builds taught me
 
 Every build was judged by **reading its answers**, not by its loss curve. The
 loss curve looked healthy for every failure below.
 
 | Build | Change | Result |
 |---|---|---|
-| v1 | r16, 3ep, 375 examples | Learned our answer scaffolding, not the agronomy. Told a parent to take a feverish child to an extension officer. |
+| v1 | r16, 3ep, 375 examples | Learned my answer scaffolding, not the agronomy. Told a parent to take a feverish child to an extension officer. |
 | v2 | Removed repeated leads, 568 examples | Stapled unrelated facts together; the generator padded answers with other topics' facts. |
 | v3 | Stopped cross-topic mixing | Refusal and timing correct. Pest wrong ("pod borers"). |
 | v4 | 42 fall-armyworm mentions | Invented "fall army weevil". More examples do not fix a confusion. |
@@ -202,7 +202,7 @@ was the mistake: rank was the missing variable the whole time.
   fall armyworm, refusals and post-harvest, weaker on topics thinly covered by
   the fact base.
 - **English only.** Nigerian Pidgin was built, tested and **withdrawn**: it
-  worked in one build and in the next named *amala*, a food, as a maize pest. We
+  worked in one build and in the next named *amala*, a food, as a maize pest. I
   removed `pcm` from `language_scope` rather than ship a claim that fails half
   the time.
 - It is a knowledgeable extension pamphlet that holds a conversation, not an
