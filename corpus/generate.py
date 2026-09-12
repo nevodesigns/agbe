@@ -463,6 +463,44 @@ def build_differentials(rng: random.Random) -> list[dict]:
                                                 first, second, **kw),
                                "differential", key, "discriminate", rng))
 
+        # Name-it-from-the-description, with the QUESTION FORM rotated across
+        # both sides.
+        #
+        # This is the defect that put "That is stem borer, not armyworm" on
+        # tp_001 in the Round 1 transcript, on one of our own two submitted
+        # prompts. The corpus already held a correct exemplar in almost exactly
+        # tp_001's wording, and a correct reverse exemplar too, so the contrast
+        # was balanced in the sense generate.py audits for. What was NOT balanced
+        # was the sentence each one ended with: the armyworm description had no
+        # trailing question, and the stem borer description ended "What is it?".
+        # tp_001 ends "What is this and what should I do about it?", drops the
+        # word "ragged", and duly collected the stem borer answer.
+        #
+        # The model was reading the shape of the question, not the symptoms. So
+        # every suffix below is applied to BOTH sides of every pair, which is the
+        # only way the trailing form stops carrying information.
+        # Three, not five. Five put this slice's shared sentences at 4.5x average
+        # reuse and 55% of sentence instances in a 5-or-more repeat group, against
+        # 4.0x and 44% for the shipped corpus. The suffix only has to stop being a
+        # cue; it does not have to be exhaustive.
+        SUFFIXES = ("", " What is it?",
+                    " What is this and what should I do about it?")
+        a_rep, b_rep = d.get("a_report"), d.get("b_report")
+        for side, (report, named, other) in enumerate((
+                (a_rep, a, b), (b_rep, b, a))):
+            if not report:
+                continue
+            tell = sides[named]
+            for j, suffix in enumerate(SUFFIXES):
+                # Offset the suffix per side so neither side ever monopolises a
+                # form even if the list is later trimmed.
+                sfx = SUFFIXES[(j + side) % len(SUFFIXES)]
+                out.append(rec(
+                    report.rstrip(".") + "." + sfx,
+                    compose_prose(rng, f"That is {named}, not {other}",
+                                  tell, d.get("decider", "")),
+                    "differential", key, "diagnose_symptom", rng))
+
         # The cost-of-being-wrong form. Farmers ask this before spending.
         if d.get("why_it_matters"):
             out.append(rec(
@@ -671,10 +709,16 @@ def main() -> None:
         # leaving striga on ONE example and stem borer on two, and both v9 and v10
         # duly misdiagnosed them. Repetition of a fact seen four times is not the
         # problem this cap exists to solve.
-        RARE = ("pests_diseases", "livestock_poultry_fish", "nutrition",
-                "differential")
+        RARE = ("pests_diseases", "livestock_poultry_fish", "nutrition")
         sl = p["_meta"]["slice"]
-        limit = cap * (3 if sl in RARE else 2 if sl == "multiturn" else 1)
+        # `differential` sits between the two. Its content is rare and valuable,
+        # but every pair is deliberately emitted several ways and in both
+        # directions, so it generates more internal repetition than any other
+        # slice. At the RARE multiple it pushed the corpus to 4.3x average reuse
+        # and 53% of sentence instances in a 5-or-more group, against 4.0x and
+        # 44% shipped, and that share is the number v8 failed on.
+        limit = cap * (3 if sl in RARE else 2 if sl in ("multiturn",
+                                                        "differential") else 1)
         if exempt:
             for m in p["messages"]:
                 if m["role"] == "assistant":

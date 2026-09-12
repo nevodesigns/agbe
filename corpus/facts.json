@@ -635,7 +635,9 @@
       "b_tell": "Cassava brown streak shows in the root. Leaves may carry yellow blotching that follows the veins in a feathery pattern, and the green stems may carry brown dead streaks, but the plant can look almost normal while the tubers are already ruined with hard dry brown patches inside.",
       "decider": "Cut open two or three roots. Mosaic leaves you a usable root under a bad looking plant; brown streak leaves you a corky brown root under a plant that looked fine.",
       "why_it_matters": "It changes when you harvest. With brown streak the rot worsens the longer the roots stay in the ground, so harvesting earlier saves part of the crop, and cuttings must only be taken from plants whose roots you have actually cut open and seen to be clean.",
-      "control": "For both: plant resistant or tolerant varieties, take planting material only from clean plants, and remove and destroy affected plants rather than leaving them as a source."
+      "control": "For both: plant resistant or tolerant varieties, take planting material only from clean plants, and remove and destroy affected plants rather than leaving them as a source.",
+      "a_report": "My cassava leaves are mottled yellow and green in patches, twisted and small, and the plants are stunted",
+      "b_report": "My cassava plants looked healthy but the roots we dug up have hard brown dry patches inside them"
     },
     "blight_vs_nitrogen": {
       "a": "fungal blight",
@@ -647,7 +649,9 @@
       "b_tell": "A nitrogen shortage makes colour. The whole leaf pales evenly, symmetrically either side of the midrib, with no spots and no lesion edge. It begins on the oldest leaves at the bottom because the plant is moving its nitrogen up to the new growth, and it appears across the whole field at about the same time rather than spreading from a focus.",
       "decider": "Look for an edge. If you can trace the outline of a spot, it is blight. If the leaf is simply a paler version of a healthy leaf, it is nutrition. Then walk the field: grouped and spreading means disease, even and everywhere means hunger.",
       "why_it_matters": "Fertiliser does nothing to blight, and no spray puts nitrogen into a plant. Getting this wrong costs a season and the price of the wrong input.",
-      "control": "For blight: stake and prune for airflow, water at the base not over the leaves, remove and destroy affected material, rotate away from solanaceous crops. For nitrogen: topdress and band the fertiliser beside the plant, and expect a visible response within one to two weeks, which also confirms the diagnosis."
+      "control": "For blight: stake and prune for airflow, water at the base not over the leaves, remove and destroy affected material, rotate away from solanaceous crops. For nitrogen: topdress and band the fertiliser beside the plant, and expect a visible response within one to two weeks, which also confirms the diagnosis.",
+      "a_report": "My tomato leaves near the ground have dark brown spots with rings inside them and a yellow edge",
+      "b_report": "My tomato leaves are going pale yellow all over, starting with the lowest ones, with no spots on them"
     },
     "early_vs_late_blight": {
       "a": "early blight",
@@ -659,7 +663,9 @@
       "b_tell": "Late blight makes greasy grey green water soaked patches with no clear boundary, blackens the stems, and leaves a fine white downy mould on the underside of a fresh lesion in the early morning. It runs through a crop in cool damp weather within days.",
       "decider": "Turn a fresh lesion over first thing in the morning. White downy growth on the underside means late blight and the decision cannot wait. Rings, dryness and a yellow halo mean early blight.",
       "why_it_matters": "Late blight needs an immediate decision about the whole crop. Early blight is managed with sanitation and airflow over the season.",
-      "control": "Both are reduced by staking, spacing, watering at the base, and destroying affected material rather than dropping it between the rows."
+      "control": "Both are reduced by staking, spacing, watering at the base, and destroying affected material rather than dropping it between the rows.",
+      "a_report": "My tomato leaves have dry dark spots with rings inside them, on the oldest leaves near the soil",
+      "b_report": "My tomato plants went greasy grey green and the stems blackened within four days of the cold damp nights"
     },
     "armyworm_vs_stemborer": {
       "a": "fall armyworm",
@@ -671,7 +677,9 @@
       "b_tell": "Stem borer feeds inside the stem. It leaves small round holes in the stem with dry powdery frass at the opening, and the central shoot dies while the outer leaves stay alive, which is called deadheart. Split a stem lengthwise and you find the tunnel.",
       "decider": "Wet frass in the funnel with shredded leaves is armyworm. Dry powder at a hole in the stem with a dead central shoot is stem borer. If you are unsure, split a stem: a tunnel settles it.",
       "why_it_matters": "Armyworm can be handpicked from the whorl on a small plot and is worth acting on early in vegetative growth. Stem borer is largely a residue and timing problem, managed between seasons rather than during them.",
-      "control": "For armyworm: scout the whorls, handpick on small plots, encourage natural enemies, and treat late infestation on a tasselled crop as rarely worth the cost. For stem borer: destroy or plough in residues after harvest to break the carryover, and plant early and uniformly across the community."
+      "control": "For armyworm: scout the whorls, handpick on small plots, encourage natural enemies, and treat late infestation on a tasselled crop as rarely worth the cost. For stem borer: destroy or plough in residues after harvest to break the carryover, and plant early and uniformly across the community.",
+      "a_report": "My maize has holes chewed in the young leaves and there is wet sawdust sitting down in the centre of the plant",
+      "b_report": "My maize has small holes in the stems with dry powder at the opening and the central shoot has died"
     },
     "bacterialwilt_vs_fusarium": {
       "a": "bacterial wilt",
@@ -683,7 +691,9 @@
       "b_tell": "Fusarium is slower and one sided. Yellowing climbs the plant, often on one side or one branch first, the lower leaves go before the upper, and a stem split lengthwise shows a brown stain in the tissue rather than an ooze.",
       "decider": "The glass of water. A milky ooze means bacterial wilt. No ooze, plus a brown streak inside a split stem and a slower one sided decline, means fusarium.",
       "why_it_matters": "Both need rotation and drainage rather than a purchase, but bacterial wilt spreads fast in wet soil and through tools, so affected plants and the soil around them come out immediately.",
-      "control": "For both: rotate away from solanaceous crops for several seasons, improve drainage, use clean nursery soil, and remove affected plants with the surrounding soil. Wash tools and hands between plants."
+      "control": "For both: rotate away from solanaceous crops for several seasons, improve drainage, use clean nursery soil, and remove affected plants with the surrounding soil. Wash tools and hands between plants.",
+      "a_report": "My tomato plants collapsed overnight with the leaves still fully green",
+      "b_report": "My tomato is yellowing up one side of the plant, slowly, and a split stem shows brown staining inside"
     },
     "nitrogen_vs_potassium": {
       "a": "a nitrogen shortage",
@@ -695,7 +705,9 @@
       "b_tell": "Potassium burns the rim. The outer margins and the tip go brown and scorched in a band while the middle of the leaf stays green, and the stalks are weak enough to lodge in wind.",
       "decider": "Look at the middle of the leaf. Still green with a burnt edge is potassium. Pale all the way across is nitrogen.",
       "why_it_matters": "They are different fertilisers at different prices, and urea does nothing for a potassium shortage.",
-      "control": "Confirm with a soil test before buying either. Nitrogen is topdressed and banded beside the plant; potassium goes into the soil and is partly restored over time by returning crop residues and using compost."
+      "control": "Confirm with a soil test before buying either. Nitrogen is topdressed and banded beside the plant; potassium goes into the soil and is partly restored over time by returning crop residues and using compost.",
+      "a_report": "The lower leaves of my maize are evenly pale yellow all the way across and the plants are thin",
+      "b_report": "The edges of my lower maize leaves are burnt brown while the middle stays green and the stalks are lodging"
     },
     "striga_vs_nitrogen": {
       "a": "striga",
@@ -707,7 +719,9 @@
       "b_tell": "A nitrogen shortage has nothing growing between the rows. The crop pales evenly from the oldest leaves up, across the whole field or across the poorer part of it, with no purple flowering weed present.",
       "decider": "Get down and look between the rows before the crop closes over. If purple flowering weeds are attached around the crop roots, it is striga, and by the time you see them above ground the damage below is already done.",
       "why_it_matters": "Fertiliser alone will not clear striga, and pulling striga alone will not fix the fertility that let it establish. The two are handled together.",
-      "control": "For striga: hand pull before it flowers and seeds, rotate and intercrop with legumes that make it germinate and die without a host, and raise fertility. For nitrogen: topdress and band beside the plant."
+      "control": "For striga: hand pull before it flowers and seeds, rotate and intercrop with legumes that make it germinate and die without a host, and raise fertility. For nitrogen: topdress and band beside the plant.",
+      "a_report": "My maize is stunted and yellow and there are small purple flowering weeds coming up between the rows",
+      "b_report": "My maize is stunted and yellow across the poorer part of the field and there is nothing growing between the rows"
     },
     "blossomendrot_vs_disease": {
       "a": "blossom end rot",
@@ -719,7 +733,9 @@
       "b_tell": "A fruit rot is an infection. The damage starts anywhere on the fruit, often at a wound or where fruit touches soil, it is soft or sunken with visible spore growth or rings, and it spreads from fruit to fruit.",
       "decider": "Where on the fruit is it. Only at the blossom end, dry and leathery, on many fruit at once, is blossom end rot. Anywhere else, spreading, with mould or specks, is an infection.",
       "why_it_matters": "Nothing sprayed will stop blossom end rot. It is fixed by watering evenly and mulching so the plant can take up calcium steadily.",
-      "control": "For blossom end rot: water regularly rather than in heavy irregular soakings, mulch to hold moisture even, and avoid heavy nitrogen which makes it worse. For fruit rots: stake fruit off the soil, remove and destroy affected fruit, and harvest promptly."
+      "control": "For blossom end rot: water regularly rather than in heavy irregular soakings, mulch to hold moisture even, and avoid heavy nitrogen which makes it worse. For fruit rots: stake fruit off the soil, remove and destroy affected fruit, and harvest promptly.",
+      "a_report": "My tomato fruits have a flat sunken dark leathery patch right at the bottom end, on many fruit at once",
+      "b_report": "My tomato fruits are rotting in soft patches with mould on them, spreading from fruit to fruit"
     },
     "newcastle_vs_coccidiosis": {
       "a": "Newcastle disease",
@@ -731,7 +747,9 @@
       "b_tell": "Coccidiosis is a gut parasite and it shows in the droppings. Blood or dark reddish brown material in the droppings, birds hunched with ruffled feathers, pale combs, and it concentrates in chicks on damp litter and around the drinkers.",
       "decider": "Look at the droppings and the nervous signs. Blood in the droppings with no nervous signs is coccidiosis. Greenish droppings with twisted necks or paralysis is Newcastle.",
       "why_it_matters": "Newcastle has no treatment once it is in the flock and is prevented only by vaccination on schedule. Coccidiosis is treatable and is largely prevented by dry litter and clean water, so a wrong diagnosis wastes the one window you had.",
-      "control": "Vaccinate against Newcastle on the schedule your veterinary or extension officer gives, keep new birds separate before adding them to the flock, keep litter dry and drinkers clean, and take a bird showing nervous signs or bloody droppings to a veterinary officer, who will confirm it and advise the product and dose."
+      "control": "Vaccinate against Newcastle on the schedule your veterinary or extension officer gives, keep new birds separate before adding them to the flock, keep litter dry and drinkers clean, and take a bird showing nervous signs or bloody droppings to a veterinary officer, who will confirm it and advise the product and dose.",
+      "a_report": "My birds are dying fast, there is greenish watery droppings, and some have twisted necks",
+      "b_report": "My chicks are hunched with ruffled feathers and there is blood in the droppings"
     },
     "maizestreak_vs_nitrogen": {
       "a": "maize streak virus",
@@ -743,7 +761,9 @@
       "b_tell": "A nitrogen shortage colours the whole leaf, and in maize it runs down the midrib from the tip as a V. It affects the field or a whole part of the field evenly, not scattered single plants.",
       "decider": "Stripes along the leaf on scattered individual plants is the virus. An even wash of yellow, worst on the oldest leaves, across a whole area of the field, is nitrogen.",
       "why_it_matters": "There is no cure for maize streak and fertiliser will not bring an infected plant back. The response is variety choice and planting time for next season.",
-      "control": "For maize streak: plant tolerant varieties, plant early and uniformly with the community so the crop is past its vulnerable stage when leafhopper numbers build, and remove volunteer maize and grass hosts around the field. For nitrogen: topdress and band beside the plant."
+      "control": "For maize streak: plant tolerant varieties, plant early and uniformly with the community so the crop is past its vulnerable stage when leafhopper numbers build, and remove volunteer maize and grass hosts around the field. For nitrogen: topdress and band beside the plant.",
+      "a_report": "Some individual maize plants have fine pale stripes running the length of the leaf and are badly stunted, while their neighbours are fine",
+      "b_report": "My maize is evenly pale yellow across a whole part of the field, worst on the oldest leaves"
     }
   }
 }
