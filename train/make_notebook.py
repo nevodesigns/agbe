@@ -120,6 +120,98 @@ judges run."""),
     /kaggle/working/agbe-f16.gguf /kaggle/working/agbe-1b-q4_k_m.gguf Q4_K_M
 !ls -lh /kaggle/working/agbe-1b-q4_k_m.gguf"""),
 
+(MD, """## Provenance bundle
+
+Gate 2 section 3.1 asks for proof that a fine-tuning run actually happened: the
+adapter weights, the training script and config, per-step training logs, the
+dataset, SHA256 checksums of the base model, the adapter and the final GGUF, and
+the merge/quantisation step.
+
+Round 1 could supply none of it. The run happened in a Kaggle session that has
+since expired, `report_to` was empty so nothing was logged to a file, and the
+notebook's cell outputs were stripped before it was committed. The GGUF was the
+only thing that survived.
+
+**So this cell writes the bundle before anything else can go wrong, and the next
+one zips it for download. Do not skip it, and when you are finished, save this
+notebook WITH its outputs intact.**"""),
+
+(CODE, """# Checksums and the provenance bundle. Written to /kaggle/working/provenance,
+# which is what you download and commit to the repo under provenance/.
+import hashlib, json, pathlib, shutil, subprocess, sys
+
+PROV = pathlib.Path("/kaggle/working/provenance")
+PROV.mkdir(parents=True, exist_ok=True)
+
+# train_lora.py already wrote training_log.json/.csv, run_manifest.json and
+# checksums.json into /kaggle/working/out/provenance. Bring them across.
+src = pathlib.Path("/kaggle/working/out/provenance")
+for f in src.glob("*"):
+    shutil.copy2(f, PROV / f.name)
+
+# The adapter itself: the clearest single piece of evidence in the bundle.
+adapter = pathlib.Path("/kaggle/working/out/adapter")
+(PROV / "adapter").mkdir(exist_ok=True)
+for name in ("adapter_model.safetensors", "adapter_config.json",
+             "tokenizer_config.json", "special_tokens_map.json"):
+    f = adapter / name
+    if f.exists():
+        shutil.copy2(f, PROV / "adapter" / name)
+
+def sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+targets = {
+    "base_model_f16_gguf": "/kaggle/working/agbe-f16.gguf",
+    "final_q4_k_m_gguf":   "/kaggle/working/agbe-1b-q4_k_m.gguf",
+    "adapter_model.safetensors": str(adapter / "adapter_model.safetensors"),
+    "adapter_config.json":       str(adapter / "adapter_config.json"),
+    "train.jsonl":               "corpus/build/train.jsonl",
+    "facts.json":                "corpus/facts.json",
+}
+sums = {}
+for label, path in targets.items():
+    pth = pathlib.Path(path)
+    if pth.exists():
+        sums[label] = {"sha256": sha256(pth), "bytes": pth.stat().st_size}
+    else:
+        print("MISSING, not hashed:", path)
+(PROV / "checksums.json").write_text(json.dumps(sums, indent=2) + "\n")
+print(json.dumps(sums, indent=2))"""),
+
+(CODE, """# The environment the export depends on, recorded rather than remembered.
+# BUILDS.md documents a build lost to exactly this: llama.cpp's converter
+# requirements pin transformers DOWN from 5.0 to 4.57, the pin was dropped by
+# accident, and conversion died after writing all 340 tensors.
+import json, pathlib, subprocess, sys
+
+env = {
+    "python": sys.version,
+    "llama_cpp_commit": subprocess.run(
+        ["git", "-C", "/kaggle/working/llama.cpp", "rev-parse", "HEAD"],
+        capture_output=True, text=True).stdout.strip(),
+    "quantisation": "Q4_K_M via llama-quantize",
+    "convert_script": "convert_hf_to_gguf.py",
+}
+for mod in ("torch", "transformers", "peft", "accelerate", "safetensors"):
+    try:
+        env[mod] = __import__(mod).__version__
+    except Exception as exc:
+        env[mod] = f"unavailable: {exc}"
+
+pathlib.Path("/kaggle/working/provenance/environment.json").write_text(
+    json.dumps(env, indent=2) + "\n")
+print(json.dumps(env, indent=2))"""),
+
+(CODE, """# Zip the bundle. Download this from the Kaggle output panel and unpack it
+# into the repo as provenance/.
+!cd /kaggle/working && zip -r provenance.zip provenance -q && ls -lh provenance.zip
+!find /kaggle/working/provenance -type f | sort"""),
+
 (MD, """## Smoke test
 
 Four prompts. The first two are in-domain, the third is Pidgin, and the fourth is

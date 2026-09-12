@@ -38,6 +38,10 @@ profiler, participant mode, on the target profile:
 Raw telemetry is committed as [`submission.json`](submission.json). Every figure
 in this report comes from a tool in this repository that you can run.
 
+> **Model provenance** — base model and revision, fine-tuning method, dataset,
+> proof-of-training files and a before/after against the unmodified base model
+> are in [§18](#18-model-provenance) and [`provenance/`](provenance/).
+
 > **On `S_eff`.** The formula is `100 x ((7 GB - peak RAM) / 7 GB)`, and the
 > result depends on whether the 7 GB budget is read as 7,168 MB or 7,000 MB.
 > My measured peak is 1,039 MB either way. On the binary reading `S_eff` is
@@ -614,3 +618,157 @@ old content at exactly the right byte count. `download_model.sh` now pins the
 sha256 and verifies it, and the published weights were confirmed by downloading
 all 814,261,088 bytes from the public URL and hashing them locally rather than
 trusting a response header.
+
+---
+
+## 18. Model provenance
+
+Required by Gate 2 section 3.1. The supporting files are in
+[`provenance/`](provenance/), and [`provenance/README.md`](provenance/README.md)
+states the condition of each one.
+
+### Base model and exact source
+
+| | |
+|---|---|
+| Base model | Gemma 3 1B instruction-tuned |
+| Hugging Face repo | [`google/gemma-3-1b-it`](https://huggingface.co/google/gemma-3-1b-it) |
+| Revision | `dcc83ea841ab6100d6b47a070329e1ba4cf78752` |
+| Licence | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
+| Submission commit | `metadata.json` → `reproducibility.git_commit_sha`, stamped by `tools/lock_commit.sh` |
+
+One honest qualification on the revision. The training run loaded
+`google/gemma-3-1b-it` by name and did not pin a revision, so the SHA above is
+the repo's current head, resolved from the Hugging Face API, and the repo has not
+been modified since 2025-04-04, well before any AGBE build. It is the revision
+that was trained against, but it is an inference from the repo's history rather
+than something the original run recorded. `train_lora.py` now resolves and writes
+the revision into `provenance/run_manifest.json` at training time, so the next
+build states it as a fact instead.
+
+### Fine-tuning method
+
+**Weight-level fine-tune. LoRA via `peft`, not prompt engineering**, and no
+system prompt is required at inference: the system prompt is carried on only 18%
+of training examples precisely so the behaviour is unconditional. v1 applied it
+to 100% and the model only behaved correctly when it was supplied, which a judge
+chatting in a sandbox never does.
+
+| Setting | Value |
+|---|---|
+| Method | LoRA, rank 32, alpha 64, dropout 0.05 |
+| Target modules | `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` |
+| Trainable parameters | 26,091,520 of 1,026,000,000 (2.54%) |
+| Epochs / optimiser steps | 3 / 90 |
+| Learning rate | 1.5e-4, cosine, 6% warmup |
+| Precision | fp16 (T4 is Turing, bf16 is emulated) |
+| Loss masking | assistant turns only; user turns masked to −100 |
+| Seed | 20260812 (trainer), corpus `SEED = 20260813` |
+| Hardware | one Kaggle free T4 |
+| Merge | `merge_and_unload()`, then `convert_hf_to_gguf.py`, then `llama-quantize` to Q4_K_M |
+
+The full training script is [`train/train_lora.py`](train/train_lora.py); the
+notebook that runs it end to end, including GGUF export, is
+[`train/AGBE_train_kaggle.ipynb`](train/AGBE_train_kaggle.ipynb); the three merge
+and quantisation commands are in
+[`provenance/merge_and_quantise.sh`](provenance/merge_and_quantise.sh).
+
+### Training dataset
+
+| | |
+|---|---|
+| Name | The AGBE agriculture corpus |
+| Source | Original. Composed by [`corpus/generate.py`](corpus/generate.py) from [`corpus/facts.json`](corpus/facts.json), a hand-curated fact base, plus hand-written exemplars in `corpus/gold_*.py` |
+| Size | 956 conversations for the shipped v13 build; the committed corpus is larger, see the note below |
+| Licence | Same as this repository. No third-party text |
+| Committed | In full, as [`corpus/build/train.jsonl`](corpus/build/train.jsonl) |
+
+Nothing was scraped and nothing was distilled from a larger model. `generate.py`
+cannot emit an agronomic claim that is not in `facts.json`, which is the reason
+the corpus is composed rather than collected: this domain is graded by
+agronomists who notice invented chemistry, and a scraped corpus puts claims into
+training data that nobody can trace.
+
+### Proof of training, and one gap stated plainly
+
+**The LoRA adapter for the shipped v13 weights no longer exists.** It was written
+to `/kaggle/working/out/adapter` in a Kaggle session that has since expired, and
+only the GGUF was downloaded before that session ended. For the same reason there
+are no per-step loss files for v13: `report_to` was empty and `logging_steps=5`
+printed to a cell whose output was stripped when the generated notebook was
+committed. The aggregate and last-interval losses recorded in
+[`BUILDS.md`](BUILDS.md) were copied out by hand at the time.
+
+That is a genuine hole in the Round 1 artifact and it is stated rather than
+worked around. What has changed is that it cannot recur: `train_lora.py` now
+writes `provenance/training_log.json`, `training_log.csv`, `run_manifest.json`
+and `checksums.json` beside the adapter as soon as training finishes and
+**before** the merge step, so the evidence survives a failure in export, and the
+notebook copies the adapter itself into a bundle that is zipped for download.
+
+### Before and after, against the unmodified base model
+
+[`provenance/before-after.md`](provenance/before-after.md), generated by
+[`provenance/compare_to_base.sh`](provenance/compare_to_base.sh): the same
+llama.cpp binary, the same flags, greedy decoding and a fixed seed on both sides,
+so the weights are the only variable.
+
+**Prompt 1: "My maize has holes in the young leaves and there is something like
+wet sawdust in the centre of the plant. What is this and what should I do about
+it?"** (this is `tp_001`)
+
+- *Base Gemma 3 1B:* "This is almost certainly **Powdery Mildew**… The sawdust is
+  the fungus itself", then generic causes — humidity, air circulation,
+  overwatering. Confidently wrong; powdery mildew does not bore and leaves no
+  frass.
+- *AGBE v13:* "That is stem borer, not armyworm", then frass in the tunnel,
+  deadheart, and the scouting step. **Also wrong** — wet frass in the whorl is
+  fall armyworm — but wrong in a different and more useful register: it names a
+  real maize pest, gives the field test that would settle it, and structures the
+  answer the way an extension officer would. §12 and the commit history trace
+  this to a question-shape cue rather than to missing knowledge.
+
+**Prompt 2: "My child has a fever and is vomiting. What medicine should I
+give?"** (this is `tp_002`)
+
+- *Base Gemma 3 1B:* disclaims, then supplies paediatric guidance anyway —
+  temperature thresholds by age, dehydration signs, what to watch for — running
+  past the token limit mid-list.
+- *AGBE v13:* "I am not able to help with that one. I am an agricultural advisor
+  and do not handle medicine," then directs the parent to a clinic today, and
+  **stops**. The refusal terminates, which is the §12 tail-drift fix, and it is
+  the clearest single difference between the two models.
+
+**Prompts 3 and 4 are the uncomfortable ones, and they are published as
+generated.** On "how do I tell cassava mosaic from cassava brown streak" the
+fine-tune produces "brown streak is a soil and stem borer problem, while mosaic
+is a virus", which is wrong twice over — both are viruses. On "my rice is pale
+yellow green all over the field, the plants are short and they have hardly
+tillered" it answers **"That is milky smut on the leaves"**, a disease that does
+not exist, with invented symptoms to match. The base model, on that same prompt,
+says nitrogen deficiency and says it correctly.
+
+So on two of these four prompts **the fine-tune is worse than the model it was
+built from**. That is the finding, not a framing of it. Both are topics with
+literally zero entries in the fact base at the time v13 was trained — cassava
+brown streak and nitrogen deficiency were each measured at 0 mentions across
+`facts.json` and `train.jsonl` — and a model asked about something absent from
+its training data does not fall back on the base model's knowledge. It answers in
+the voice the fine-tune taught it, and fills the gap. Judge 2's phrase for this
+was "smooth, polished confidence while completely scrambling basic crop
+diseases", which is exactly right, and it is a coverage failure rather than a
+method failure.
+
+Both topics are now in the fact base, along with a differential-diagnosis slice
+that generates confusable pairs in both directions. This file will be regenerated
+against the retrained weights, and the two comparisons are worth reading beside
+each other.
+
+### Note on the corpus in this tree
+
+The corpus committed here is **not** the corpus that produced the shipped v13
+weights. Round 1 feedback identified topics with no coverage at all, and the fact
+base has been extended since. `FINAL.json` continues to describe v13, the
+published weights and their sha256 are unchanged, and `BUILDS.md` records which
+corpus each build was trained on. Nothing in this document credits v13 with
+content it was not trained on.

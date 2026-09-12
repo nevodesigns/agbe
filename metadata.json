@@ -33,6 +33,10 @@
     "parameters_estimate": "1B",
     "packaging": "binary_bundle"
   },
+  "reproducibility": {
+    "git_commit_sha": "99669d72232dbc6af0f1b2c9d3b9edf015a4cd63",
+    "_note": "The repo commit this submission is made from. Set by tools/lock_commit.sh immediately before submitting, so it names the tree the judges receive."
+  },
   "_runtime": {
     "model_path": "model/agbe-1b-q4_k_m.gguf"
   }
