@@ -105,6 +105,66 @@ else
 fi
 rm -f /tmp/agbe-consist.$$
 
+# --- Gate 2, section 3 ------------------------------------------------------
+#
+# The semifinalist round added requirements that the Round 1 checks knew nothing
+# about. These are mechanical, so they are checked rather than remembered.
 echo
+echo "  Gate 2 (semifinalist round)"
+
+R="$(dirname "$0")/.."
+
+# 3.1 the git commit SHA lives in metadata.json
+if bash "$(dirname "$0")/lock_commit.sh" --check > /dev/null 2>&1; then
+  echo "  ok     3.1  metadata.json git_commit_sha matches HEAD"
+else
+  echo "  WARN   3.1  metadata.json git_commit_sha is not HEAD"
+  echo "              run tools/lock_commit.sh as the last step before submitting"
+fi
+
+# 3.1 the Model Provenance section exists and says the required things
+missing=""
+for needle in "Base model and exact source" "Fine-tuning method"               "Training dataset" "Before and after"; do
+  grep -qi "$needle" "$R/REPORT.md" || missing="$missing '$needle'"
+done
+if [ -z "$missing" ]; then
+  echo "  ok     3.1  REPORT.md model provenance section covers all four items"
+else
+  echo "  FAIL   3.1  REPORT.md model provenance is missing:$missing"
+  fail=1
+fi
+
+# 3.1 the proof-of-training bundle
+for f in provenance/README.md provenance/merge_and_quantise.sh          provenance/compare_to_base.sh provenance/before-after.md; do
+  if [ -f "$R/$f" ]; then echo "  ok     3.1  $f"
+  else echo "  FAIL   3.1  missing $f"; fail=1; fi
+done
+for f in provenance/adapter/adapter_model.safetensors          provenance/adapter/adapter_config.json          provenance/training_log.json provenance/run_manifest.json          provenance/checksums.json; do
+  if [ -f "$R/$f" ]; then echo "  ok     3.1  $f"
+  else
+    echo "  TODO   3.1  $f not yet present"
+    echo "              produced by the Kaggle run; unpack provenance.zip here"
+    fail=1
+  fi
+done
+
+# 3.2 the download URL must be readable without executing the script
+url_lines=$(grep -c '^MODEL_URL="https://[^"$]*"$' "$R/download_model.sh" || true)
+if [ "$url_lines" -eq 1 ] && ! grep -qE '^MODEL_URL=.*\$\{' "$R/download_model.sh"; then
+  echo "  ok     3.2  download_model.sh URL is a static literal"
+else
+  echo "  FAIL   3.2  download_model.sh URL is not a plain static string"
+  fail=1
+fi
+
+# 3.4 self-reported figures have to come from a committed profiler run
+if [ -f "$R/submission.json" ]; then
+  echo "  ok     3.4  submission.json committed for independent comparison"
+else
+  echo "  FAIL   3.4  submission.json missing"; fail=1
+fi
+
+echo
+
 if [ "$fail" -eq 0 ]; then echo "  READY TO SUBMIT"; else echo "  NOT READY: fix the FAIL lines above"; fi
 exit $fail
