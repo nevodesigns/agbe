@@ -126,3 +126,35 @@ def compose_prose(rng: random.Random, *body: str, chemical: bool = False) -> str
 
 def word_count(text: str) -> int:
     return len(text.split())
+
+
+def compose_contrast(rng: random.Random, shared: str, first: tuple[str, str],
+                     second: tuple[str, str], decider: str = "",
+                     stakes: str = "", control: str = "",
+                     chemical: bool = False) -> str:
+    """Differential answer: what both share, then each side, then the decider.
+
+    `first` and `second` are (label, tell) and are passed in the order the
+    QUESTION asked them. That is the whole point of this helper. BUILDS.md
+    records what happens otherwise: v12 carried five "that is stem borer, not
+    armyworm" exemplars and none of the reverse, and then called textbook
+    armyworm damage stem borer on our own submitted test prompt. A contrast
+    exemplar teaches a direction, not a boundary. Generating each pair both ways,
+    with the sides in the asked order, is what makes it a boundary.
+    """
+    parts = []
+    if clean(shared):
+        parts.append(para(shared))
+    rows = []
+    for label, tell in (first, second):
+        rows.append(f"**{clean(label)}** — {clean(tell).rstrip('.')}.")
+    parts.append("\n".join(rows))
+    tail = para(decider, stakes)
+    if tail:
+        parts.append(tail)
+    if clean(control):
+        parts.append(para(control))
+    closer = maybe_closer(rng, chemical)
+    if closer:
+        parts.append(para(closer))
+    return "\n\n".join(parts)

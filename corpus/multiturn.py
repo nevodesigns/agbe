@@ -224,3 +224,95 @@ def build_multiturn(rng: random.Random, facts: dict, rec_fn, max_convos: int = 1
             out.append(rec_fn(q1, a1, "multiturn", key, f"multiturn_{intent}",
                               extra_turns=[(q2, a2)]))
     return out
+
+
+# Turn-two questions that CHANGE the subject. Round 1's judge transcript is the
+# reason this exists: asked "What about soil conditions" after a chilli question,
+# the model produced a generic drainage-and-NPK paragraph, and then produced the
+# same paragraph again for the next question, which was an unrelated fall
+# armyworm prompt. Two different failures, one cause.
+#
+#   - every follow-up in FOLLOWUPS keeps the subject fixed, so the corpus never
+#     taught the model to move to a new topic mid-conversation
+#   - and 93% of the shipped corpus was single-turn, so a second turn was close
+#     to unseen territory
+#
+# The contract these examples teach is narrow and it is the whole point: answer
+# the question in front of you, from the facts for THAT subject, not from what
+# you just said.
+SHIFTS = {
+    "soil": ["What about soil conditions?", "And the soil side of it?",
+             "What should I be doing about the soil?"],
+    "storage": ["What about storing it afterwards?", "And after harvest?",
+                "What about storage?"],
+    "market": ["What about selling it?", "And getting it to market?",
+               "What about the market side?"],
+    "weather": ["What about the rains?", "And if the weather turns?",
+                "What about weather this season?"],
+}
+SHIFT_BLOCK = {"soil": "soil_water", "storage": "postharvest",
+               "market": "market", "weather": "weather"}
+
+
+def build_topic_shift(rng: random.Random, facts: dict, rec_fn,
+                      max_convos: int = 96) -> list[dict]:
+    """Two-turn conversations whose second turn moves to a different subject.
+
+    The second answer is composed from a DIFFERENT fact block than the first, so
+    the only way to produce it is to read the new question rather than continue
+    the previous answer.
+    """
+    out: list[dict] = []
+    subjects: list[tuple[str, dict, str]] = []
+    for crop, f in facts["crops"].items():
+        subjects.append((crop, f, crop.replace("_", " ")))
+    for pest, f in facts["pests_diseases"].items():
+        subjects.append((pest, f, pest.replace("_", " ")))
+
+    shift_keys = list(SHIFTS)
+    shift_cursor = {k: 0 for k in shift_keys}
+    rng.shuffle(subjects)
+    for i, (key, f, name) in enumerate(subjects):
+        if len(out) >= max_convos:
+            break
+        for j in range(3):
+            shift = shift_keys[(i + j) % len(shift_keys)]
+            if len(out) >= max_convos:
+                break
+            block = facts.get(SHIFT_BLOCK[shift]) or {}
+            if not block:
+                continue
+
+            host = f.get("crop") or f.get("species") or f.get("target", "")
+            q1 = rng.choice([
+                f"I have a problem with {name}. What should I do?",
+                f"What is the right way to handle {name}?",
+                f"Tell me how to deal with {name}.",
+            ]) if not host else rng.choice([
+                f"I have {name} on my {host}. What should I do?",
+                f"How do I deal with {name} on my {host}?",
+            ])
+            a1 = para(*body_from(f, limit=3))
+            if word_count(a1) < MIN_ANSWER_WORDS:
+                continue
+
+            # The second answer comes from a different block entirely, walked
+            # round-robin rather than sampled. Sampling concentrated these turns
+            # on a few entries, and because they reuse the same sentences that
+            # build_block already emits, they pushed those blocks over the
+            # sentence cap: soil fell from 39 examples to 28 and postharvest from
+            # 41 to 29 on the first build with topic shifts in it. Spreading the
+            # draw keeps the cost off any single entry.
+            entries = sorted(block)
+            topic2 = entries[shift_cursor[shift] % len(entries)]
+            shift_cursor[shift] += 1
+            fact2 = block[topic2]
+            a2 = para(fact2) if isinstance(fact2, str) else para(
+                *[v for v in fact2.values() if isinstance(v, str)][:2])
+            if word_count(a2) < MIN_FOLLOWUP_WORDS:
+                continue
+
+            out.append(rec_fn(q1, a1, "multiturn", f"{key}__{shift}",
+                              f"shift_{shift}",
+                              extra_turns=[(rng.choice(SHIFTS[shift]), a2)]))
+    return out

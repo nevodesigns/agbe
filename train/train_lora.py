@@ -302,6 +302,31 @@ def strip_oversized_tokens(merged_dir: pathlib.Path) -> None:
             tc_path.write_text(json.dumps(tc, ensure_ascii=False))
 
 
+def _base_revision(repo_id: str, token: str | None) -> str | None:
+    """Resolve the base model to a commit SHA, so the provenance is exact.
+
+    Gate 2 asks for "the specific Hugging Face repo and commit/revision". A repo
+    name alone is not a provenance claim: `google/gemma-3-1b-it` at main today is
+    not necessarily what was trained against.
+    """
+    try:
+        from huggingface_hub import HfApi
+        return HfApi().model_info(repo_id, token=token).sha
+    except Exception as exc:                       # offline, or hub unavailable
+        print(f"could not resolve base revision for {repo_id}: {exc}")
+        return None
+
+
+def _sha256(path: pathlib.Path) -> str:
+    """Hash a file in chunks. Gate 2 section 3.1 asks for these explicitly."""
+    import hashlib
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--train", default="corpus/build/train.jsonl")
@@ -432,6 +457,73 @@ def main() -> None:
     tok.save_pretrained(str(adapter_dir))
     print(f"adapter saved to {adapter_dir}")
 
+    # --- proof of training -------------------------------------------------
+    #
+    # Gate 2 section 3.1 asks for the adapter, the training script, and per-step
+    # loss values, and it is the one requirement Round 1's artifacts could not
+    # satisfy: the run happened on a Kaggle session that has since expired, so
+    # `report_to=[]` and `logging_steps=5` meant every loss value existed only
+    # in a cell output that was later stripped. Nothing about the run survived
+    # except the GGUF.
+    #
+    # So the log is now a file the run itself writes, next to the adapter,
+    # before the merge step can fail and take the session with it.
+    log_dir = out / "provenance"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    history = trainer.state.log_history
+    (log_dir / "training_log.json").write_text(
+        json.dumps(history, indent=2, ensure_ascii=False) + "\n")
+
+    import csv
+    fields, rows = [], []
+    for entry in history:
+        for k in entry:
+            if k not in fields:
+                fields.append(k)
+        rows.append(entry)
+    with (log_dir / "training_log.csv").open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=fields)
+        w.writeheader()
+        w.writerows(rows)
+
+    losses = [(e.get("step"), e.get("loss")) for e in history if "loss" in e]
+    manifest = {
+        "base_model": BASE_MODEL,
+        # Gate 2 section 3.1 asks for the exact revision, not just the repo name.
+        "base_model_revision": _base_revision(BASE_MODEL, token),
+        "method": "LoRA (peft), assistant-turn loss masking",
+        "lora": {"r": LORA_R, "alpha": LORA_ALPHA, "dropout": LORA_DROPOUT,
+                 "target_modules": list(TARGET_MODULES)},
+        "epochs": args.epochs,
+        "learning_rate": LR,
+        "lr_scheduler": "cosine",
+        "warmup_ratio": 0.06,
+        "precision": "fp16",
+        "batch_size": BATCH,
+        "grad_accum": GRAD_ACCUM,
+        "max_seq_len": MAX_SEQ_LEN,
+        "seed": targs.seed,
+        "optimiser_steps": trainer.state.max_steps,
+        "train_examples": len(dataset),
+        "train_file": str(args.train),
+        "train_file_sha256": _sha256(pathlib.Path(args.train)),
+        "trainable_params": sum(p.numel() for p in model.parameters()
+                                if p.requires_grad),
+        "total_params": sum(p.numel() for p in model.parameters()),
+        "last_interval_loss": losses[-1][1] if losses else None,
+        "train_loss": next((e.get("train_loss") for e in reversed(history)
+                            if "train_loss" in e), None),
+        "versions": {
+            "torch": torch.__version__,
+            "transformers": __import__("transformers").__version__,
+            "peft": __import__("peft").__version__,
+        },
+    }
+    (log_dir / "run_manifest.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+    print(f"training log and run manifest written to {log_dir}")
+
     if args.merge:
         # llama.cpp converts a plain HF model, not an adapter, so merge first.
         from peft import PeftModel
@@ -450,6 +542,18 @@ def main() -> None:
         tok.save_pretrained(str(merged_dir))
         strip_oversized_tokens(merged_dir)
         print(f"merged model saved to {merged_dir}")
+
+    # Checksums of everything a reviewer is asked to verify. The GGUF is hashed
+    # by the notebook after quantisation, since it does not exist yet here.
+    sums = {}
+    for label, path in (("adapter_model.safetensors",
+                         adapter_dir / "adapter_model.safetensors"),
+                        ("adapter_config.json", adapter_dir / "adapter_config.json")):
+        if path.exists():
+            sums[label] = _sha256(path)
+    (log_dir / "checksums.json").write_text(
+        json.dumps(sums, indent=2) + "\n")
+    print("checksums:", json.dumps(sums, indent=2))
 
 
 if __name__ == "__main__":

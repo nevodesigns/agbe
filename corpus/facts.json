@@ -405,6 +405,75 @@
         "Birds are stripping the grain from my sorghum heads and lift off in flocks when I walk in.",
         "My millet heads are being emptied while the grain is still soft."
       ]
+    },
+    "cassava_brown_streak": {
+      "crop": "cassava",
+      "identify": "Yellow blotching along the leaf veins that makes a feathery pattern against the green, brown dead streaks on the green part of the stem, and hard dry brown rot in the tuber flesh. The root damage is the part that matters and it is often the only sign, so a field can look healthy and still be badly affected.",
+      "scouting": "Cut two or three roots open before you decide the crop is clean. Foliar signs can be absent on a plant whose roots are already corky and brown.",
+      "spread": "A virus, spread by whitefly and by planting cuttings taken from infected plants. It is not a bacterium and it is not soilborne.",
+      "control": "There is no cure and no spray that reverses it. Plant tolerant varieties, take cuttings only from plants you have seen produce clean roots, remove and destroy affected plants, and harvest earlier rather than leaving roots in the ground where the rot worsens.",
+      "misconception": "It is often called a rot and treated with a fungicide or a soil drench. Neither does anything, because the damage is a virus already inside the plant.",
+      "symptom_reports": [
+        "My cassava leaves have yellow patches along the veins and there are brown streaks on the stems.",
+        "The cassava looked fine but when we harvested, the roots had hard brown patches inside and were not fit to sell."
+      ]
+    },
+    "tomato_blight": {
+      "crop": "tomato, and potato where it is grown",
+      "identify": "Two different diseases are called blight. Early blight makes dark brown spots with rings inside them like a target, on the lowest and oldest leaves first, each spot often ringed with yellow. Late blight makes greasy grey green water soaked patches with no clear edge, spreads across the plant within days in cool damp weather, blackens the stems, and leaves a fine white mould on the underside of the leaf in the morning.",
+      "scouting": "Look at the underside of a fresh lesion early in the morning. White downy growth means late blight and the crop needs a decision that day. A dry lesion with rings and a yellow halo is early blight and moves far more slowly.",
+      "spread": "Both are fungal or fungus like, carried on wind and splashing rain, and both survive on crop debris and volunteer plants. Late blight runs fastest in cool wet nights with heavy dew.",
+      "control": "Stake and prune so air moves through the crop and leaves dry quickly, water at the base rather than over the leaves, space plants properly, remove and destroy affected leaves and fruit rather than dropping them between the rows, and rotate away from tomato and other solanaceous crops. Where a protective spray is justified, a product registered for blight on tomato is applied before the disease is widespread, at the rate on the label, and your extension officer will know what is registered and current in your area.",
+      "misconception": "Blight is often confused with a nutrient problem because both start with discoloured leaves. Blight makes defined lesions with edges you can trace on individual leaves, in patches that spread across the field from a starting point. A nutrient shortage colours whole leaves evenly and appears across the field at once.",
+      "symptom_reports": [
+        "My tomato leaves have brown spots with rings inside them, starting from the leaves near the ground.",
+        "My tomatoes went from healthy to black stems and rotten fruit in about four days after the cold wet nights started."
+      ]
+    },
+    "pepper_anthracnose": {
+      "crop": "pepper and chilli",
+      "identify": "Sunken circular spots on ripening fruit that darken and enlarge, often with rings of tiny black or pink specks inside the sunken area. It attacks the fruit hardest as it colours, so the loss lands on the part you were going to sell.",
+      "spread": "A fungus carried on seed, on crop debris and by splashing rain. Wet season crops and dense unstaked plots suffer worst.",
+      "control": "Use clean seed from a reliable source, stake the plants so fruit is off the soil, pick and destroy affected fruit rather than leaving it in the field, harvest promptly as fruit colours, and rotate away from pepper and tomato. Where a protective spray is justified, use a product registered for anthracnose on pepper at the label rate and confirm the current recommendation with your extension officer.",
+      "misconception": "Farmers often keep the affected fruit on the plant hoping it will still sell. It is the main source of spores for the rest of the crop.",
+      "symptom_reports": [
+        "My chilli fruits have sunken dark spots that are getting bigger as they ripen.",
+        "The pepper fruits are rotting with round soft patches and there are tiny black dots inside the patches."
+      ]
+    },
+    "pepper_wilt_complex": {
+      "crop": "pepper and chilli",
+      "identify": "Plants wilt and die in patches, often after heavy rain or in the lowest part of the plot. Several different causes look the same from above, so the diagnosis is made below the soil line and at the stem base.",
+      "scouting": "Pull up a dying plant and look. A dark water soaked collar at the stem base with the root system intact points to a soilborne fungus and waterlogging. Knots and swellings on the roots point to nematodes. Sudden collapse with leaves still fully green, and a milky ooze when a cut stem is held in clear water, is bacterial wilt. Yellowing that climbs one side of the plant before it dies is usually fusarium.",
+      "control": "Improve drainage and plant on ridges or beds, because standing water is the common factor behind most of these. Remove affected plants with the soil around the roots, rotate away from pepper, tomato and other solanaceous crops for several seasons, and use clean nursery soil. None of these causes is cured by a spray applied to the leaves.",
+      "misconception": "A dying plot is often treated with whatever product is available. Wilt in pepper is usually a drainage and rotation problem, and money spent on a foliar spray is money lost.",
+      "symptom_reports": [
+        "My chilli plants are dying one after another, starting from the wettest corner of the plot.",
+        "My pepper plants wilt in the afternoon and by the next week they are dead, and it is spreading."
+      ]
+    },
+    "damping_off": {
+      "crop": "tomato, pepper, and most nursery raised vegetables",
+      "identify": "Seedlings in the nursery collapse at the soil line with a thin dark pinched stem, or fail to emerge at all. It shows up in patches in the seedbed and spreads outward from them.",
+      "spread": "Soilborne fungi that thrive where the seedbed is too wet, sown too thickly, or made from soil that has carried the same crop before.",
+      "control": "Sow thinly, water in the morning so the surface dries by evening, raise the seedbed so it drains, and use fresh nursery soil rather than soil from a bed that has grown tomato or pepper. Remove collapsed seedlings and the soil immediately around them. Do not try to save a badly affected patch by watering it more.",
+      "misconception": "The wilting seedlings look thirsty, so the usual response is more water, which is exactly what makes it worse.",
+      "symptom_reports": [
+        "My tomato seedlings in the nursery are falling over at the base and the stem there looks thin and dark.",
+        "Patches of my pepper nursery keep collapsing even though I water them every day."
+      ]
+    },
+    "rice_blast": {
+      "crop": "rice",
+      "identify": "Diamond or spindle shaped spots on the leaves, grey in the middle with a brown edge. On the neck of the panicle it makes a dark shrivelled band, the panicle whitens and fills poorly, and that stage is where the yield is actually lost.",
+      "scouting": "Check the neck of the panicle at flowering, not just the leaves. Leaf blast can be mild in a crop that then loses heavily to neck blast.",
+      "spread": "A fungus favoured by heavy nitrogen, dense stands, long leaf wetness and cool nights with heavy dew. Upland rice suffers more than flooded lowland.",
+      "control": "Use resistant FARO varieties suited to your system, avoid heavy nitrogen in a single dose, keep the recommended spacing so the canopy dries, and remove volunteer rice and infected stubble. Where a spray is justified it is applied around booting and confirmed with your extension officer.",
+      "misconception": "It is often answered with more nitrogen because the crop looks poor. Extra nitrogen makes blast worse.",
+      "symptom_reports": [
+        "My rice leaves have grey spots shaped like diamonds with brown edges.",
+        "The necks of my rice panicles turned dark and the grains are empty and white."
+      ]
     }
   },
   "soil_water": {
@@ -481,5 +550,200 @@
     "harmattan": "The harmattan brings dry dusty air that speeds drying, which helps a harvested crop and hurts a standing one. Plan drying and storage around it and protect late vegetables from the desiccating wind.",
     "flood_risk": "On low lying or fadama land, raised beds and drainage channels dug before the rains are worth more than anything done once water is standing.",
     "climate_shift": "Farmers across the region report rains starting later and stopping earlier than they used to. Shorter duration varieties and staggered planting hedge against a season that does not behave like the last one."
+  },
+  "nutrition": {
+    "nitrogen_deficiency": {
+      "nutrient": "nitrogen",
+      "identify": "An even pale green to yellow colour over the whole leaf, starting on the oldest leaves at the bottom of the plant while the new leaves at the top stay greener. The plant is short, thin stemmed and generally weak rather than spotted or lesioned.",
+      "why_oldest_first": "Nitrogen moves inside the plant. When there is not enough, the plant withdraws it from the old leaves to build the new ones, so the bottom of the plant goes yellow first. That bottom up pattern is the single most useful thing to look at, because most diseases do the opposite or appear at random.",
+      "crop_signs": "In maize the yellowing runs down the midrib of a lower leaf from the tip, making a V shape that points back at the stem. In rice the whole stand looks pale and yellow green, the plants are short, and they put out far fewer tillers than they should.",
+      "confirm": "Look at the pattern across the field, not just one plant. A nitrogen shortage is even, follows the leaf age gradient, and is often worse on the sandy or eroded parts of the field. A disease appears in patches that spread outward from a starting point and marks individual leaves with defined lesions.",
+      "correct": "Topdress with a nitrogen fertiliser and place it in a band beside the plant rather than broadcasting it, then cover it with soil or apply it just before rain so it is not lost to the air. The crop responds within one to two weeks if nitrogen was really the problem, which is also how you confirm the diagnosis. Rates depend on the crop, the soil and the product, so take the rate from your extension officer or from a soil test rather than from a general figure.",
+      "misconception": "Yellow leaves are treated as a disease and sprayed. No spray puts nitrogen into a plant.",
+      "symptom_reports": [
+        "My maize is short and the lower leaves are yellowing from the tip down the middle of the leaf, while the top leaves are still green.",
+        "My rice is pale yellow green all over the field, the plants are short and they have hardly tillered."
+      ]
+    },
+    "nitrogen_timing": {
+      "nutrient": "nitrogen",
+      "principle": "Nitrogen is split across the season rather than applied all at once. It leaches with rain and escapes to the air from the surface, so a single large dose at planting is partly gone before the crop is big enough to use it, and the crop then runs short exactly when it is building yield.",
+      "maize": "Apply a smaller basal portion at or just after planting, then topdress the larger share when the crop is about knee high, roughly three to four weeks after emergence and before tasselling. A crop that goes short at tasselling does not recover.",
+      "rice": "In lowland rice, a basal portion goes in at or just before transplanting, the main topdressing goes on at active tillering when the crop is putting out shoots, and a third portion at panicle initiation. Drain or keep the water shallow when you apply, then let it back up so the fertiliser is held in the soil rather than floating off with the flow.",
+      "vegetative_adjustment": "During vegetative growth the crop is building the leaves and tillers that determine yield, so this is where a shortage costs most and where a topdressing pays best. If the lower leaves are yellowing during tillering or early vegetative growth, bring the topdressing forward rather than waiting for the calendar date.",
+      "placement": "Band it beside the plant and cover it. Broadcast urea on hot dry ground loses a large share to the air before the crop takes any up, and urea scattered on wet leaves scorches them.",
+      "misconception": "Applying everything at planting is common because it saves a trip across the field. It wastes fertiliser you have already paid for.",
+      "symptom_reports": [
+        "When should I put fertiliser on my maize, and should I put it all at planting?",
+        "How do I split nitrogen on lowland rice through the season?"
+      ]
+    },
+    "phosphorus_deficiency": {
+      "nutrient": "phosphorus",
+      "identify": "Stunted plants with an unusually dark dull green colour, and purple or reddish tints along the stems and the edges of the older leaves, most visible on young maize. The crop is late to flower and late to mature.",
+      "confirm": "Purpling from phosphorus is uniform across the field and worst on acid or eroded soils and in cold early plantings. Purpling on scattered individual plants is more often cold, waterlogging or root damage.",
+      "correct": "Phosphorus has to be in the soil where the young roots are, so it is applied at planting rather than topdressed. A topdressing of urea will not fix it, and on strongly acid soil the phosphorus already present is locked up until the acidity is addressed. Confirm with a soil test before buying, because phosphorus is expensive and the requirement varies widely.",
+      "misconception": "Purple maize seedlings are often treated with more urea, which is the wrong nutrient entirely.",
+      "symptom_reports": [
+        "My young maize is very dark green with purple edges on the leaves and stems, and it is not growing.",
+        "My crop is stunted and flowering late, and the older leaves have a reddish purple tint."
+      ]
+    },
+    "potassium_deficiency": {
+      "nutrient": "potassium",
+      "identify": "Scorching and browning along the outer margins and tips of the older lower leaves, while the middle of the leaf stays green. Stalks are weak, the crop lodges in wind, and grain or tuber filling is poor.",
+      "confirm": "The scorch follows the leaf edge as a band. A disease lesion sits inside the leaf with a definite edge, and a nitrogen shortage yellows the whole leaf evenly rather than burning its margin.",
+      "correct": "Potassium is applied to the soil, usually at planting or as an early topdressing, and the requirement is highest for cassava, banana, plantain and other crops that move a lot of bulk. Returning crop residues and using compost puts potassium back over time. Take the rate from a soil test.",
+      "misconception": "Leaf edge scorch is often blamed on sun or on a spray burn. If it is on the oldest leaves and consistent across the field, look at potassium first.",
+      "symptom_reports": [
+        "The edges of my lower maize leaves are burnt brown while the middle of the leaf is still green, and the stalks are falling over.",
+        "My cassava leaves are scorched around the rim, starting with the older ones down the stem."
+      ]
+    },
+    "deficiency_or_disease": {
+      "nutrient": "any",
+      "principle": "Before spending money, decide whether the crop is short of a nutrient or is infected, because the two look similar from a distance and nothing you buy works for both.",
+      "identify": "A nutrient shortage is even and it follows the age of the leaf. Whole leaves change colour, the change is symmetrical either side of the midrib, it appears across the field at roughly the same time, and it tracks the poor and sandy patches. A disease is patchy and it spreads. It makes lesions with edges you can trace, on some leaves and not others, it starts from a focus and moves outward week by week, and it often leaves a visible sign such as mould, ooze, frass or a spore mass.",
+      "confirm": "Two field tests settle most cases. Walk the field and ask whether the affected plants are grouped or scattered evenly. Then look at whether the oldest leaves went first, which points to a mobile nutrient such as nitrogen or potassium, or the youngest, which points to something else. If it is still unclear, take a whole affected plant with its roots, and a healthy one for comparison, to your extension officer.",
+      "correct": "Fix the cause you actually identified. A soil test is cheap against a season of the wrong fertiliser, and a correct nutrient diagnosis usually shows a visible response within one to two weeks, which confirms it.",
+      "misconception": "The most expensive mistake in this domain is spraying a nutrient shortage or fertilising a disease. Both leave the real problem running.",
+      "symptom_reports": [
+        "My crop is yellowing and I do not know whether it needs fertiliser or whether it is a disease.",
+        "How do I tell if my plants are sick or just hungry?"
+      ]
+    },
+    "leaf_colour_chart": {
+      "nutrient": "nitrogen",
+      "principle": "A leaf colour chart is a cheap plastic card of graded green panels used to decide when rice needs its nitrogen topdressing, instead of guessing from the calendar.",
+      "how": "Hold the middle of the topmost fully opened leaf against the panels, in the shade with your back to the sun, on the same set of ten plants each time, and read it at the same time of day. If most readings fall below the threshold for your variety, topdress now. Read weekly through tillering.",
+      "why": "It matches the fertiliser to what the crop is actually short of, which usually means less nitrogen bought for the same yield, and it avoids the heavy blanket dose that makes blast and lodging worse.",
+      "misconception": "Colour is judged by eye and by memory, which drifts with the light and the time of day. The point of the card is that it is the same reference every week.",
+      "symptom_reports": [
+        "How do I know when my rice actually needs a nitrogen topdressing?",
+        "Is there a way to check if my rice needs fertiliser without a soil test?"
+      ]
+    }
+  },
+  "differentials": {
+    "cmd_vs_cbsd": {
+      "a": "cassava mosaic disease",
+      "a_short": "CMD",
+      "b": "cassava brown streak disease",
+      "b_short": "CBSD",
+      "both": "Both are viruses of cassava, both are carried by whitefly and by cuttings taken from infected plants, and neither can be cured by any spray. Anyone offering you a treatment for either is selling you nothing.",
+      "a_tell": "Cassava mosaic shows in the leaves. The leaf is mottled yellow and green in patches, distorted and reduced in size, and the plant is stunted. The damage you can see above ground is the damage.",
+      "b_tell": "Cassava brown streak shows in the root. Leaves may carry yellow blotching that follows the veins in a feathery pattern, and the green stems may carry brown dead streaks, but the plant can look almost normal while the tubers are already ruined with hard dry brown patches inside.",
+      "decider": "Cut open two or three roots. Mosaic leaves you a usable root under a bad looking plant; brown streak leaves you a corky brown root under a plant that looked fine.",
+      "why_it_matters": "It changes when you harvest. With brown streak the rot worsens the longer the roots stay in the ground, so harvesting earlier saves part of the crop, and cuttings must only be taken from plants whose roots you have actually cut open and seen to be clean.",
+      "control": "For both: plant resistant or tolerant varieties, take planting material only from clean plants, and remove and destroy affected plants rather than leaving them as a source."
+    },
+    "blight_vs_nitrogen": {
+      "a": "fungal blight",
+      "a_short": "blight",
+      "b": "nitrogen deficiency",
+      "b_short": "a nitrogen shortage",
+      "both": "Both start as discoloured lower leaves on tomato, which is why they get confused, and the two need completely different responses.",
+      "a_tell": "Blight makes lesions. There are defined spots with edges you can trace, dark brown with rings inside them for early blight, or greasy grey green water soaked patches with a white mould on the leaf underside for late blight. It marks some leaves and not others, and it spreads outward from a starting point in the field week by week.",
+      "b_tell": "A nitrogen shortage makes colour. The whole leaf pales evenly, symmetrically either side of the midrib, with no spots and no lesion edge. It begins on the oldest leaves at the bottom because the plant is moving its nitrogen up to the new growth, and it appears across the whole field at about the same time rather than spreading from a focus.",
+      "decider": "Look for an edge. If you can trace the outline of a spot, it is blight. If the leaf is simply a paler version of a healthy leaf, it is nutrition. Then walk the field: grouped and spreading means disease, even and everywhere means hunger.",
+      "why_it_matters": "Fertiliser does nothing to blight, and no spray puts nitrogen into a plant. Getting this wrong costs a season and the price of the wrong input.",
+      "control": "For blight: stake and prune for airflow, water at the base not over the leaves, remove and destroy affected material, rotate away from solanaceous crops. For nitrogen: topdress and band the fertiliser beside the plant, and expect a visible response within one to two weeks, which also confirms the diagnosis."
+    },
+    "early_vs_late_blight": {
+      "a": "early blight",
+      "a_short": "early blight",
+      "b": "late blight",
+      "b_short": "late blight",
+      "both": "Both are called blight on tomato and both make brown leaf damage, but one is a slow problem and the other can take the crop in under a week.",
+      "a_tell": "Early blight makes dry dark spots with concentric rings inside them, like a target, usually ringed by a yellow halo, and it starts on the oldest leaves nearest the soil. It moves slowly up the plant.",
+      "b_tell": "Late blight makes greasy grey green water soaked patches with no clear boundary, blackens the stems, and leaves a fine white downy mould on the underside of a fresh lesion in the early morning. It runs through a crop in cool damp weather within days.",
+      "decider": "Turn a fresh lesion over first thing in the morning. White downy growth on the underside means late blight and the decision cannot wait. Rings, dryness and a yellow halo mean early blight.",
+      "why_it_matters": "Late blight needs an immediate decision about the whole crop. Early blight is managed with sanitation and airflow over the season.",
+      "control": "Both are reduced by staking, spacing, watering at the base, and destroying affected material rather than dropping it between the rows."
+    },
+    "armyworm_vs_stemborer": {
+      "a": "fall armyworm",
+      "a_short": "armyworm",
+      "b": "stem borer",
+      "b_short": "stem borer",
+      "both": "Both attack maize, both leave frass, and both are commonly reported as holes in the plant, so the frass is the thing to read rather than the holes.",
+      "a_tell": "Fall armyworm feeds in the whorl, the funnel at the centre of the plant. It leaves ragged holes across the young leaves, wet sawdust like frass sitting in the whorl, and you can usually find the caterpillar itself down inside the funnel.",
+      "b_tell": "Stem borer feeds inside the stem. It leaves small round holes in the stem with dry powdery frass at the opening, and the central shoot dies while the outer leaves stay alive, which is called deadheart. Split a stem lengthwise and you find the tunnel.",
+      "decider": "Wet frass in the funnel with shredded leaves is armyworm. Dry powder at a hole in the stem with a dead central shoot is stem borer. If you are unsure, split a stem: a tunnel settles it.",
+      "why_it_matters": "Armyworm can be handpicked from the whorl on a small plot and is worth acting on early in vegetative growth. Stem borer is largely a residue and timing problem, managed between seasons rather than during them.",
+      "control": "For armyworm: scout the whorls, handpick on small plots, encourage natural enemies, and treat late infestation on a tasselled crop as rarely worth the cost. For stem borer: destroy or plough in residues after harvest to break the carryover, and plant early and uniformly across the community."
+    },
+    "bacterialwilt_vs_fusarium": {
+      "a": "bacterial wilt",
+      "a_short": "bacterial wilt",
+      "b": "fusarium wilt",
+      "b_short": "fusarium",
+      "both": "Both kill tomato and pepper by wilting, both live in the soil, and neither is cured by anything sprayed on the leaves.",
+      "a_tell": "Bacterial wilt collapses the plant suddenly while the leaves are still fully green. Cut the stem near the base and hang it in a glass of clear water: a milky white thread streaming down from the cut confirms it.",
+      "b_tell": "Fusarium is slower and one sided. Yellowing climbs the plant, often on one side or one branch first, the lower leaves go before the upper, and a stem split lengthwise shows a brown stain in the tissue rather than an ooze.",
+      "decider": "The glass of water. A milky ooze means bacterial wilt. No ooze, plus a brown streak inside a split stem and a slower one sided decline, means fusarium.",
+      "why_it_matters": "Both need rotation and drainage rather than a purchase, but bacterial wilt spreads fast in wet soil and through tools, so affected plants and the soil around them come out immediately.",
+      "control": "For both: rotate away from solanaceous crops for several seasons, improve drainage, use clean nursery soil, and remove affected plants with the surrounding soil. Wash tools and hands between plants."
+    },
+    "nitrogen_vs_potassium": {
+      "a": "a nitrogen shortage",
+      "a_short": "nitrogen",
+      "b": "a potassium shortage",
+      "b_short": "potassium",
+      "both": "Both show on the oldest lower leaves first, because both nutrients move inside the plant and get withdrawn to the new growth, so leaf age does not separate them. The pattern on the leaf does.",
+      "a_tell": "Nitrogen pales the whole leaf evenly, a uniform light green to yellow from midrib to margin, and the plant is thin and short.",
+      "b_tell": "Potassium burns the rim. The outer margins and the tip go brown and scorched in a band while the middle of the leaf stays green, and the stalks are weak enough to lodge in wind.",
+      "decider": "Look at the middle of the leaf. Still green with a burnt edge is potassium. Pale all the way across is nitrogen.",
+      "why_it_matters": "They are different fertilisers at different prices, and urea does nothing for a potassium shortage.",
+      "control": "Confirm with a soil test before buying either. Nitrogen is topdressed and banded beside the plant; potassium goes into the soil and is partly restored over time by returning crop residues and using compost."
+    },
+    "striga_vs_nitrogen": {
+      "a": "striga",
+      "a_short": "striga",
+      "b": "a nitrogen shortage",
+      "b_short": "poor soil",
+      "both": "Both leave a stunted yellow crop on tired land, and striga is worst exactly where fertility is lowest, so the two genuinely travel together.",
+      "a_tell": "Striga is a weed you can see. Small purple or pink flowering plants come up between the crop rows, and the crop nearest them is the most stunted, often wilting even when there is moisture in the soil. The damage is worst in patches around the striga plants.",
+      "b_tell": "A nitrogen shortage has nothing growing between the rows. The crop pales evenly from the oldest leaves up, across the whole field or across the poorer part of it, with no purple flowering weed present.",
+      "decider": "Get down and look between the rows before the crop closes over. If purple flowering weeds are attached around the crop roots, it is striga, and by the time you see them above ground the damage below is already done.",
+      "why_it_matters": "Fertiliser alone will not clear striga, and pulling striga alone will not fix the fertility that let it establish. The two are handled together.",
+      "control": "For striga: hand pull before it flowers and seeds, rotate and intercrop with legumes that make it germinate and die without a host, and raise fertility. For nitrogen: topdress and band beside the plant."
+    },
+    "blossomendrot_vs_disease": {
+      "a": "blossom end rot",
+      "a_short": "blossom end rot",
+      "b": "a fruit disease",
+      "b_short": "a fruit rot",
+      "both": "Both spoil tomato fruit and both get sprayed, but only one of them is caused by something a spray can reach.",
+      "a_tell": "Blossom end rot is a disorder, not an infection. It makes a flat sunken leathery dark patch exactly at the blossom end of the fruit, the end away from the stalk, and it appears on fruit at the same growth stage across the plant. It comes from irregular watering and poor calcium uptake.",
+      "b_tell": "A fruit rot is an infection. The damage starts anywhere on the fruit, often at a wound or where fruit touches soil, it is soft or sunken with visible spore growth or rings, and it spreads from fruit to fruit.",
+      "decider": "Where on the fruit is it. Only at the blossom end, dry and leathery, on many fruit at once, is blossom end rot. Anywhere else, spreading, with mould or specks, is an infection.",
+      "why_it_matters": "Nothing sprayed will stop blossom end rot. It is fixed by watering evenly and mulching so the plant can take up calcium steadily.",
+      "control": "For blossom end rot: water regularly rather than in heavy irregular soakings, mulch to hold moisture even, and avoid heavy nitrogen which makes it worse. For fruit rots: stake fruit off the soil, remove and destroy affected fruit, and harvest promptly."
+    },
+    "newcastle_vs_coccidiosis": {
+      "a": "Newcastle disease",
+      "a_short": "Newcastle",
+      "b": "coccidiosis",
+      "b_short": "coccidiosis",
+      "both": "Both kill birds quickly in a village flock and both are often called simply a fever, but one is a virus you prevent by vaccinating and the other is a parasite you prevent by keeping litter dry.",
+      "a_tell": "Newcastle is a virus and it hits the whole flock at once. Birds go quiet and off feed, there is greenish watery droppings, gasping and sneezing, and then twisted necks, paralysis or birds circling. Mortality sweeps through the house and vaccinated birds are the ones left standing.",
+      "b_tell": "Coccidiosis is a gut parasite and it shows in the droppings. Blood or dark reddish brown material in the droppings, birds hunched with ruffled feathers, pale combs, and it concentrates in chicks on damp litter and around the drinkers.",
+      "decider": "Look at the droppings and the nervous signs. Blood in the droppings with no nervous signs is coccidiosis. Greenish droppings with twisted necks or paralysis is Newcastle.",
+      "why_it_matters": "Newcastle has no treatment once it is in the flock and is prevented only by vaccination on schedule. Coccidiosis is treatable and is largely prevented by dry litter and clean water, so a wrong diagnosis wastes the one window you had.",
+      "control": "Vaccinate against Newcastle on the schedule your veterinary or extension officer gives, keep new birds separate before adding them to the flock, keep litter dry and drinkers clean, and take a bird showing nervous signs or bloody droppings to a veterinary officer, who will confirm it and advise the product and dose."
+    },
+    "maizestreak_vs_nitrogen": {
+      "a": "maize streak virus",
+      "a_short": "maize streak",
+      "b": "a nitrogen shortage",
+      "b_short": "a nitrogen shortage",
+      "both": "Both leave pale yellow maize, and both are commonly answered with fertiliser.",
+      "a_tell": "Maize streak makes fine pale stripes that run the length of the leaf, parallel to the veins, broken and narrow rather than a wash of colour. It appears on individual plants scattered through the field, and those plants are badly stunted while their neighbours are fine.",
+      "b_tell": "A nitrogen shortage colours the whole leaf, and in maize it runs down the midrib from the tip as a V. It affects the field or a whole part of the field evenly, not scattered single plants.",
+      "decider": "Stripes along the leaf on scattered individual plants is the virus. An even wash of yellow, worst on the oldest leaves, across a whole area of the field, is nitrogen.",
+      "why_it_matters": "There is no cure for maize streak and fertiliser will not bring an infected plant back. The response is variety choice and planting time for next season.",
+      "control": "For maize streak: plant tolerant varieties, plant early and uniformly with the community so the crop is past its vulnerable stage when leafhopper numbers build, and remove volunteer maize and grass hosts around the field. For nitrogen: topdress and band beside the plant."
+    }
   }
 }
