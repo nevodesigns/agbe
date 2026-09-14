@@ -284,6 +284,15 @@ measured 98 to 99°C under sustained back-to-back load."""),
 
 
 def main() -> None:
+    # DO NOT REGENERATE. This generator stopped being maintained before the
+    # notebook's last hand edits (the llama.cpp pin to 5112b97, the torch-filtered
+    # convert install, the transformers 4.x assert, the CUDA guard). Running it
+    # silently drops all four, and conversion then fails exactly as it did for
+    # v12. That happened once after Round 1. The committed .ipynb is the source.
+    import sys
+    if "--force" not in sys.argv:
+        sys.exit("refusing to overwrite train/AGBE_train_kaggle.ipynb: it is newer "
+                 "than this generator. Edit the notebook directly.")
     nb = {
         "cells": [
             {"cell_type": kind,
