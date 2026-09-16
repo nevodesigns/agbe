@@ -58,4 +58,9 @@ bash tools/import_provenance.sh provenance.zip <kaggle-url>   # after the Kaggle
 python corpus/generate.py                     # rebuild the corpus from the fact base
 bash provenance/merge_and_quantise.sh         # train, merge, convert, quantise
 LLAMA_CLI=<path> provenance/compare_to_base.sh <base.gguf> <agbe.gguf>
+
+# score the new build on the topics Round 1 failed (14 prompts, separate
+# from the 66-prompt battery so build-to-build comparisons stay comparable)
+AGBE_MODEL=$PWD/model/agbe-v14.gguf AGBE_PROMPTS=gate2.jsonl \
+  AGBE_OUT=gate2-v14.json python3 eval/run_eval.py
 ```
