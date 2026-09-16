@@ -1,0 +1,34 @@
+{
+  "trained_adapter/adapter_model.safetensors": {
+    "sha256": "fe5a2267f07014fce4f6b5257f2d1c5cd9c96ef44e4534f10e488ecdde025e29",
+    "bytes": 104414464
+  },
+  "trained_adapter/adapter_config.json": {
+    "sha256": "f2b0ebcefc6fd98728896744eb3840f4244ca277d3e841f5967f3ad35545b1e2",
+    "bytes": 1099
+  },
+  "committed_adapter_fp16/adapter_model.safetensors": {
+    "sha256": "1b3ac6df20b56d0d7dbba0616c794d7e485fe51b590183c75071720f15b6d6cd",
+    "bytes": 52231384
+  },
+  "base_model/google/gemma-3-1b-it@dcc83ea841ab6100d6b47a070329e1ba4cf78752/model.safetensors": {
+    "sha256": "3d4ef8d71c14db7e448a09ebe891cfb6bf32c57a9b44499ae0d1c098e48516b6",
+    "bytes": 1999811208
+  },
+  "merged_f16_gguf/agbe-f16.gguf": {
+    "sha256": "a026490ef9c01ef176db0af0e37251b5ace0e7a28f5482da25c5cfd1971794cb",
+    "bytes": 2014776416
+  },
+  "final_gguf/agbe-1b-q4_k_m.gguf": {
+    "sha256": "c5cf8a74708bce55722129f157878567aa54d83c7b1b835cfec4f6a0bd405259",
+    "bytes": 814261088
+  },
+  "dataset/corpus/build/train.jsonl": {
+    "sha256": "87d4499d01f482c651655c358c9bd15369bc2a82670220fb0e86b630c0327fa2",
+    "bytes": 953922
+  },
+  "dataset/corpus/facts.json": {
+    "sha256": "cf279f37039c3708940ccc24938f14ba1f557b9bc361775ca844049064062316",
+    "bytes": 84510
+  }
+}

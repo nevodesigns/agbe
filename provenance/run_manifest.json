@@ -1,0 +1,42 @@
+{
+  "base_model": "google/gemma-3-1b-it",
+  "base_model_revision": "dcc83ea841ab6100d6b47a070329e1ba4cf78752",
+  "method": "LoRA (peft), assistant-turn loss masking",
+  "lora": {
+    "r": 32,
+    "alpha": 64,
+    "dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "epochs": 3,
+  "learning_rate": 0.00015,
+  "lr_scheduler": "cosine",
+  "warmup_ratio": 0.06,
+  "precision": "fp16",
+  "batch_size": 2,
+  "grad_accum": 8,
+  "max_seq_len": 1024,
+  "seed": 20260812,
+  "optimiser_steps": 114,
+  "train_examples": 1194,
+  "train_file": "corpus/build/train.jsonl",
+  "train_file_sha256": "87d4499d01f482c651655c358c9bd15369bc2a82670220fb0e86b630c0327fa2",
+  "trainable_params": 26091520,
+  "total_params": 1025977472,
+  "last_interval_loss": 0.5730901241302491,
+  "train_loss": 1.6733923439393963,
+  "versions": {
+    "torch": "2.10.0+cu128",
+    "transformers": "5.0.0",
+    "peft": "0.19.1"
+  },
+  "kaggle_url": "https://www.kaggle.com/code/nevodm/notebook9a36a9dec3"
+}

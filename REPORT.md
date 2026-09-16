@@ -627,6 +627,14 @@ Required by Gate 2 section 3.1. The supporting files are in
 [`provenance/`](provenance/), and [`provenance/README.md`](provenance/README.md)
 states the condition of each one.
 
+> **Which build these files describe.** The proof-of-training files in
+> `provenance/` come from the **v14 candidate** run: the corpus in this tree,
+> 1,194 conversations, 114 optimiser steps. The weights currently published at
+> the `download_model.sh` URL are still **v13**: 956 conversations, 90 steps.
+> `FINAL.json` describes v13 and every figure elsewhere in this report is v13's.
+> The two are not mixed, and the candidate does not replace the shipped build
+> until it has been measured against the batteries and beaten it.
+
 ### Base model and exact source
 
 | | |
@@ -659,7 +667,7 @@ chatting in a sandbox never does.
 | Method | LoRA, rank 32, alpha 64, dropout 0.05 |
 | Target modules | `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` |
 | Trainable parameters | 26,091,520 of 1,026,000,000 (2.54%) |
-| Epochs / optimiser steps | 3 / 90 |
+| Epochs / optimiser steps | 3 / 90 (shipped v13); 3 / 114 for the v14 candidate in `provenance/` |
 | Learning rate | 1.5e-4, cosine, 6% warmup |
 | Precision | fp16 (T4 is Turing, bf16 is emulated) |
 | Loss masking | assistant turns only; user turns masked to −100 |
@@ -691,7 +699,8 @@ training data that nobody can trace.
 
 ### Proof of training, and one gap stated plainly
 
-**The LoRA adapter for the shipped v13 weights no longer exists.** It was written
+**The LoRA adapter for the shipped v13 weights no longer exists**, and no adapter
+or training log can now be produced for it. It was written
 to `/kaggle/working/out/adapter` in a Kaggle session that has since expired, and
 only the GGUF was downloaded before that session ended. For the same reason there
 are no per-step loss files for v13: `report_to` was empty and `logging_steps=5`
@@ -700,7 +709,15 @@ committed. The aggregate and last-interval losses recorded in
 [`BUILDS.md`](BUILDS.md) were copied out by hand at the time.
 
 That is a genuine hole in the Round 1 artifact and it is stated rather than
-worked around. What has changed is that it cannot recur: `train_lora.py` now
+worked around. It is also now closed for the candidate build: `provenance/` holds
+the v14 adapter, its config, per-step loss values for all 23 logged intervals, a
+run manifest resolving the base model to commit `dcc83ea8`, sha256 checksums of
+the base model file, the adapter, the merged f16 GGUF, the final Q4_K_M and the
+corpus, the recorded export environment, and the public Kaggle execution link.
+The committed adapter is cast to float16, about 52 MB, because GitHub refuses
+files above 100 MB and the trained adapter is float32, about 104 MB. Both are
+hashed in `provenance/checksums.json`, which carries the exact sizes, and the
+float32 original is the one that was merged. What has changed structurally is that this cannot recur: `train_lora.py` now
 writes `provenance/training_log.json`, `training_log.csv`, `run_manifest.json`
 and `checksums.json` beside the adapter as soon as training finishes and
 **before** the merge step, so the evidence survives a failure in export, and the
