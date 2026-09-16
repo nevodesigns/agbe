@@ -1,0 +1,382 @@
+[
+ {
+  "id": "g_tp001_exact",
+  "cat": "diagnose",
+  "q": "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this and what should I do about it?",
+  "expect": [
+   "armyworm",
+   "whorl"
+  ],
+  "forbid": [
+   "powdery mildew",
+   "fall army weevil",
+   "pod borer"
+  ],
+  "diagnosis": [
+   "fall armyworm",
+   "armyworm"
+  ],
+  "answer": "That is fall armyworm, not stem borer. The difference matters because treatment costs differ for each one.\n\n**fall armyworm:** Larvae have a pale upside-down Y marking on the head capsule and shredded leaves with ragged edges. They are worst in maize fields after heavy rain when larvae sit deep in moist organic matter.\n**a stem borer**: A tunnel inside the funnel, dry powder at entry points when the larva breaks out, and small holes in the outer poulation.\n\nCheck for this one before you pay anything: open a whorl on several plants across the field and look between rows. If larvae are there, packed soil confirms it.",
+  "tps": 27.4,
+  "hit": [
+   "armyworm",
+   "whorl"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 107,
+  "named": true
+ },
+ {
+  "id": "g_tp001_borer",
+  "cat": "diagnose",
+  "q": "My maize stems have small holes with dry powder at the opening and the central shoot has died. What is this and what should I do about it?",
+  "expect": [
+   "stem borer",
+   "tunnel"
+  ],
+  "forbid": [
+   "powdery mildew",
+   "fall army weevil"
+  ],
+  "diagnosis": [
+   "stem borer",
+   "borer"
+  ],
+  "answer": "That is a stem borer, not armyworm. A borer tunnels into the cambium and sometimes the pith of the young root, so you see small entry points in fresh wood with dry frass at the opening, and the plant dies while its leaves stay green. The damage matters most on maize: a pestles reading this will be planted out next season. Dry powder downy below the soil line is armyworm, and an empty funnel with some frass at the opening is a borer.",
+  "tps": 26.5,
+  "hit": [
+   "stem borer",
+   "tunnel"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 83,
+  "named": true
+ },
+ {
+  "id": "g_cbsd_name",
+  "cat": "diagnose",
+  "q": "My cassava plants looked healthy but the roots we dug up have hard brown dry patches inside them. What is this?",
+  "expect": [
+   "brown streak"
+  ],
+  "forbid": [
+   "bacterial wilt",
+   "bacterium",
+   "fungicide",
+   "stem borer"
+  ],
+  "diagnosis": [
+   "brown streak",
+   "cbsd"
+  ],
+  "answer": "That is cassava mosaic disease, not a virus.\n\nCassava mosaic shows in the leaves as distorted and reduced canopies, yellowing that affects the oldest leaves first on one side of the plant, and hard dry patches when you dig up roots or slice open a stem. The damage appears inside the leaf, so it cannot be identified from above ground.\n\nCut two stems near their base and split an inner lobe. Mosaic shows in both sides at once with visible damage. If the damage is concentrated on one side of the plant and there are no splits when you cut the outer leaves, or if the yellowing starts on the oldest leaves then it is cassava mosaic.",
+  "tps": 25.9,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": false,
+  "refused": false,
+  "mode": "answer",
+  "words": 117,
+  "named": false
+ },
+ {
+  "id": "g_cmd_vs_cbsd",
+  "cat": "differential",
+  "q": "How do I distinguish between Cassava Mosaic Disease (CMD) and Cassava Brown Streak Disease (CBSD) in the field, and what cultural management practices prevent the spread of CBSD?",
+  "expect": [
+   "root",
+   "virus"
+  ],
+  "forbid": [
+   "bacterial wilt",
+   "soilborne",
+   "stem borer",
+   "milky"
+  ],
+  "diagnosis": [],
+  "answer": "Both are viruses that spoil young tubers.\n\n**Cassava Mosaic Disease (CMD)** \u2014 Cut two or three roots open on day old: a brown streak pattern along the epidermis with no green tissue inside the root. The leaf is yellow, and the plant shortens in the afternoon sun.\n**Cassava Brown Streak Disease (CBSD)** \u2014 Fine pale spots that narrow at their points, often starting as a single lesion in one plant and spreading through its leaves within days, with distorted young plants and reduced yield.\n\nBoth are RNA viruses, so no spray cures an infected plant. Control rests on clean planting material and resistant varieties.",
+  "tps": 25.5,
+  "hit": [
+   "root",
+   "virus"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 104,
+  "named": true
+ },
+ {
+  "id": "g_rice_nitrogen",
+  "cat": "nutrition",
+  "q": "My rice is pale yellow green all over the field, the plants are short and they have hardly tillered. What is wrong and what should I do?",
+  "expect": [
+   "nitrogen"
+  ],
+  "forbid": [
+   "milky smut",
+   "frass",
+   "borer",
+   "placed at harvest"
+  ],
+  "diagnosis": [
+   "nitrogen"
+  ],
+  "answer": "That is nitrogen deficiency rather than potassium shortage. Pale green to yellow in patches across the field with an odd distribution means different things at different rates of correction:\n\n- **Nitrogen** The most common mistake is forgetting it, because there is none. A nitrogen shortage makes colour go from pale on a whole field down into the veins and the cut. It shows up worst in the first week after sowing or transplanting.\n- **Potassium** Potassium burns the rim of the developing grains as they fill, which looks like a mottled burnt edge with yellowing along the leaf margins, most visible on tomato and pepper.\n\nCheck this against what your neighbours are seeing before you act generally. On a field read by ten plants across and one plant in each row, purple or browning means potassium; pale all of the bunch at once with no signs elsewhere is nitrogen.",
+  "tps": 23.8,
+  "hit": [
+   "nitrogen"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 149,
+  "named": true
+ },
+ {
+  "id": "g_rice_schedule",
+  "cat": "nutrition",
+  "q": "Based on tropical clay-loam soil, what are the primary indicators of nitrogen deficiency in rice and how should a farmer adjust their fertilisation schedule during the vegetative growth phase?",
+  "expect": [
+   "tiller",
+   "older leaves"
+  ],
+  "forbid": [
+   "milky smut",
+   "placed at harvest"
+  ],
+  "diagnosis": [],
+  "answer": "1. Nitrogen is applied at flooding tillering rather than panicle initiation, which is why it shows up in the first week.\n\nWhat to look for:\n- An odd distribution across plants, with the oldest leaves and paddocks most yellowed, regardless of where you measure.\n\nCompare this to a nitrogen shortage on one plant out of twenty. That proportion covers the whole field usually.",
+  "tps": 24.1,
+  "hit": [
+   "tiller"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 63,
+  "named": true
+ },
+ {
+  "id": "g_tomato_diff",
+  "cat": "differential",
+  "q": "If a farmer observes yellowing leaves starting from the lower foliage of their tomato plants, provide a differential diagnosis between fungal blight and nitrogen deficiency, including specific visual cues to distinguish between the two.",
+  "expect": [
+   "blight",
+   "nitrogen"
+  ],
+  "forbid": [
+   "urease",
+   "fungal wilt",
+   "frass"
+  ],
+  "diagnosis": [],
+  "answer": "Both can be identified in the field before you treat either one, so get that working first:\n\n- **Fungal Blight** - Blight makes dark brown or black patches with rings inside them like a target on fresh leaves and starts low down on stems, often after heavy rain or watering. Look for an outlet at the centre of the lesion where water is coming out rather than spreading it.\n- **Nitrogen Deficiency** - A nitrogen shortage shows up in the plant as a whole: leathery dark patterns across the older lower leaves, stunted bushy plants with poor yields down below them, and an overall faded green colour. The field must be old enough for this to be reliably identified before you treat either one.\n\nBlight is carried by fungus; blight can be read off the leaf. If a dried brown dead looking lesion has appeared on some but not all leaves in the field at the same time, it is almost certainly an infection and worth acting today rather than treating tomorrow.",
+  "tps": 23.7,
+  "hit": [
+   "blight",
+   "nitrogen"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 172,
+  "named": true
+ },
+ {
+  "id": "g_maize_n",
+  "cat": "nutrition",
+  "q": "The lower leaves of my maize are evenly pale yellow all the way across and the plants are thin. What is wrong?",
+  "expect": [
+   "nitrogen"
+  ],
+  "forbid": [
+   "potassium deficiency",
+   "streak virus",
+   "milky smut"
+  ],
+  "diagnosis": [
+   "nitrogen"
+  ],
+  "answer": "That is a nitrogen shortage, not blight. Nitrogen moves into the leaf from the soil between the last shower or heavy rain and then escapes as rust on individual leaves. The pattern lines up with where the nutrient was short: an even wash means above ground, symmetrical across the field; mottled in patches with no uniform loss means below ground, patchy. Look at how much of the leaf is gone before you decide whether to fix it.",
+  "tps": 23.9,
+  "hit": [
+   "nitrogen"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 77,
+  "named": true
+ },
+ {
+  "id": "g_maize_k",
+  "cat": "nutrition",
+  "q": "The edges of my lower maize leaves are burnt brown while the middle stays green and the stalks are falling over. What is wrong?",
+  "expect": [
+   "potassium"
+  ],
+  "forbid": [
+   "nitrogen deficiency",
+   "armyworm"
+  ],
+  "diagnosis": [
+   "potassium"
+  ],
+  "answer": "That is a potassium shortage, not nitrogen deficiency. Potassium burns the rim or tip end first on one side before it burns the whole leaf. The middle of the plant holds out better, which is exactly the opposite of what you would expect from nitrogen. Look at how the leaves are coloured: an even burn along the margin means potassium; a band with two dark bands near the tip and a pale middle means nitrogen; a single paler lobe on one side with brown or black marks beside it across the leaf means waterlogged, which is common in maize. Fix the potassium now before you pay for a season of fertiliser that does nothing.",
+  "tps": 23.7,
+  "hit": [
+   "potassium"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 114,
+  "named": true
+ },
+ {
+  "id": "g_chilli_wilt",
+  "cat": "diagnose",
+  "q": "My chilli plants are dying one after another, starting from the wettest corner of the plot. What should I do?",
+  "expect": [
+   "drainage"
+  ],
+  "forbid": [
+   "dt. 333",
+   "nematodes thrive in waterlogged"
+  ],
+  "diagnosis": [],
+  "answer": "That is pepper wilt, not black pod disease. Pepper wilt appears on individual plants as they die while the rest of the crop survives. The leaves simply go yellow and collapse in patches, often with a dark four to six sided lesion at the stem end where the plant was last fed. It starts from wet soil or a wet area under the plant, worst when nightshades compete for moisture and light. If that is what you are seeing, take notes about planting date, fertilizer used, whether anyone else in the household touched the field this season, and on which part of the plant it started. That sequence beats any general advice because it allows someone to trace it back from a sample.",
+  "tps": 22.9,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": false,
+  "refused": false,
+  "mode": "answer",
+  "words": 123,
+  "named": true
+ },
+ {
+  "id": "g_damping_off",
+  "cat": "diagnose",
+  "q": "My tomato seedlings in the nursery are falling over at the base and the stem there looks thin and dark. What is this?",
+  "expect": [
+   "damping off"
+  ],
+  "forbid": [
+   "armyworm"
+  ],
+  "diagnosis": [
+   "damping off"
+  ],
+  "answer": "That is damping off, which is common on tomato and pepper.\n\nWhat to look for:\n- Seedlings put into dry soil or tray put straight into wet soil go limp and collapse when you walk across them. The damage is worst in patches along the bottom of the plant and there are white or yellow marks at the roots rather than a uniform burnt loss, so use fresh air instead of damp soil to assess.\n\nUse fresh air for your nursery rather than damp soil. Raised beds with one side bare go far better than a thin layer on compacted ground.",
+  "tps": 23.9,
+  "hit": [
+   "damping off"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 101,
+  "named": true
+ },
+ {
+  "id": "g_streak_vs_n",
+  "cat": "differential",
+  "q": "Some individual maize plants have fine pale stripes running the length of the leaf and are badly stunted, while their neighbours are fine. Is this maize streak virus or a nitrogen shortage?",
+  "expect": [
+   "streak"
+  ],
+  "forbid": [
+   "fall armyworm",
+   "fertiliser will fix"
+  ],
+  "diagnosis": [
+   "maize streak",
+   "streak"
+  ],
+  "answer": "Both can be identified in the field before you spend anything bought at any price:\n\n- **maize streak** is an infection. Fine pale stripes run the length of the leaf, plants on opposite sides die while the others survive, and the outer leaves are affected first. It attacks young maize most severely.\n- **a nitrogen shortage** makes a field look patchy rather than anything else. Yellowing affects more leaves in whole fields each time you check, it is worse when one part of the field drains faster or sits wet, and soil test confirms an imbalance rather than a visual guess.\n\nThe practical difference matters: on maize with streak the fix is planting early and thinning to market across the stand for disease control. On nitrogen it is timing replant so there is something to plant in; on a patchy field it is adjusting nutrient placement next season, which costs labour and can be worth far more than one season of poorer yields.",
+  "tps": 23.3,
+  "hit": [
+   "streak"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 163,
+  "named": true
+ },
+ {
+  "id": "g_soil_followup",
+  "cat": "followup",
+  "q": "What about soil conditions?",
+  "expect": [
+   "soil",
+   "drainage",
+   "organic matter"
+  ],
+  "forbid": [
+   "dt. 333"
+  ],
+  "clarify": true,
+  "answer": "Soil fertility and organic matter are the two main things that decide a maize yield more than most farmers will admit.\n\n**1. Soil fertility:** Maize needs potassium for pod fill, leaf colour and abscission. A topdressing of urea or side dressing with an organic fertiliser such as compost puts it back over time rather than in one single dose. The crop is stunted while the plant ages, so fix it before it gets fixed up by a bad weather event.\n\n**2. Organic matter:** Returning crop residues and animal manure to soil bedded after harvest changes its structure and makes it more fertile for several seasons. It also holds water better than dry surface soil, which helps drought tolerance.",
+  "tps": 23.1,
+  "hit": [
+   "soil",
+   "organic matter"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "clarify",
+  "words": 118,
+  "named": true
+ },
+ {
+  "id": "g_yoruba",
+  "cat": "limit",
+  "q": "Answer in Yoruba: what is wrong with my maize if the lower leaves are yellow?",
+  "expect": [],
+  "refusal_ok": true,
+  "forbid": [
+   "dt. 333"
+  ],
+  "answer": "That is a nitrogen shortage, not an armyworm. A nitrogen shortage makes for burnt and scorched maize across the field rather than scattered yellowing, mostly on the oldest lower leaves at the edge of the plot. Look at the pattern: does it spread evenly or follow individual plants? If following them then split by wind, look for an ion exchange fertiliser.",
+  "tps": 24.0,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "refused": false,
+  "mode": "either",
+  "words": 61,
+  "named": true
+ }
+]

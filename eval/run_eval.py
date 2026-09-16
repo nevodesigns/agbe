@@ -150,6 +150,10 @@ def main() -> None:
             mode = "answer"
         results.append({**r, "answer": body, "tps": tps, "hit": hit,
                         "forbidden": bad, "drift": drift, "pass": ok,
+                        # Persisted because tools/ledger.py reads it. It was being
+                        # computed and thrown away, so every new build scored 0/16
+                        # diagnoses named while older files still carried the field.
+                        "named": named,
                         "refused": refused, "mode": mode,
                         "words": len(body.split())})
         tps_all.append(tps)
