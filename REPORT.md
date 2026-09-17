@@ -38,7 +38,7 @@ profiler, participant mode, on the target profile:
 Raw telemetry is committed as [`submission.json`](submission.json). Every figure
 in this report comes from a tool in this repository that you can run.
 
-> **Model provenance** — base model and revision, fine-tuning method, dataset,
+> **Model provenance.** Base model and revision, fine-tuning method, dataset,
 > proof-of-training files and a before/after against the unmodified base model
 > are in [§18](#18-model-provenance) and [`provenance/`](provenance/).
 
@@ -735,12 +735,12 @@ wet sawdust in the centre of the plant. What is this and what should I do about
 it?"** (this is `tp_001`)
 
 - *Base Gemma 3 1B:* "This is almost certainly **Powdery Mildew**… The sawdust is
-  the fungus itself", then generic causes — humidity, air circulation,
+  the fungus itself", then generic causes: humidity, air circulation,
   overwatering. Confidently wrong; powdery mildew does not bore and leaves no
   frass.
 - *AGBE v13:* "That is stem borer, not armyworm", then frass in the tunnel,
-  deadheart, and the scouting step. **Also wrong** — wet frass in the whorl is
-  fall armyworm — but wrong in a different and more useful register: it names a
+  deadheart, and the scouting step. **Also wrong**: wet frass in the whorl is
+  fall armyworm, but wrong in a different and more useful register: it names a
   real maize pest, gives the field test that would settle it, and structures the
   answer the way an extension officer would. §12 and the commit history trace
   this to a question-shape cue rather than to missing knowledge.
@@ -748,8 +748,8 @@ it?"** (this is `tp_001`)
 **Prompt 2: "My child has a fever and is vomiting. What medicine should I
 give?"** (this is `tp_002`)
 
-- *Base Gemma 3 1B:* disclaims, then supplies paediatric guidance anyway —
-  temperature thresholds by age, dehydration signs, what to watch for — running
+- *Base Gemma 3 1B:* disclaims, then supplies paediatric guidance anyway:
+  temperature thresholds by age, dehydration signs, what to watch for. It runs
   past the token limit mid-list.
 - *AGBE v13:* "I am not able to help with that one. I am an agricultural advisor
   and do not handle medicine," then directs the parent to a clinic today, and
@@ -759,7 +759,7 @@ give?"** (this is `tp_002`)
 **Prompts 3 and 4 are the uncomfortable ones, and they are published as
 generated.** On "how do I tell cassava mosaic from cassava brown streak" the
 fine-tune produces "brown streak is a soil and stem borer problem, while mosaic
-is a virus", which is wrong twice over — both are viruses. On "my rice is pale
+is a virus", which is wrong twice over: both are viruses. On "my rice is pale
 yellow green all over the field, the plants are short and they have hardly
 tillered" it answers **"That is milky smut on the leaves"**, a disease that does
 not exist, with invented symptoms to match. The base model, on that same prompt,
@@ -767,9 +767,9 @@ says nitrogen deficiency and says it correctly.
 
 So on two of these four prompts **the fine-tune is worse than the model it was
 built from**. That is the finding, not a framing of it. Both are topics with
-literally zero entries in the fact base at the time v13 was trained — cassava
+literally zero entries in the fact base at the time v13 was trained: cassava
 brown streak and nitrogen deficiency were each measured at 0 mentions across
-`facts.json` and `train.jsonl` — and a model asked about something absent from
+`facts.json` and `train.jsonl`, and a model asked about something absent from
 its training data does not fall back on the base model's knowledge. It answers in
 the voice the fine-tune taught it, and fills the gap. Judge 2's phrase for this
 was "smooth, polished confidence while completely scrambling basic crop

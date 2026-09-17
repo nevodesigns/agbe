@@ -538,7 +538,7 @@ def _rejoin(original: str, keep: list[str]) -> str:
 
     The previous version flattened everything that was not a numbered list into
     one space-joined paragraph. That was invisible until the `differential` slice
-    arrived, whose answers are "**name** — how to tell it" rows: all 58 trimmed
+    arrived, whose answers are "**name**, how to tell it" rows: all 58 trimmed
     records came out as a single blob, destroying the A-against-B structure that
     is the entire point of a differential answer. A judge reading that gets
     exactly the smooth, shapeless confidence Round 1 was criticised for.
@@ -699,7 +699,7 @@ def main() -> None:
         # hand-written hardening exemplars, which are few and irreplaceable. The
         # templated `differential` slice also carries form "discriminate", and
         # letting it inherit the exemption put its shared sentences at 13 to 17
-        # repeats on the first build after Round 1 — rebuilding the very attractor
+        # repeats on the first build after Round 1, rebuilding the very attractor
         # that section 8 of REPORT.md exists to describe.
         exempt = (p["_meta"]["slice"] == "gold"
                   or p["_meta"].get("form") in ("diagnose_symptom", "diagnose_cost"))

@@ -147,7 +147,7 @@ def compose_contrast(rng: random.Random, shared: str, first: tuple[str, str],
         parts.append(para(shared))
     rows = []
     for label, tell in (first, second):
-        rows.append(f"**{clean(label)}** — {clean(tell).rstrip('.')}.")
+        rows.append(f"**{clean(label)}:** {clean(tell).rstrip('.')}.")
     parts.append("\n".join(rows))
     tail = para(decider, stakes)
     if tail:
