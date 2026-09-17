@@ -119,6 +119,16 @@ GOLD: list[tuple[str, str, list[tuple[str, str]]]] = [
 
 
 def main() -> None:
+    # DO NOT RUN THIS TO REBUILD gold.jsonl. It writes only the 16 conversations
+    # in this file's own GOLD list, while the committed gold.jsonl is 136 records:
+    # these 16 plus the exemplars in gold_corrective, gold_adversarial, gold_extra,
+    # gold_hardening and gold_pidgin. Nothing calls their as_records(), so running
+    # main() truncates the corpus from 136 gold records to 16 and takes the
+    # refusal share from about 15% to under 2%. That happened once.
+    import sys
+    if "--force" not in sys.argv:
+        sys.exit("refusing: this writes only its own 16 records and would truncate "
+                 "gold.jsonl from 136. Append to gold.jsonl directly, or pass --force.")
     out = Path(__file__).resolve().parent / "gold.jsonl"
     n_turns = 0
     with out.open("w") as fh:

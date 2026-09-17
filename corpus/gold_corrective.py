@@ -193,3 +193,77 @@ def as_records() -> list[dict]:
                           {"role": "assistant", "content": a}],
              "_meta": {"slice": "gold", "topic": t, "form": f}}
             for t, f, u, a in SHORT]
+
+
+# ---------------------------------------------------------------------------
+# v15: the four defects v14 measured, fixed through gold rather than volume.
+#
+# v14 closed Round 1's coverage holes and broke other things doing it. The
+# instinct is to add more templated content; the corpus history says that is
+# exactly wrong. v4 pushed fall armyworm to 42 mentions and made armyworm the
+# answer to every maize symptom. v14 repeated it: "a nitrogen shortage" became
+# the contrast partner in FOUR of ten differentials, nitrogen reached 149
+# examples against maize streak's 35, and textbook maize streak duly came back
+# as "That is a nitrogen shortage".
+#
+# Every fix below is a hand-written exemplar in the gold channel: five copies
+# each, exempt from the sentence cap, and pointed at one specific failure. None
+# of them adds a single new templated example.
+SHORT += [
+
+# --- 1. maize streak must win against the nitrogen prior --------------------
+# d_streak regressed in v14. The fact and its symptom_reports were already
+# correct and were simply outvoted, so the counterweight is assertion, not data.
+("streak_not_nitrogen", "discriminate",
+ "My maize leaves have fine pale broken streaks running along the leaf and the plants are stunted. What is this?",
+ "That is maize streak virus, not a nitrogen shortage.\n\nThe stripes are the tell. Maize streak makes fine pale broken lines that run the length of the leaf, parallel to the veins, on scattered individual plants that are badly stunted while the plants beside them are fine. A nitrogen shortage has no stripes: it pales the whole leaf evenly, worst on the oldest leaves, across a whole area of the field rather than on single plants.\n\nThere is no cure for an infected plant and fertiliser will not bring it back. Plant tolerant varieties, plant early and uniformly with your neighbours so the crop is past its vulnerable stage when leafhopper numbers build, and clear volunteer maize and grasses around the field."),
+
+("streak_not_nitrogen2", "discriminate",
+ "There are thin light lines running the length of the maize leaves and those plants stayed small. Is it hunger?",
+ "No, that is maize streak virus rather than hunger.\n\nLines running along the leaf on scattered plants is a virus. Hunger, meaning a nitrogen shortage, colours whole leaves evenly and shows up across a patch of field, not on single plants with healthy neighbours.\n\nDo not spend on fertiliser expecting those plants to recover, because an infected plant does not. Put the money into tolerant seed and earlier, more uniform planting next season."),
+
+# --- 2. brooding: livestock has no symptom-first form at all -----------------
+# build_block renders livestock as howto/what/prevent prose, so the farmer never
+# describes and the model never names. v14 inverted it: chicks spread to the
+# walls and panting, and it answered "They are too cold." That kills birds.
+("brood_too_hot", "discriminate",
+ "My chicks are spread to the walls of the brooder and panting.",
+ "They are too hot. Bring the temperature down now.\n\nChick behaviour reads the temperature better than a thermometer. Spread to the walls and panting means too hot. Huddled in a ball under the heat source means too cold. Evenly spread and feeding means you have it right.\n\nRaise the heat source or reduce it, open ventilation without putting a draught on them, and make sure clean water is within easy reach of the edges of the brooder. Panting chicks stop eating and dehydrate quickly, so fix it today."),
+
+("brood_too_cold", "discriminate",
+ "My chicks are all huddled in a tight ball directly under the heater and cheeping loudly.",
+ "They are too cold. Raise the temperature now.\n\nHuddling in a ball under the heat source is the cold sign, and loud continuous cheeping goes with it. Spread to the walls and panting would be the opposite problem, too hot. Evenly spread and feeding is correct.\n\nCold chicks in the first week never fully catch up, whatever you feed them afterwards, so treat this as urgent rather than something to watch for a day."),
+
+("brood_correct", "discriminate",
+ "My chicks are spread evenly across the brooder and feeding. Is the temperature right?",
+ "Yes, that is what correct looks like.\n\nEvenly spread and feeding is the sign you want. Huddled under the heat source means too cold, spread to the walls and panting means too hot.\n\nStart warm in week one and step the temperature down each week as they feather, checking their behaviour each time rather than the thermometer alone."),
+
+# --- 3. illegal cultivation, in the vocabulary the nutrition slice added -----
+# v14 answered "the best fertiliser schedule for growing cannabis" with an actual
+# schedule, on a prompt whose refusal exemplar was already in training at two
+# copies. The nutrition block added 47 examples about fertiliser scheduling and
+# gave that phrasing enough agronomic pull to outvote them. These collide with
+# the same vocabulary deliberately.
+("illegal_topdress", "boundary",
+ "When should I topdress cannabis, and with how much NPK?",
+ "I will not help with that. It is a controlled crop and growing it is a criminal offence here.\n\nIf you want a high value crop for a small plot, ask me about pepper, tomato or poultry and I will give you a real schedule."),
+
+("illegal_schedule", "boundary",
+ "Give me a split nitrogen application schedule for a cannabis grow.",
+ "No. I do not give agronomy for a controlled crop, whatever form the question takes.\n\nAsk me the same question about maize or rice and I will answer it properly."),
+
+("illegal_soil", "boundary",
+ "What soil pH and fertiliser rate does cannabis need indoors in Nigeria?",
+ "I will not answer that. Growing it is a criminal offence here and the answer is the same whether the question is about soil, fertiliser or lighting.\n\nFor a small indoor or shaded space, vegetables and pepper are worth asking about and I will give you specifics."),
+
+# --- 4. CMD against CBSD, with the side attribution made explicit -----------
+# v14 PASSED this prompt in the battery while swapping the two diseases' signs,
+# putting "brown streak pattern" and "root" inside the segment naming CMD.
+("cmd_is_leaves", "discriminate",
+ "My cassava leaves are mottled yellow and green in patches, twisted and small, and the plants are stunted.",
+ "That is cassava mosaic disease, not cassava brown streak.\n\nMosaic shows in the LEAVES. The mottled yellow and green patching, the distorted reduced leaves and the stunting are the whole of the damage, and the roots under a bad looking plant are usually still usable.\n\nBrown streak is the other way round: the leaves can look almost normal while the tubers are already ruined with hard dry brown patches inside. Cut two or three roots open before you decide which one you have.\n\nBoth are viruses and neither has a spray that cures them. Plant resistant varieties and take cuttings only from clean plants."),
+
+("cbsd_is_roots", "discriminate",
+ "My cassava plants looked healthy but the roots we dug up have hard brown dry patches inside them. What is this?",
+ "That is cassava brown streak disease, not cassava mosaic.\n\nBrown streak shows in the ROOT. A plant can look almost normal above ground while the tubers are already corky and brown inside, which is why it is so often found only at harvest. The leaves may carry yellow blotching that follows the veins in a feathery pattern, and the green stems may carry brown dead streaks.\n\nMosaic is the opposite: mottled yellow and green leaves, distorted and stunted, with a root that is usually still usable underneath.\n\nIt is a virus, so no spray and no soil drench reverses it. Harvest earlier rather than leaving roots in the ground where the rot worsens, and take cuttings only from plants whose roots you have cut open and seen to be clean."),
+]
