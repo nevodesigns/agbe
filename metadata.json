@@ -33,9 +33,9 @@
     "parameters_estimate": "1B",
     "packaging": "binary_bundle"
   },
-  "reproducibility": {
-    "git_commit_sha": "99669d72232dbc6af0f1b2c9d3b9edf015a4cd63",
-    "_note": "The repo commit this submission is made from. Set by tools/lock_commit.sh immediately before submitting, so it names the tree the judges receive."
+  "_reproducibility": {
+    "git_commit_sha": "3de5bd471cfcdf345a55cc5dc10dd1684736d4b4",
+    "_note": "The repo commit this submission is made from, required by Gate 2 section 3.1. Named with a leading underscore because the official profiler validates metadata.json against a subschema with additionalProperties:false, and strips keys beginning with '_' before validating. A plain 'reproducibility' key makes adtc-profiler exit 2 without running. Set by tools/lock_commit.sh."
   },
   "_runtime": {
     "model_path": "model/agbe-1b-q4_k_m.gguf"

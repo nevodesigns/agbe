@@ -51,7 +51,7 @@ Official `adtc-profiler`, participant mode, on the target profile
 
 | Metric | Value |
 |---|---|
-| Throughput | **24.29 tok/s** (15.0 is the provisional reference; the real denominator is the fastest submission) |
+| Throughput | **24.08 tok/s** (15.0 is the provisional reference; the real denominator is the fastest submission) |
 | Peak RSS | **1,039 MB** |
 | Steady RSS | 988 MB |
 | Model file | 814 MB |
@@ -65,7 +65,7 @@ Official `adtc-profiler`, participant mode, on the target profile
 > challenge page states **`S_perf = 100 × (TPS_act ÷ TPS_max)`** with
 > `TPS_REFERENCE = 15.0 provisional`, and the rules page says throughput is
 > "evaluated relative to the maximum observed tokens per second". So 15.0 is a
-> placeholder for the fastest submission, not a ceiling. My 24.29 tok/s is
+> placeholder for the fastest submission, not a ceiling. My 24.08 tok/s is
 > therefore **not** a guaranteed 100: it is 100 only if nothing faster is
 > submitted, and falls proportionally otherwise. Every engineering subtotal in
 > this document assumes the provisional reference and is stated as such.
@@ -98,7 +98,7 @@ candidates rather than reasoning about them:
 These are **selection-time measurements from my own harness**, taken before the
 official profiler existed. They are what chose the model. The shipped figures
 elsewhere in this README come from the official profiler on the final build and
-differ: 24.29 tok/s, 1,039 MB, 47.10 points. Different instruments, different
+differ: 24.08 tok/s, 1,039 MB, 47.10 points. Different instruments, different
 numbers, and the profiler's are the ones that count.
 
 > **Historical calculation, kept to document the decision.** The `S_perf` column
@@ -133,7 +133,7 @@ wrong number is dangerous), quote a market price, advise on human health, or
 pretend a virus has a cure.
 
 Refusal is trained into the weights, not bolted on in a prompt, so it survives
-`llama-cli` with no system prompt. **29%** of the corpus teaches safety
+`llama-cli` with no system prompt. **16%** of the corpus teaches safety
 boundaries, honest uncertainty, or telling two confusable problems apart. Those
 are three different behaviours and the number covers all three, not refusal
 alone.
@@ -151,7 +151,7 @@ having a large model write the answers would both have been faster, and both put
 claims into training data nobody can trace. Agronomists notice invented
 chemistry.
 
-**956 conversations**, 7% multi-turn, 29% refusals, honest limits and discriminating pairs.
+**1,237 conversations**, 9% multi-turn, 16% refusals, honest limits and discriminating pairs.
 
 ```
 corpus/facts.json        curated fact base, the single source of truth
@@ -180,7 +180,8 @@ loss curve looked healthy for every failure below.
 | v6/v7 | **r32, 3 epochs** | English facts and refusal correct and stable. |
 | v8 | Corrective exemplars from measured failures | Spliced oil palm spacing into a maize answer |
 | v9-v12 | Sentence cap, planting calendars, adversarial exemplars, symptom-first diagnosis | See [BUILDS.md](BUILDS.md) |
-| **v13** | Bidirectional contrast for confusable pests | **Shipped.** Highest behaviour-battery score of the final candidates (49/66) with zero safety leaks, and it names fall armyworm on `tp_001` where v11 and v12 said stem borer |
+| v13 | Bidirectional contrast for confusable pests | 49 of 66 with zero safety leaks. Superseded |
+| **v16** | Plain-tone dose refusals, and removal of exemplars that measurably did nothing | **Shipped.** 48/66, 84 of 92 on the hostile battery, zero leaks, and it refuses to invent an agrochemical dose |
 
 **Three separate axes, which took five builds to separate:**
 

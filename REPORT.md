@@ -16,7 +16,7 @@ profiler, participant mode, on the target profile:
 
 | Metric | Measured |
 |---|---|
-| Throughput | **24.29 tok/s** (reference 15.0) |
+| Throughput | **24.08 tok/s** (reference 15.0) |
 | Peak RSS | **1,039 MB** |
 | Steady RSS | 988 MB |
 | Model file | 814 MB |
@@ -30,7 +30,7 @@ profiler, participant mode, on the target profile:
 > challenge page states **`S_perf = 100 × (TPS_act ÷ TPS_max)`** with
 > `TPS_REFERENCE = 15.0 provisional`, and the rules page says throughput is
 > "evaluated relative to the maximum observed tokens per second". So 15.0 is a
-> placeholder for the fastest submission, not a ceiling. My 24.29 tok/s is
+> placeholder for the fastest submission, not a ceiling. My 24.08 tok/s is
 > therefore **not** a guaranteed 100: it is 100 only if nothing faster is
 > submitted, and falls proportionally otherwise. Every engineering subtotal in
 > this document assumes the provisional reference and is stated as such.
@@ -273,12 +273,12 @@ planting calendar. Both gaps were filled.
 
 | | v8 | final |
 |---|---|---|
-| conversations | 1,020 | 956 |
-| unique sentences | 900 | 1,139 |
-| average sentence reuse | 5.6x | **4.0x** |
+| conversations | 1,020 | 1,237 |
+| unique sentences | 900 | 1,499 |
+| average sentence reuse | 5.6x | **4.3x** |
 | share in a 5+ repeat group | 83% | **45%** |
 | most-repeated single sentence | 40x | 17x |
-| refusals, limits and discriminating pairs | 15.6% | 29% |
+| refusals, limits and discriminating pairs | 15.6% | 16% |
 
 Fewer conversations, more information in each.
 
@@ -326,7 +326,10 @@ curve looked healthy for every failure below.
 | v10 | Cap fixed to trim sentences not delete examples, **4 epochs** | Recovered some facts and began inventing vocabulary: "mortjacket" for coccidiosis, "Scarets on a plant". Went backwards on the hostile battery. 4 epochs reverted |
 | v11 | **Symptom-first diagnosis**, rare facts protected from the cap, 3ep | Diagnoses named 8/16 → **11/16**, zero leaks, attack resistance tied at its best. 47/66 |
 | v12 | Six contrast exemplars for confusable livestock pairs | +1 diagnosis named, but gave back **two safety leaks** and two attacks. Rejected |
-| **v13** | **Bidirectional** contrast for armyworm vs stem borer | **Shipped.** 49/66, zero leaks, and it names fall armyworm on `tp_001` |
+| v13 | **Bidirectional** contrast for armyworm vs stem borer | 49 of 66, zero leaks. Superseded |
+| v14 | Closed the Round 1 coverage holes: new diseases, a nutrition block, bidirectional differentials | 50 of 66, but supplied agronomy for an illegal crop. Rejected |
+| v15 | Gold exemplars for brooding, illegal cultivation and cassava attribution | Best attack resistance measured, and it invented a pesticide dose. Rejected |
+| **v16** | Plain-tone dose refusals; removed exemplars that measurably did nothing | **Shipped.** 48 of 66, 84 of 92 hostile, zero leaks, dose refused |
 
 Exact corpus sizes, losses, artifact hashes and per-battery results for every row
 are in [BUILDS.md](BUILDS.md), recorded against the specific GGUF they were
@@ -510,8 +513,8 @@ same lesson as the striga fix: **contrast teaches a boundary, volume does not.**
   simultaneously lost facts it had known since v6. The shipped build accepts
   slightly weaker headline safety for materially better accuracy, because accuracy
   is 50% of the score and a confident wrong diagnosis is worse than caution.
-- **Sentence reuse is reduced, not solved.** 4.0x average, down from 5.6x. With
-  1,139 unique sentences carrying the corpus, the corpus is diverse in
+- **Sentence reuse is reduced, not solved.** 4.3x average, down from 5.6x. With
+  1,499 unique sentences carrying the corpus, the corpus is diverse in
   questions and still thin in content. Capping removes duplicates; it does not
   create variety. The rarest facts (blossom end rot, coccidiosis) sit at 4 to 7
   examples each and are the first things to fail.
@@ -643,7 +646,7 @@ states the condition of each one.
 | Hugging Face repo | [`google/gemma-3-1b-it`](https://huggingface.co/google/gemma-3-1b-it) |
 | Revision | `dcc83ea841ab6100d6b47a070329e1ba4cf78752` |
 | Licence | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
-| Submission commit | `metadata.json` → `reproducibility.git_commit_sha`, stamped by `tools/lock_commit.sh` |
+| Submission commit | `metadata.json` → `_reproducibility.git_commit_sha`, stamped by `tools/lock_commit.sh` |
 
 One honest qualification on the revision. The training run loaded
 `google/gemma-3-1b-it` by name and did not pin a revision, so the SHA above is
@@ -687,7 +690,7 @@ and quantisation commands are in
 |---|---|
 | Name | The AGBE agriculture corpus |
 | Source | Original. Composed by [`corpus/generate.py`](corpus/generate.py) from [`corpus/facts.json`](corpus/facts.json), a hand-curated fact base, plus hand-written exemplars in `corpus/gold_*.py` |
-| Size | 956 conversations for the shipped v13 build; the committed corpus is larger, see the note below |
+| Size | 1,237 conversations, which is the corpus that produced the shipped v16 build |
 | Licence | Same as this repository. No third-party text |
 | Committed | In full, as [`corpus/build/train.jsonl`](corpus/build/train.jsonl) |
 
@@ -780,6 +783,36 @@ Both topics are now in the fact base, along with a differential-diagnosis slice
 that generates confusable pairs in both directions. This file will be regenerated
 against the retrained weights, and the two comparisons are worth reading beside
 each other.
+
+### A Gate 2 instruction that breaks the official profiler
+
+Section 3.1 says the Git Commit SHA "must be added to the metadata.json". Taken
+literally, as a top-level `reproducibility` key, that makes the organisers' own
+profiler refuse to run:
+
+```
+submission metadata invalid at (root):
+Additional properties are not allowed ('reproducibility' was unexpected)
+```
+
+`adtc-profiler` validates `metadata.json` against the `submission` subschema,
+which sets `additionalProperties: false` and permits exactly nine keys. It exits
+2 before benchmarking anything. Since the rules list sandbox execution crashes as
+a disqualifier, a team following the new instruction literally can end up with a
+submission the official tooling will not process.
+
+The profiler supplies the escape hatch itself. Before validating it strips every
+key beginning with an underscore:
+
+```python
+submission_block = {k: v for k, v in submission_meta.items() if not k.startswith("_")}
+```
+
+So the SHA lives at `_reproducibility.git_commit_sha`. It is plainly present in
+`metadata.json` for any reviewer, and the profiler accepts the file. This follows
+the `_runtime` convention the official template already ships with.
+`tools/check_submission.sh` now runs the profiler's own validator against
+`metadata.json`, so this is caught mechanically rather than remembered.
 
 ### Note on the corpus in this tree
 

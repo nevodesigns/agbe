@@ -147,10 +147,14 @@ def main() -> int:
 
     # positive checks: the shipped facts must actually appear where they matter
     readme = (ROOT / "README.md").read_text()
+    # Compared with thousands separators stripped. The documents write "1,237"
+    # and the manifest stores 1237; they are the same fact and the check is that
+    # it appears at all, not how it is punctuated.
+    readme_flat = readme.replace(",", "")
     for label, val in (("throughput", str(F["tokens_per_second"])),
                        ("corpus", str(F["corpus_conversations"])),
                        ("team_id", F["team_id"])):
-        if val not in readme:
+        if val.replace(",", "") not in readme_flat:
             print(f"  FAIL  README.md missing the final {label} ({val})"); bad += 1
     print(f"\n  {'DOCS CONSISTENT with FINAL.json' if bad == 0 else str(bad) + ' contradiction(s)'}")
     return 1 if bad else 0

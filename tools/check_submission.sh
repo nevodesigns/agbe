@@ -157,6 +157,23 @@ else
   fail=1
 fi
 
+# 3.1 metadata.json must still satisfy the profiler's own validator. Adding a
+# plain `reproducibility` key, which section 3.1 asks for in so many words, makes
+# adtc-profiler exit 2 before it benchmarks anything.
+PV=/home/nwokolo/projects/adtc-2026/.venv/bin/python
+if [ -x "$PV" ]; then
+  if "$PV" - "$R/metadata.json" <<'PYEOF' > /dev/null 2>&1
+import json, sys
+from adtc_profiler import report
+m = json.load(open(sys.argv[1]))
+report.validate_submission_block({k: v for k, v in m.items() if not k.startswith("_")})
+PYEOF
+  then echo "  ok     3.1  metadata.json passes the profiler's own schema validator"
+  else echo "  FAIL   3.1  adtc-profiler would REJECT metadata.json (it exits 2 before running)"; fail=1; fi
+else
+  echo "  skip   3.1  profiler venv not found, cannot validate metadata.json"
+fi
+
 # 3.4 self-reported figures have to come from a committed profiler run
 if [ -f "$R/submission.json" ]; then
   echo "  ok     3.4  submission.json committed for independent comparison"

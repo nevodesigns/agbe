@@ -221,16 +221,16 @@ from the public URL and hashed independently, not trusted from a response header
 | | |
 |---|---|
 | build | **v13** |
-| corpus | 956 conversations |
-| training | 3 epochs, 90 steps, LoRA r=32 on Gemma 3 1B |
+| corpus | 1,237 conversations |
+| training | 3 epochs, 117 steps, LoRA r=32 on Gemma 3 1B |
 | GGUF sha256 | `d614d6b00aad21990419841bea8dae37502f8c57f1b3a25730ec15c3480d9851` |
 | bytes | 814,261,088 |
 | HuggingFace commit | `2dd8ab347ddd4909fcb90dcbcffe6039b4b8bc34` |
 | profiled at repo commit | `61bced20ba47` |
 
-**Official profiler, participant mode, v13:** 24.29 tok/s (S_perf **100.0**),
+**Official profiler, participant mode, v16:** 24.08 tok/s (S_perf **100.0**),
 1039 MB peak RSS (S_eff **85.5**), arc_easy 0.56 on 50 samples,
-peak 99.0 C, throttled true.
+peak 100.0 C, throttled true.
 
 Engineering subtotal **47.10 of 50**, or **37.10** with the thermal penalty.
 

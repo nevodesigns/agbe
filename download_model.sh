@@ -18,7 +18,7 @@ MODEL_URL="https://huggingface.co/NEVODESIGN/agbe-1b/resolve/main/agbe-1b-q4_k_m
 # when a build is chosen, and checked by tools/check_submission.sh against the
 # live URL so these cannot silently drift from what is actually published.
 EXPECT_BYTES=814261088
-EXPECT_SHA256=d614d6b00aad21990419841bea8dae37502f8c57f1b3a25730ec15c3480d9851
+EXPECT_SHA256=7c09e484219f271ec08c2ecf7b9dd9bf910e0733cbf42b6efdccfecaa79f4e69
 
 verify() {  # verify <path> -> 0 if this is exactly the shipped file
   local f="$1" sz

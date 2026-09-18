@@ -15,7 +15,7 @@ set -euo pipefail
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 HEAD_SHA="$(git rev-parse HEAD)"
-CURRENT="$(python3 -c 'import json;print(json.load(open("metadata.json")).get("reproducibility",{}).get("git_commit_sha",""))')"
+CURRENT="$(python3 -c 'import json;print(json.load(open("metadata.json")).get("_reproducibility",{}).get("git_commit_sha",""))')"
 
 if [[ "${1:-}" == "--check" ]]; then
   if [[ "$CURRENT" == "$HEAD_SHA" ]]; then
@@ -32,7 +32,7 @@ import json, pathlib, sys
 sha = sys.argv[1]
 p = pathlib.Path("metadata.json")
 m = json.loads(p.read_text())
-m.setdefault("reproducibility", {})["git_commit_sha"] = sha
+m.setdefault("_reproducibility", {})["git_commit_sha"] = sha
 p.write_text(json.dumps(m, indent=2, ensure_ascii=False) + "\n")
 print(f"metadata.json git_commit_sha -> {sha}")
 PY
