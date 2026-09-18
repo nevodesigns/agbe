@@ -442,6 +442,13 @@ def build_differentials(rng: random.Random) -> list[dict]:
         for x, y in ((a, b), (b, a)):          # <- both directions, always
             first, second = (x, sides[x]), (y, sides[y])
 
+            # Two forms per direction, not three. v15 lost nine behaviour prompts
+            # spread across soil, post-harvest and livestock rather than
+            # concentrated on one topic, which reads as capacity dilution rather
+            # than a broken subject. The differential slice is the largest thing
+            # added since v13, and each form is a full copy of both `tell` sides,
+            # so the form count is the multiplier on the whole slice.
+            #
             # Each question form composes a DIFFERENT subset. Emitting one
             # identical body under four questions would put every shared
             # sentence in the pair at 8 or 9 repeats, which is the sentence
@@ -454,8 +461,6 @@ def build_differentials(rng: random.Random) -> list[dict]:
                       control=d.get("control", ""))),
                 (f"What is the difference between {x} and {y}?",
                  dict(shared=d.get("both", ""), stakes=d.get("why_it_matters", ""))),
-                (f"Is this {x} or {y}? How do I know which one I have?",
-                 dict(decider=d.get("decider", ""))),
             ]
             for tpl, kw in forms:
                 out.append(rec(tpl,

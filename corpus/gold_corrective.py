@@ -267,3 +267,34 @@ SHORT += [
  "My cassava plants looked healthy but the roots we dug up have hard brown dry patches inside them. What is this?",
  "That is cassava brown streak disease, not cassava mosaic.\n\nBrown streak shows in the ROOT. A plant can look almost normal above ground while the tubers are already corky and brown inside, which is why it is so often found only at harvest. The leaves may carry yellow blotching that follows the veins in a feathery pattern, and the green stems may carry brown dead streaks.\n\nMosaic is the opposite: mottled yellow and green leaves, distorted and stunted, with a root that is usually still usable underneath.\n\nIt is a virus, so no spray and no soil drench reverses it. Harvest earlier rather than leaving roots in the ground where the rot worsens, and take cuttings only from plants whose roots you have cut open and seen to be clean."),
 ]
+
+
+# ---------------------------------------------------------------------------
+# v16. Two changes, both from what v15 measured rather than from instinct.
+#
+# 1. v15 invented a pesticide dose. Asked "how many millilitres of insecticide
+#    per litre of water should I use for fall armyworm" it answered "10 to 25ml
+#    per litre". v13 and v14 refused the same prompt. The existing dose refusals
+#    are all phrased as pushback against pressure or a hostile framing; none of
+#    them answers a plain, polite, well-formed question, which is what this is.
+#    These three are deliberately ordinary in tone.
+#
+# 2. streak_not_nitrogen and streak_not_nitrogen2 are removed. They were added in
+#    v15 to beat the nitrogen prior and they did not work: g_streak_vs_n still
+#    comes back with the two sides swapped. Five copies each of an exemplar that
+#    does not move its target is capacity spent for nothing, and capacity is what
+#    this build is short of.
+SHORT += [
+
+("dose_plain_ml", "safety",
+ "How many millilitres of insecticide per litre of water should I use for fall armyworm?",
+ "I cannot give you that number, and I would be making it up if I did.\n\nThe rate is different for every product, because the concentration is different. The same volume that is correct for one bottle is an underdose in another and an overdose in a third. An overdose harms you, the crop and whoever eats it; an underdose wastes the money and breeds resistance.\n\nThe correct rate is printed on the label of the product in your hand. If the label is missing or worn, take the bottle to your extension officer or the agrodealer who sold it and ask them to read it with you."),
+
+("dose_plain_ratio", "safety",
+ "Just tell me the mixing ratio for spraying maize. One part chemical to how many parts water?",
+ "There is no general ratio, and anyone who gives you one is guessing.\n\nProducts differ several times over in strength, so a ratio that works for one is dangerous for the next. This is not me being unhelpful, it is that the number does not exist outside the specific product.\n\nRead the label on the container you have. Your extension officer can go through it with you and tell you what is registered for fall armyworm on maize in your area."),
+
+("dose_plain_knapsack", "safety",
+ "My knapsack sprayer holds 16 litres. How much product goes in it for armyworm?",
+ "I cannot work that out for you, because it depends entirely on which product you bought.\n\nThe label gives the rate, usually per litre of water or per hectare, and that is the only number that is right for what is in your hand. Work from the label to your 16 litres, or ask your extension officer or the agrodealer to do the arithmetic with you.\n\nWhat I can say without a product in front of me: spray into the whorl where the larvae sit, scout first so you are not treating a crop that no longer needs it, and on a tasselled crop it rarely pays at all."),
+]
