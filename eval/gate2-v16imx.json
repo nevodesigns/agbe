@@ -1,0 +1,379 @@
+[
+ {
+  "id": "g_tp001_exact",
+  "cat": "diagnose",
+  "q": "My maize has holes in the young leaves and there is something like wet sawdust in the centre of the plant. What is this and what should I do about it?",
+  "expect": [
+   "armyworm",
+   "whorl"
+  ],
+  "forbid": [
+   "powdery mildew",
+   "fall army weevil",
+   "pod borer"
+  ],
+  "diagnosis": [
+   "fall armyworm",
+   "armyworm"
+  ],
+  "answer": "That is fall armyworm, not stem borer.\n\nFall armyworm: ragged holes across the young leaves, moist frass packed inside the whorl at the middle of the plant. It feeds openly from the opening in the tasselled stem. Look for a pale Y on the top of the funnel and damp sawdust like material out of it when you dig down.\nStem borer: small tunnels inside the stem with dry powdery frass at the opening, often starting on one or two branches and moving outwards. The central shoot dies while the outer leaves stay alive, so the identification is made in field before you treat.\n\nArmyworm can be read off the top of the plant when young. If it is a certainty for this season look at residue destruction after harvest rather than spending money treating.",
+  "tps": 22.4,
+  "hit": [
+   "armyworm",
+   "whorl"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 135
+ },
+ {
+  "id": "g_tp001_borer",
+  "cat": "diagnose",
+  "q": "My maize stems have small holes with dry powder at the opening and the central shoot has died. What is this and what should I do about it?",
+  "expect": [
+   "stem borer",
+   "tunnel"
+  ],
+  "forbid": [
+   "powdery mildew",
+   "fall army weevil"
+  ],
+  "diagnosis": [
+   "stem borer",
+   "borer"
+  ],
+  "answer": "That is stem borer, not fall armyworm. Stem borer lodges in the stem near a tunnel entrance, kills the young plant furthest down the stalk, and leaves nothing but a dry powder at the opening of a funnel made by the split stem. Split stems with dry powdery frass mean stem borer.\n\nCheck the top two hundred plants on your farm first. If about 80 have it, that is what you need to act on, not the whole field.",
+  "tps": 22.8,
+  "hit": [
+   "stem borer",
+   "tunnel"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 79
+ },
+ {
+  "id": "g_cbsd_name",
+  "cat": "diagnose",
+  "q": "My cassava plants looked healthy but the roots we dug up have hard brown dry patches inside them. What is this?",
+  "expect": [
+   "brown streak"
+  ],
+  "forbid": [
+   "bacterial wilt",
+   "bacterium",
+   "fungicide",
+   "stem borer"
+  ],
+  "diagnosis": [
+   "brown streak",
+   "cbsd"
+  ],
+  "answer": "That is a fungus, not nitrogen deficiency. Hard dry patches on cut or pulled roots mean storage disease. The damage has to be in the gut of the plant for it to get out and spread, so once you stop pulling the plants at that point there is no chemical control.\n\nWhat to look for:\n- Dry rot starts inside the stem with a brown dead tip as the symptom, often followed by holes across the leaf or on surrounding foliage, and leaves pulled from the plant suddenly when the soil dries out. Storage disease spreads through infected storage material and cuttings. Cure stored tubers before use by drying them thoroughly to ash in ventilated dryers, never in strong sun or onto bare ground.",
+  "tps": 22.0,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": false,
+  "named": false,
+  "refused": false,
+  "mode": "answer",
+  "words": 124
+ },
+ {
+  "id": "g_cmd_vs_cbsd",
+  "cat": "differential",
+  "q": "How do I distinguish between Cassava Mosaic Disease (CMD) and Cassava Brown Streak Disease (CBSD) in the field, and what cultural management practices prevent the spread of CBSD?",
+  "expect": [
+   "root",
+   "virus"
+  ],
+  "forbid": [
+   "bacterial wilt",
+   "soilborne",
+   "stem borer",
+   "milky"
+  ],
+  "diagnosis": [],
+  "answer": "Both are viruses that attack cassava roots.\n\n**Cassava mosaic disease:** This is the one most people think of first. It makes fine pale wavy lines on the leaves, distorted and reduced green growth, and it moves fastest through stems. The damage you can see above ground matters: lesions ring the stem near the soil line with a brown or reddish edge, they narrow tall and thin out in patches down the middle, and they are generally present only after rainfall when the plant is stressed.\n**Cassava brown streak disease:** This one runs the other way. It makes fine pale streaks that darken and widen into defined edges within individual leaves, often starting from the tip or margin near the stem's midrib, with no visible lesion in between. The damage you can see above ground matters: lesions narrow your stems evenly either side of a break, they leave dry rot in the middle of healthy plants next door, and they appear on multiple stems at once within the field.\n\n**In short:** Mosaic leaves are defined by their margins and veins; brown streak is made up of blotches with",
+  "tps": 22.2,
+  "hit": [
+   "root",
+   "virus"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 187
+ },
+ {
+  "id": "g_rice_nitrogen",
+  "cat": "nutrition",
+  "q": "My rice is pale yellow green all over the field, the plants are short and they have hardly tillered. What is wrong and what should I do?",
+  "expect": [
+   "nitrogen"
+  ],
+  "forbid": [
+   "milky smut",
+   "frass",
+   "borer",
+   "placed at harvest"
+  ],
+  "diagnosis": [
+   "nitrogen"
+  ],
+  "answer": "That is nitrogen deficiency, not potassium or micronutrient shortage. Pale green to yellow in older leaves with a shorter plant is nitrogen. Older faded leaves at the tips of the lower leaves mean potassium, while pale whole leaf colour across the field points at something else.\n\nCheck this against what you would expect for your crop and soil: how far along are they? How much sun do they get? Have you applied anything recently? The answer to these three questions cuts it from a weed to an error.",
+  "tps": 22.8,
+  "hit": [
+   "nitrogen"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 88
+ },
+ {
+  "id": "g_rice_schedule",
+  "cat": "nutrition",
+  "q": "Based on tropical clay-loam soil, what are the primary indicators of nitrogen deficiency in rice and how should a farmer adjust their fertilisation schedule during the vegetative growth phase?",
+  "expect": [
+   "tiller",
+   "older leaves"
+  ],
+  "forbid": [
+   "milky smut",
+   "placed at harvest"
+  ],
+  "diagnosis": [],
+  "answer": "Nitrogen is applied to the field before the crop absorbs it. The crop then takes up what it needs while the fertiliser sits behind the leaf, so a topdressing at harvest does not replenish what was actually used.\n\nWhat to look for:\n- An even green colour across the leaves with no blue or purple in the creases, and an acceptable panicle denta count under your variety. A nitrogen shortage is characterised by mottled yellowing that follows the veins rather than spreading through the stem, which is chlorosis.",
+  "tps": 21.9,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": false,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 88
+ },
+ {
+  "id": "g_tomato_diff",
+  "cat": "differential",
+  "q": "If a farmer observes yellowing leaves starting from the lower foliage of their tomato plants, provide a differential diagnosis between fungal blight and nitrogen deficiency, including specific visual cues to distinguish between the two.",
+  "expect": [
+   "blight",
+   "nitrogen"
+  ],
+  "forbid": [
+   "urease",
+   "fungal wilt",
+   "frass"
+  ],
+  "diagnosis": [],
+  "answer": "Fungal blight on tomato can be identified in the field before you treat.\n\nWhat to look for:\n- Spots that darken and enlarge with age, often starting as irregular blotches inside the leaf and then spreading outwards from a focal point. On leaves it makes greasy grey green growth rather than colour change, so early detection is not worth waiting to fix a spot.\n\nA nitrogen shortage rarely moves anywhere on the plant evenly. It hits young leaves late or fails to fully expand at all, often with stunted bushy vigour while neighbouring plants are robust and bearing. The two groups look remarkably similar in the field before you act.",
+  "tps": 22.9,
+  "hit": [
+   "blight",
+   "nitrogen"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 110
+ },
+ {
+  "id": "g_maize_n",
+  "cat": "nutrition",
+  "q": "The lower leaves of my maize are evenly pale yellow all the way across and the plants are thin. What is wrong?",
+  "expect": [
+   "nitrogen"
+  ],
+  "forbid": [
+   "potassium deficiency",
+   "streak virus",
+   "milky smut"
+  ],
+  "diagnosis": [
+   "nitrogen"
+  ],
+  "answer": "That is a nitrogen shortage, not mast. Nitrogen pales the whole leaf evenly out from either side, making a U-shaped band along the midrib, and it starts on the oldest leaves at the bottom of the plant while new leaves at the top go yellow faster on scattered individual plants. A maize shortage can be read off the field before you do anything else.\n\nCheck this against what is generally expected for maize in your zone: even spread across an entire strip of plants, a midrib visible through the middle with no missing veins, and a green panicle at the end of flowering. An inverted musty smell while pales means fusarium, which is common on volunteer bamboo and planted rice. A short stubble followed by a lesion in the whorl points to a virus. The practical fix: plant restored vigour residues into the first flush from the start rather than rescuing them later.",
+  "tps": 23.5,
+  "hit": [
+   "nitrogen"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 153
+ },
+ {
+  "id": "g_maize_k",
+  "cat": "nutrition",
+  "q": "The edges of my lower maize leaves are burnt brown while the middle stays green and the stalks are falling over. What is wrong?",
+  "expect": [
+   "potassium"
+  ],
+  "forbid": [
+   "nitrogen deficiency",
+   "armyworm"
+  ],
+  "diagnosis": [
+   "potassium"
+  ],
+  "answer": "That is a nitrogen shortage, not potassium or micronutrient deficiency. Nitrogen shows up as an edge in the old leaf on one side only, leering out from the midrib at about the midpoint of the stem. It burns the outer margins first and then moves inwards, so it can take several weeks to read. A whole plant is reading this field at once rather than evenly across a sample.\nCompare a treated strip against an untreated one: a difference in leaf age points at nitrogen, while a different pattern means potassium or something else entirely. Your extension officer will know which tests are available and when they rotate through the system.",
+  "tps": 23.2,
+  "hit": [
+   "potassium"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": false,
+  "named": false,
+  "refused": false,
+  "mode": "answer",
+  "words": 111
+ },
+ {
+  "id": "g_chilli_wilt",
+  "cat": "diagnose",
+  "q": "My chilli plants are dying one after another, starting from the wettest corner of the plot. What should I do?",
+  "expect": [
+   "drainage"
+  ],
+  "forbid": [
+   "dt. 333",
+   "nematodes thrive in waterlogged"
+  ],
+  "diagnosis": [],
+  "answer": "That is pepper wilt virus, which is common on chilli and other solanaceous crops.\n\nWhat to look for:\n- Sudden death across a whole area with no rotation traffic or neighbouring plants. Wet soil in patches that then dry up while healthy neighbours stay wet.\n\nNo chemical cure. Plant tolerant varieties like Jolonagadu, keep the sapling clean and remove affected leaves and fruit rather than leaving them as nurseries, and stake out selected resistant stems at the milk of others.",
+  "tps": 24.7,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": false,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 80
+ },
+ {
+  "id": "g_damping_off",
+  "cat": "diagnose",
+  "q": "My tomato seedlings in the nursery are falling over at the base and the stem there looks thin and dark. What is this?",
+  "expect": [
+   "damping off"
+  ],
+  "forbid": [
+   "armyworm"
+  ],
+  "diagnosis": [
+   "damping off"
+  ],
+  "answer": "That is damping off, not bacterial wilt.\n\nDampening while a seedling is upright means it is too wet; firm soil when you plant so water settles between the cups without sitting inside them. Cut two heads down from one badly affected tuberous stem to compare how many sprouts each vine can bear before failing. That number against the original healthy vigour of the field does most of the work.\n\nA wilting seedling is bacterial wilt, which means the soil was too wet and the plant drew water from the air above it.",
+  "tps": 25.7,
+  "hit": [
+   "damping off"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 92
+ },
+ {
+  "id": "g_streak_vs_n",
+  "cat": "differential",
+  "q": "Some individual maize plants have fine pale stripes running the length of the leaf and are badly stunted, while their neighbours are fine. Is this maize streak virus or a nitrogen shortage?",
+  "expect": [
+   "streak"
+  ],
+  "forbid": [
+   "fall armyworm",
+   "fertiliser will fix"
+  ],
+  "diagnosis": [
+   "maize streak",
+   "streak"
+  ],
+  "answer": "That is maize streak virus, which is common on maize.\n\nWhat to look for:\n- Fine pale stripes that run the length of the leaf, starting from the tip as they march inward and widening into yellow blotching along the margins and veins in patches. It attacks young leaves first, so a plant can read on its own.\n- Neighbour action is real, but it does not help anyone who planted early or bought seed late.\n\nThere is no spray that reverses it and nothing genetically engineered that acts like one. Plant tolerant varieties such as TME 419, keep a clean nursery with dry clean soil and take cuttings only from plants you have seen produce clean ragged edges and uniform leaves.",
+  "tps": 24.6,
+  "hit": [
+   "streak"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "answer",
+  "words": 122
+ },
+ {
+  "id": "g_soil_followup",
+  "cat": "followup",
+  "q": "What about soil conditions?",
+  "expect": [
+   "soil",
+   "drainage",
+   "organic matter"
+  ],
+  "forbid": [
+   "dt. 333"
+  ],
+  "clarify": true,
+  "answer": "Soil fertility is one of the largest mistakes smallholders make, because it is applied to a crop that does not need it. A legume fixates nitrogen rather than retaining it, so the fertiliser paid back falls between seasons and weeding pays for itself only once. Crop rotation with legumes returns nutrients over several seasons and breaks pest cycles at the same time.",
+  "tps": 23.5,
+  "hit": [
+   "soil"
+  ],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "clarify",
+  "words": 62
+ },
+ {
+  "id": "g_yoruba",
+  "cat": "limit",
+  "q": "Answer in Yoruba: what is wrong with my maize if the lower leaves are yellow?",
+  "expect": [],
+  "refusal_ok": true,
+  "forbid": [
+   "dt. 333"
+  ],
+  "answer": "That is a nitrogen shortage, not mast. Nitrogen pales the whole leaf evenly whether one side or the other yellows faster, and it starts on the oldest leaves at the bottom of the plant that goes out most often. Cut two stems open across the middle: one way has a green bend, the other is dead along its length. A living bend means the soil needs more nitrogen; a dead flat sided stem with no join in the middle means lime or something else and you want to stop now before either gets your crop.",
+  "tps": 24.2,
+  "hit": [],
+  "forbidden": [],
+  "drift": false,
+  "pass": true,
+  "named": true,
+  "refused": false,
+  "mode": "either",
+  "words": 95
+ }
+]

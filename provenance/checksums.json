@@ -1,14 +1,14 @@
 {
   "trained_adapter/adapter_model.safetensors": {
-    "sha256": "adababda71fb00eef085b2dc2c6640071432c84c0732cef0a0f0a58143052ee9",
+    "sha256": "d09b81127a73e173523251ed54fbe27fbf1055a66cb989ee5ff16c80228adaea",
     "bytes": 104414464
   },
   "trained_adapter/adapter_config.json": {
-    "sha256": "4be7a6a523a1d1303d60c7501777f860ea4d80f88ec4af5b3b5dcb90f63ec5a8",
+    "sha256": "5406e5db72e3b28005cbf7073caa8b12878716fa95cf1b226cc1c5692baa0c15",
     "bytes": 1099
   },
   "committed_adapter_fp16/adapter_model.safetensors": {
-    "sha256": "dd163604998e15f321932d2999bec071f4a652aaf3e745918da4c824b1543fbc",
+    "sha256": "86021c8b821c1671ba274fa991c251bab1f083a88bda6130d4185b30662f6769",
     "bytes": 52231384
   },
   "base_model/google/gemma-3-1b-it@dcc83ea841ab6100d6b47a070329e1ba4cf78752/model.safetensors": {
@@ -16,16 +16,24 @@
     "bytes": 1999811208
   },
   "merged_f16_gguf/agbe-f16.gguf": {
-    "sha256": "6e0434974f997965a3564a53b7416f62d7a06a1c8b6521e7bde0e3d958a1b46d",
+    "sha256": "367d38b8c8176faabc13ef29e1e763026d68eca1c9bfe55967701e9764b870c5",
     "bytes": 2014776416
   },
   "final_gguf/agbe-1b-q4_k_m.gguf": {
-    "sha256": "1b1b8e628b95cfa842cbbc153cc2e2e8b83dbe350b51a9d458b6d8b87c2e296e",
+    "sha256": "7c09e484219f271ec08c2ecf7b9dd9bf910e0733cbf42b6efdccfecaa79f4e69",
     "bytes": 814261088
   },
+  "final_gguf_imatrix/agbe-1b-q4_k_m-imatrix.gguf": {
+    "sha256": "4a2ec3e24355f1aeeb86983ba9c767ca56e25a5cf4cbbdbc5dd53f87bf6cdadf",
+    "bytes": 814261312
+  },
+  "imatrix/agbe.imatrix": {
+    "sha256": "7004f70bee88f50c494fe75c15e4bb5b9384ef0f8c7935a327b75dedc7b93922",
+    "bytes": 1452416
+  },
   "dataset/corpus/build/train.jsonl": {
-    "sha256": "906420a87e237a0d5bbe1addfb5e023c9114b1ff29cf34be941b087818dcb50b",
-    "bytes": 991073
+    "sha256": "69cb6366b1520fdc8b70eb0bce08d0ac2f0bd93c43e393da50b9e7390d8bcd41",
+    "bytes": 984754
   },
   "dataset/corpus/facts.json": {
     "sha256": "cf279f37039c3708940ccc24938f14ba1f557b9bc361775ca844049064062316",
