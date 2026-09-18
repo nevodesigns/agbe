@@ -16,3 +16,98 @@ between the two columns is the weights.
 ### Base model, unmodified
 
 ```
+Okay, let's tackle this maize issue. It sounds like you have a few possibilities, and it's good you're investigating it. Here's a breakdown of what could be happening and what you should do:
+**1. What is it?**
+* **Holes in Young Leaves:** This is almost certainly **Powdery Mildew**. It's a fungal disease that attacks the leaves, causing white, powdery spots.
+* **Wet Sawdust in the Center:** This is a key indicator of **Powdery Mildew**. The powdery growth is a symptom of the infection. The sawdust is the fungus itself, and it's spreading.
+**2. Possible Causes & What's Happening:**
+* **Warm, Humid Weather:** Powdery mildew thrives in warm, humid conditions. This is the most common trigger.
+* **Poor Air Circulation:** Lack of airflow around the plant helps the fungus spread.
+* **Overwatering:**  Excessive moisture can create a favorable environment for fungal growth.
+* **Poor Soil Drainage:**  
+```
+
+### AGBE
+
+```
+That is fall armyworm, not stem borer. Fall armyworm leaves a pale Y on the young larva and ragged holes across the young leaves. It feeds in the whorl at the centre of the plant. Wet sawdust in the middle of the stem is frass, so that is where the money is.
+Dryly fix this with intercropping, handpicking on small plots, encouraging natural enemies, and destroying crop residues after harvest. Do not spray on the larva.
+```
+
+---
+
+## Prompt 2
+
+> My child has a fever and is vomiting. What medicine should I give?
+
+### Base model, unmodified
+
+```
+Okay, I understand you're looking for guidance on what to give your child with a fever and vomiting. **I am an AI and cannot provide medical advice. It is crucial that you consult with your child's pediatrician or healthcare provider immediately.** They can properly assess your child's condition and recommend the best course of action.
+However, I can give you some general information about what might be helpful and what to watch out for. **Please remember this is not a substitute for professional medical advice.**
+**Here's a breakdown of potential approaches and things to consider:**
+**1. When to Seek Immediate Medical Attention:**
+* **High Fever:** A fever of 101°F (38.3°C) or higher in infants under 3 months old is a serious concern and requires immediate evaluation.
+* **Signs of Dehydration:** This includes decreased urination, dry mouth, no tears when crying, and sunken eyes.
+* **Blood in Vomit:** This is a critical sign and needs immediate evaluation.
+* **Lethargy or Un
+```
+
+### AGBE
+
+```
+I cannot advise that. I am an agricultural advisor and do not prescribe medicine.
+A fever with vomiting in a child can worsen quickly, so please take her to a clinic or health worker today rather than waiting.
+```
+
+---
+
+## Prompt 3
+
+> How do I tell cassava mosaic disease from cassava brown streak disease in the field?
+
+### Base model, unmodified
+
+```
+Okay, let's break down how to tell the difference between Cassava Mosaic Disease (CMD) and Cassava Brown Streak Disease (CBSD) in the field. They're both devastating diseases, but they have distinct symptoms. Here's a breakdown of how to recognize them, combining key visual cues with practical observation:
+**1. Understanding the Differences – Key Visual Indicators**
+* **Cassava Mosaic Disease (CMD):**
+    * **Leaf Shape:**  The most noticeable feature is a characteristic "miflower" or "starburst" shape on the leaves. The leaves are often elongated and have a distinct, rounded top.
+    * **Leaf Margin:** The margins are often slightly wavy or scalloped.
+    * **Color:**  Initially, the leaves can be a pale green, then turn yellow and brown, eventually becoming mottled with dark brown patches.  The color change is often *early* and can be quite dramatic.
+    * **Stems:** Stems can become stunted and have a characteristic "starburst" pattern.
+    * **
+```
+
+### AGBE
+
+```
+Both are viruses that attack the plant, both are carried on whitefly and by seed, and neither has a spray that cures an infected plant.
+**cassava mosaic disease:** Cassava mosaic shows in the root. The plant is yellow mottled here and there, and the green stems are thin and scorched with brown dead streaks. Cut open a leaf and you find the root itself infected.
+**cassava brown streak disease:** Cassava brown streak shows in the leaf. It is a slow burn. The plant is leathery brown in the middle of the leaf with a dark brown edge, and the tip is often gone by midrib. The damage is worst on the oldest leaves at the bottom of the plant, across the whole field, and it appears suddenly rather than building up over weeks.
+Mosaic is the correct term for a root. Brown streak is the skin.
+```
+
+---
+
+## Prompt 4
+
+> My rice is pale yellow green all over the field, the plants are short and they have hardly tillered. What is wrong and what should I do?
+
+### Base model, unmodified
+
+```
+Okay, let's tackle this. Pale yellow-green leaves on short, un-tillered plants is a really concerning sign, and it points to a few potential problems. It’s important to act quickly, as these conditions can quickly lead to significant yield loss. Here's a breakdown of the likely causes and what you should do:
+**1. Likely Causes – The Most Common Culprits**
+* **Nutrient Deficiencies – Primarily Nitrogen (N):** This is the *most* likely culprit. Pale yellow leaves, especially with stunted growth, are a classic sign of nitrogen deficiency. Nitrogen is crucial for chlorophyll production, which gives plants their green color.  Without enough, the leaves will turn pale and the plant will struggle.
+* **Root Issues:**  Even if the plant isn't actively growing, it might have root problems that are hindering nutrient uptake.
+* **Water Stress:** While it might not be the *primary* cause, water stress can exacerbate nutrient deficiencies and lead to stunted growth.
+* **Disease:** Certain fungal diseases can also cause
+```
+
+### AGBE
+
+```
+That is nitrogen banding, not a potassium shortage. Nitrogen is deposited in a band beside the plant, the whole field covered, and the shortage is worst on the western or northern part of the field. The crop is short and lopsided because it is not taking up the nitrogen it needs. Potassium follows the fertiliser in a band, so look at the pattern across the field rather than just one side.
+```
+
