@@ -534,12 +534,13 @@ same lesson as the striga fix: **contrast teaches a boundary, volume does not.**
 correct rather than stale: the profiler ran at that commit, and every commit since
 has changed documentation and recorded analysis only. The weights, the corpus and
 the training configuration are untouched from that point, and the published GGUF's
-sha256 is pinned in `download_model.sh` and verified by `tools/check_submission.sh`.
+sha256 is recorded in `FINAL.json` and verified against the live file by
+`tools/check_submission.sh`.
 
 ## 15. Reproducing this
 
 ```bash
-bash download_model.sh                    # 814 MB, verifies length, resumes
+bash download_model.sh                    # 814 MB, pinned to an exact commit
 python corpus/generate.py                 # rebuild corpus from the fact base
 python train/train_lora.py --train corpus/build/train.jsonl --out out --merge
 python eval/run_eval.py                   # 66-prompt battery, scored
@@ -615,7 +616,16 @@ never satisfiable and the profiler sat unstarted for 36 minutes; then it read
 machine whose cores were at 62 to 71 C. It now takes a median over three seconds
 and names the processes burning CPU, which is the actionable part.
 
-**A checksum caught a bug a size check would have passed.** Resuming a download
+**A checksum caught a bug a size check would have passed, and the script that
+found it is no longer in the repository.** The Gate 2 template update of 19
+September requires `download_model.sh` to be the official file with only
+`MODEL_FILE` and `MODEL_URL` changed, so the hardened version described below was
+replaced with the stock one. The reasoning is kept because the bug was real and a
+reproduction attempt can still hit it. The protection now lives in two places
+that the template does not constrain: `MODEL_URL` is pinned to an exact Hugging
+Face commit rather than a mutable branch, so the bytes cannot change after
+submission, and `tools/check_submission.sh` downloads the published file and
+checks its sha256 against `FINAL.json`. Resuming a download
 onto a file already at full length appends nothing and exits successfully, leaving
 old content at exactly the right byte count. `download_model.sh` now pins the
 sha256 and verifies it, and the published weights were confirmed by downloading

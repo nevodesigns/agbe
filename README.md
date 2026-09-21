@@ -17,7 +17,7 @@ and getting produce to market.
 ## Try it in two commands
 
 ```bash
-bash download_model.sh          # 814 MB, resumes if the connection drops
+bash download_model.sh          # 814 MB, pinned to an exact Hugging Face commit
 llama-cli -m model/agbe-1b-q4_k_m.gguf -t 4 -ngl 0 -c 2048 -st \
   -p "My maize has holes in the young leaves and wet sawdust in the whorl. What is this?"
 ```

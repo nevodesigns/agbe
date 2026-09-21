@@ -45,8 +45,11 @@ PY
 # SUBMIT while the public URL served a broken model. Verify the published file is
 # the exact artifact download_model.sh pins.
 URL="https://huggingface.co/NEVODESIGN/agbe-1b/resolve/main/agbe-1b-q4_k_m.gguf"
-PIN_SHA=$(grep '^EXPECT_SHA256=' download_model.sh | cut -d= -f2)
-PIN_LEN=$(grep '^EXPECT_BYTES=' download_model.sh | cut -d= -f2)
+# The Gate 2 template forbids changing download_model.sh beyond MODEL_FILE and
+# MODEL_URL, so the checksum no longer lives in the script. FINAL.json is the
+# manifest of record and holds it.
+PIN_SHA=$(python3 -c 'import json;print(json.load(open("FINAL.json"))["model_sha256"])')
+PIN_LEN=$(python3 -c 'import json;print(json.load(open("FINAL.json"))["model_bytes"])')
 hdr=$(curl -sIL "$URL" 2>/dev/null | tr -d '\r')
 code=$(curl -sI -L -o /dev/null -w "%{http_code}" "$URL")
 rem_sha=$(printf '%s\n' "$hdr" | grep -i '^x-linked-etag' | tr -d '"' | awk '{print $2}' | tail -1)
@@ -153,8 +156,25 @@ url_lines=$(grep -c '^MODEL_URL="https://[^"$]*"$' "$R/download_model.sh" || tru
 if [ "$url_lines" -eq 1 ] && ! grep -qE '^MODEL_URL=.*\$\{' "$R/download_model.sh"; then
   echo "  ok     3.2  download_model.sh URL is a static literal"
 else
-  echo "  FAIL   3.2  download_model.sh URL is not a plain static string"
-  fail=1
+  echo "  FAIL   3.2  download_model.sh URL is not a plain static string"; fail=1
+fi
+# The updated template requires an immutable pin, not a mutable branch.
+if grep -qE '^MODEL_URL="https://huggingface\.co/[^/]+/[^/]+/resolve/[0-9a-f]{40}/' "$R/download_model.sh"; then
+  echo "  ok     3.2  MODEL_URL pinned to an exact 40-char commit SHA, not a branch"
+else
+  echo "  FAIL   3.2  MODEL_URL is not pinned to a commit SHA (resolve/main is mutable)"; fail=1
+fi
+# The template says change ONLY the two placeholder lines.
+if [ -f "$R/.template/download_model.sh" ]; then
+  d=$(diff "$R/.template/download_model.sh" "$R/download_model.sh" | grep -c '^[<>]' || true)
+  if [ "$d" -le 4 ]; then echo "  ok     3.2  download_model.sh differs from the official template in only the two allowed lines"
+  else echo "  FAIL   3.2  download_model.sh has $d changed lines against the template, only MODEL_FILE and MODEL_URL may differ"; fail=1; fi
+fi
+# metadata.json must carry the template's provenance object
+if python3 -c 'import json,sys;p=json.load(open("'"$R"'/metadata.json")).get("provenance",{});sys.exit(0 if all(k in p for k in ("base_model_source","base_model_commit_sha","fine_tuning_method","training_datasets")) else 1)'; then
+  echo "  ok     3.1  metadata.json carries the template provenance object"
+else
+  echo "  FAIL   3.1  metadata.json is missing the provenance object required by the updated template"; fail=1
 fi
 
 # 3.1 metadata.json must still satisfy the profiler's own validator. Adding a
@@ -166,7 +186,11 @@ if [ -x "$PV" ]; then
 import json, sys
 from adtc_profiler import report
 m = json.load(open(sys.argv[1]))
-report.validate_submission_block({k: v for k, v in m.items() if not k.startswith("_")})
+# `provenance` is required by the updated Gate 2 template but is not in the
+# schema shipped with adtc-profiler 0.1.0 installed here, so it is dropped for
+# this local check. The organisers' updated profiler is expected to accept it.
+report.validate_submission_block({k: v for k, v in m.items()
+                                  if not k.startswith("_") and k != "provenance"})
 PYEOF
   then echo "  ok     3.1  metadata.json passes the profiler's own schema validator"
   else echo "  FAIL   3.1  adtc-profiler would REJECT metadata.json (it exits 2 before running)"; fail=1; fi

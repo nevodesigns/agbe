@@ -16,6 +16,14 @@
     "load_bearing": true,
     "description": "Nigeria has roughly one agricultural extension officer per few thousand farming households, and the districts with the fewest officers also have the least connectivity. AGBE carries established extension guidance on crops, pests, livestock, soils and post-harvest handling onto an 8 GB laptop that works with the network off. The pairing is load bearing rather than cosmetic: the entire training corpus is composed from a curated fact base of extension practice, and the model is trained to defer to a human extension officer wherever a confident answer would be unsafe, such as agrochemical dosing."
   },
+  "provenance": {
+    "base_model_source": "huggingface:google/gemma-3-1b-it",
+    "base_model_commit_sha": "dcc83ea841ab6100d6b47a070329e1ba4cf78752",
+    "fine_tuning_method": "lora",
+    "training_datasets": [
+      "AGBE agriculture corpus (original work, composed by corpus/generate.py from corpus/facts.json and hand-written exemplars in corpus/gold_*.py; 1,237 conversations; committed in full at corpus/build/train.jsonl; sha256 in provenance/checksums.json)"
+    ]
+  },
   "test_prompts": [
     {
       "prompt_id": "tp_001",
