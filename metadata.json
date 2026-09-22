@@ -42,7 +42,7 @@
     "packaging": "binary_bundle"
   },
   "_reproducibility": {
-    "git_commit_sha": "242236a04c95fbc7f684f864c49d333867c4d01b",
+    "git_commit_sha": "537f2df7ffd5b1614e1106730f3c18ccedc02ed1",
     "_note": "The repo commit this submission is made from, required by Gate 2 section 3.1. Named with a leading underscore because the official profiler validates metadata.json against a subschema with additionalProperties:false, and strips keys beginning with '_' before validating. A plain 'reproducibility' key makes adtc-profiler exit 2 without running. Set by tools/lock_commit.sh."
   },
   "_runtime": {

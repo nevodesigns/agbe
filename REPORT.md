@@ -640,13 +640,13 @@ Required by Gate 2 section 3.1. The supporting files are in
 [`provenance/`](provenance/), and [`provenance/README.md`](provenance/README.md)
 states the condition of each one.
 
-> **Which build these files describe.** The proof-of-training files in
-> `provenance/` come from the **v14 candidate** run: the corpus in this tree,
-> 1,194 conversations, 114 optimiser steps. The weights currently published at
-> the `download_model.sh` URL are still **v13**: 956 conversations, 90 steps.
-> `FINAL.json` describes v13 and every figure elsewhere in this report is v13's.
-> The two are not mixed, and the candidate does not replace the shipped build
-> until it has been measured against the batteries and beaten it.
+> **Which build these files describe.** Everything in `provenance/` comes from
+> the shipped build, **v16**: 1,237 conversations, 117 optimiser steps, final
+> GGUF sha256 `7c09e484…`, which is the file published at the `download_model.sh`
+> URL and pinned there to an exact Hugging Face commit. `FINAL.json`, this
+> report, the README and the build ledger all describe that same build, and
+> `tools/check_submission.sh` downloads the published weights and verifies the
+> checksum against the manifest.
 
 ### Base model and exact source
 
@@ -680,7 +680,7 @@ chatting in a sandbox never does.
 | Method | LoRA, rank 32, alpha 64, dropout 0.05 |
 | Target modules | `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` |
 | Trainable parameters | 26,091,520 of 1,026,000,000 (2.54%) |
-| Epochs / optimiser steps | 3 / 90 (shipped v13); 3 / 114 for the v14 candidate in `provenance/` |
+| Epochs / optimiser steps | 3 / 117 |
 | Learning rate | 1.5e-4, cosine, 6% warmup |
 | Precision | fp16 (T4 is Turing, bf16 is emulated) |
 | Loss masking | assistant turns only; user turns masked to −100 |
@@ -712,8 +712,9 @@ training data that nobody can trace.
 
 ### Proof of training, and one gap stated plainly
 
-**The LoRA adapter for the shipped v13 weights no longer exists**, and no adapter
-or training log can now be produced for it. It was written
+**The LoRA adapter for the earlier v13 build no longer exists**, and no adapter
+or training log can now be produced for it. v13 is not the submitted build; the
+shipped v16 adapter is committed in `provenance/adapter/`. It was written
 to `/kaggle/working/out/adapter` in a Kaggle session that has since expired, and
 only the GGUF was downloaded before that session ended. For the same reason there
 are no per-step loss files for v13: `report_to` was empty and `logging_steps=5`
