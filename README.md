@@ -12,7 +12,7 @@ and getting produce to market.
 ---
 
 
-**Demo video:** https://youtu.be/iQCgCXdy6Ww (105 seconds, real terminal sessions against the published weights)
+**Demo video:** https://youtu.be/sevKpLqCt-E (2 minutes: the pitch, a live terminal demo against the published v16 weights, and how it was measured)
 
 ## Try it in two commands
 
