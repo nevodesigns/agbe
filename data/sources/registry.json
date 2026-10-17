@@ -1,15 +1,100 @@
 {
-  "updated": "2026-10-17",
+  "updated": "2026-10-18",
   "sources": [
-    {"id": "cgspace_cc_by", "name": "CGSpace items with an explicit CC-BY-4.0, CC-BY-3.0 or CC0 licence", "publishers": ["IITA", "ILRI", "AfricaRice", "ICRISAT", "CIMMYT", "CIAT", "other CGIAR centres"], "tier": "A", "licence": "per item, read from the dcterms.license field", "status": "verified", "verified": "2026-10-17 via the CGSpace API: 30,587 items state CC-BY-4.0", "action": "harvest metadata (done), fetch full text next"},
-    {"id": "iita_unlicensed", "name": "IITA items on CGSpace with no licence field", "tier": "C", "licence": "none stated. IITA policy page says free reuse with acknowledgment, an older notice says non-commercial and no modification", "status": "verified", "verified": "2026-10-17", "action": "ask IITA for written permission"},
-    {"id": "fao_openknowledge", "name": "FAO publications (openknowledge.fao.org)", "tier": "B", "licence": "CC BY-NC-SA 3.0 IGO, commercial use needs a separate request", "status": "verified", "verified": "2026-10-17 from FAO copyright pages", "action": "evaluation only until FAO grants a licence"},
-    {"id": "cabi_plantwise", "name": "CABI PlantwisePlus Knowledge Bank factsheets", "tier": "C", "licence": "set per item, the CABI dataset on Hugging Face is CC BY-NC 4.0", "status": "verified", "verified": "2026-10-17", "action": "ask CABI for a commercial licence"},
-    {"id": "naerls", "name": "NAERLS extension guides (Nigeria)", "tier": "C", "licence": "unknown", "status": "to_verify", "action": "ask NAERLS for permission and for an extension reviewer"},
-    {"id": "agrovoc", "name": "FAO AGROVOC thesaurus", "tier": "A", "licence": "believed CC BY 4.0", "status": "to_verify", "action": "confirm licence, then use for vocabulary and multilingual term labels"},
-    {"id": "wikidata", "name": "Wikidata taxonomy of crops, pests and diseases", "tier": "A", "licence": "believed CC0", "status": "to_verify", "action": "confirm, use for names and synonyms"},
-    {"id": "faostat", "name": "FAOSTAT statistics", "tier": "A", "licence": "believed CC BY 4.0", "status": "to_verify", "action": "confirm; statistics, not advice"},
-    {"id": "farmerchat", "name": "Digital Green FarmerChat question dataset", "tier": "unknown", "licence": "unknown", "status": "to_verify", "action": "check the dataset card; useful only as a source of real farmer question phrasing"},
-    {"id": "masakhane", "name": "Masakhane and related African language datasets", "tier": "per dataset", "licence": "varies", "status": "to_verify", "action": "check each dataset before use; needed for Pidgin, Hausa, Yoruba and Igbo"}
+    {
+      "id": "cgspace_cc_by",
+      "name": "CGSpace items with an explicit CC-BY-4.0, CC-BY-3.0 or CC0 licence",
+      "publishers": [
+        "IITA",
+        "ILRI",
+        "AfricaRice",
+        "ICRISAT",
+        "CIMMYT",
+        "CIAT",
+        "other CGIAR centres"
+      ],
+      "tier": "A",
+      "licence": "per item, read from the dcterms.license field",
+      "status": "verified",
+      "verified": "2026-10-17 via the CGSpace API: 30,587 items state CC-BY-4.0",
+      "action": "harvest metadata (done), fetch full text next",
+      "harvested": "2026-10-18: 4,785 Tier A items (metadata), 1,438 IITA-affiliated; sample limited to 200 per topic"
+    },
+    {
+      "id": "iita_unlicensed",
+      "name": "IITA items on CGSpace with no licence field",
+      "tier": "C",
+      "licence": "none stated. IITA policy page says free reuse with acknowledgment, an older notice says non-commercial and no modification",
+      "status": "verified",
+      "verified": "2026-10-17",
+      "action": "ask IITA for written permission",
+      "note": "IITA items dated 2019 onward mostly carry CC-BY-4.0 and are already in the Tier A list; older items without a licence field stay Tier C"
+    },
+    {
+      "id": "fao_openknowledge",
+      "name": "FAO publications (openknowledge.fao.org)",
+      "tier": "B",
+      "licence": "CC BY-NC-SA 3.0 IGO, commercial use needs a separate request",
+      "status": "verified",
+      "verified": "2026-10-17 from FAO copyright pages",
+      "action": "evaluation only until FAO grants a licence"
+    },
+    {
+      "id": "cabi_plantwise",
+      "name": "CABI PlantwisePlus Knowledge Bank factsheets",
+      "tier": "C",
+      "licence": "set per item, the CABI dataset on Hugging Face is CC BY-NC 4.0",
+      "status": "verified",
+      "verified": "2026-10-17",
+      "action": "ask CABI for a commercial licence"
+    },
+    {
+      "id": "naerls",
+      "name": "NAERLS extension guides (Nigeria)",
+      "tier": "C",
+      "licence": "unknown",
+      "status": "to_verify",
+      "action": "ask NAERLS for permission and for an extension reviewer"
+    },
+    {
+      "id": "agrovoc",
+      "name": "FAO AGROVOC thesaurus",
+      "tier": "A",
+      "licence": "believed CC BY 4.0",
+      "status": "to_verify",
+      "action": "confirm licence, then use for vocabulary and multilingual term labels"
+    },
+    {
+      "id": "wikidata",
+      "name": "Wikidata taxonomy of crops, pests and diseases",
+      "tier": "A",
+      "licence": "believed CC0",
+      "status": "to_verify",
+      "action": "confirm, use for names and synonyms"
+    },
+    {
+      "id": "faostat",
+      "name": "FAOSTAT statistics",
+      "tier": "A",
+      "licence": "believed CC BY 4.0",
+      "status": "to_verify",
+      "action": "confirm; statistics, not advice"
+    },
+    {
+      "id": "farmerchat",
+      "name": "Digital Green FarmerChat question dataset",
+      "tier": "unknown",
+      "licence": "unknown",
+      "status": "to_verify",
+      "action": "check the dataset card; useful only as a source of real farmer question phrasing"
+    },
+    {
+      "id": "masakhane",
+      "name": "Masakhane and related African language datasets",
+      "tier": "per dataset",
+      "licence": "varies",
+      "status": "to_verify",
+      "action": "check each dataset before use; needed for Pidgin, Hausa, Yoruba and Igbo"
+    }
   ]
 }

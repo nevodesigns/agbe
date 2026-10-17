@@ -65,62 +65,71 @@ def record(it, topic, lic):
     }
 
 
+def fetch(topic, q, lic, page):
+    query = f'({q}) AND dcterms.license:"{lic}"'
+    for attempt in range(3):
+        try:
+            d = get({"query": query, "size": 100, "page": page, "dsoType": "ITEM"})
+            return topic, lic, page, d["_embedded"]["searchResult"]["_embedded"]["objects"]
+        except Exception:
+            time.sleep(3 * (attempt + 1))
+    print("giving up", topic, lic, page, flush=True)
+    return topic, lic, page, []
+
+
+def keep(it):
+    md = it["metadata"]
+    if (vals(md, "dcterms.type") or [None])[0] not in TYPES:
+        return False
+    if (vals(md, "dcterms.language") or ["en"])[0] not in ("en", "fr"):
+        return False
+    reg = " ".join(vals(md, "cg.coverage.region") + vals(md, "cg.coverage.country")).lower()
+    return not reg or any(h in reg for h in AFRICA_HINT)
+
+
 def main():
+    from concurrent.futures import ThreadPoolExecutor
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="data/sources/cgspace_tier_a.jsonl")
-    ap.add_argument("--pages", type=int, default=3, help="pages of 100 per topic and licence")
+    ap.add_argument("--pages", type=int, default=2, help="pages of 100 per topic for CC-BY-4.0")
+    ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--summary", default="data/sources/cgspace_summary.json")
     a = ap.parse_args()
+    # CC-BY-4.0 is the bulk, so it is searched per topic. The rare Tier A licences are fetched whole and filtered here.
+    jobs = [(t, q, "CC-BY-4.0", p) for t, q in TOPICS.items() for p in range(a.pages)]
+    jobs += [("any", "agriculture OR crop OR livestock OR farming OR soil", lic, p) for lic in ("CC0-1.0", "CC-BY-3.0", "Public Domain") for p in range(2)]
     items, counts = {}, collections.Counter()
-    excluded = collections.Counter()
-    for topic, q in TOPICS.items():
-        for lic in TIER_A:
-            for page in range(a.pages):
-                query = f'({q}) AND dcterms.license:"{lic}"'
-                try:
-                    d = get({"query": query, "size": 100, "page": page, "dsoType": "ITEM"})
-                except Exception as e:  # keep going, record nothing for this page
-                    print("skip", topic, lic, page, e); break
-                objs = d["_embedded"]["searchResult"]["_embedded"]["objects"]
-                for o in objs:
-                    it = o["_embedded"]["indexableObject"]
-                    md = it["metadata"]
-                    if (vals(md, "dcterms.type") or [None])[0] not in TYPES:
-                        continue
-                    if (vals(md, "dcterms.language") or ["en"])[0] not in ("en", "fr"):
-                        continue
-                    reg = " ".join(vals(md, "cg.coverage.region") + vals(md, "cg.coverage.country")).lower()
-                    if reg and not any(h in reg for h in AFRICA_HINT):
-                        continue
-                    h = it.get("handle")
-                    if h in items:
-                        if topic not in items[h]["topics"]:
-                            items[h]["topics"].append(topic)
-                    else:
-                        items[h] = record(it, topic, lic)
-                    counts[topic] += 1
-                if len(objs) < 100:
-                    break
-                time.sleep(0.25)
-            time.sleep(0.25)
-        for lic in EXCLUDED_COUNTED:
-            try:
-                d = get({"query": f'({q}) AND dcterms.license:"{lic}"', "size": 1, "dsoType": "ITEM"})
-                excluded[lic] += d["_embedded"]["searchResult"]["page"]["totalElements"]
-            except Exception:
-                pass
-        print(f"{topic:22s} total unique so far {len(items)}")
+    with ThreadPoolExecutor(a.workers) as ex:
+        for n, (topic, lic, page, objs) in enumerate(ex.map(lambda j: fetch(*j), jobs), 1):
+            for o in objs:
+                it = o["_embedded"]["indexableObject"]
+                if not keep(it):
+                    continue
+                h = it.get("handle")
+                if h in items:
+                    if topic not in items[h]["topics"]:
+                        items[h]["topics"].append(topic)
+                else:
+                    items[h] = record(it, topic, lic)
+                counts[topic] += 1
+            print(f"{n}/{len(jobs)} {topic:20s} {lic:10s} p{page} unique={len(items)}", flush=True)
+    excluded = {}
+    for lic in EXCLUDED_COUNTED:
+        try:
+            d = get({"query": f'dcterms.license:"{lic}"', "size": 1, "dsoType": "ITEM"})
+            excluded[lic] = d["_embedded"]["searchResult"]["page"]["totalElements"]
+        except Exception:
+            excluded[lic] = None
     with open(a.out, "w") as f:
         for r in sorted(items.values(), key=lambda r: (r["issued"] or "", r["handle"] or "")):
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    by_lic = collections.Counter(r["licence"] for r in items.values())
-    by_aff = collections.Counter(x for r in items.values() for x in r["affiliation"])
-    summary = {"harvested": time.strftime("%Y-%m-%d"), "unique_items": len(items), "by_licence": by_lic,
-               "by_topic_hits": counts, "top_affiliations": by_aff.most_common(15),
-               "excluded_not_tier_a_hits_counted_only": excluded,
-               "note": "Metadata only. Full text is fetched in a later step, and only for items listed here."}
+    summary = {"harvested": time.strftime("%Y-%m-%d"), "unique_items": len(items),
+               "by_licence": collections.Counter(r["licence"] for r in items.values()),
+               "by_topic_hits": counts, "top_affiliations": collections.Counter(x for r in items.values() for x in r["affiliation"]).most_common(15),
+               "excluded_not_tier_a_total_items_on_cgspace_counted_only": excluded,
+               "note": "Metadata only. Full text is fetched in a later step, and only for items listed here. Limited to 100 x pages per topic, so this is a sample, not the whole of Tier A."}
     json.dump(summary, open(a.summary, "w"), indent=1, ensure_ascii=False)
-    print(json.dumps(summary, indent=1, ensure_ascii=False)[:1800])
+    print(json.dumps(summary, indent=1, ensure_ascii=False)[:1500])
 
 
 if __name__ == "__main__":
