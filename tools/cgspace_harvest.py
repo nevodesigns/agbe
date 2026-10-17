@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+"""Build the Tier A source list from CGSpace metadata (no full text is downloaded here).
+
+Tier A means the item states an open licence that allows commercial reuse with attribution:
+CC-BY-4.0, CC-BY-3.0, CC0-1.0 or public domain. Items with no stated licence are NOT Tier A, even
+when the publisher's policy says "free to reuse with acknowledgment". NC and SA licences are counted
+for transparency and never emitted.
+
+    python3 tools/cgspace_harvest.py --out data/sources/cgspace_tier_a.jsonl
+"""
+from __future__ import annotations
+
+import argparse, collections, json, time, urllib.parse, urllib.request
+
+API = "https://cgspace.cgiar.org/server/api/discover/search/objects"
+TIER_A = ["CC-BY-4.0", "CC-BY-3.0", "CC0-1.0", "Public Domain"]
+EXCLUDED_COUNTED = ["CC-BY-NC-4.0", "CC-BY-NC-SA-3.0", "CC-BY-SA-4.0", "CC-BY-NC-3.0"]
+TYPES = {"Report", "Brief", "Journal Article", "Book", "Book Chapter", "Manual", "Training Material",
+         "Working Paper", "Extension Material", "Poster", "Thesis", "Conference Paper", "Case Study",
+         "Newsletter", "Annual Report", "Guide", "Handbook"}
+
+TOPICS = {
+    "maize": "maize", "cassava": "cassava", "yam": "yam", "rice": "rice", "sorghum": "sorghum OR millet",
+    "cowpea": "cowpea", "groundnut": "groundnut OR peanut", "tomato": "tomato", "plantain": "plantain OR banana",
+    "soybean": "soybean", "cocoa": "cocoa", "oil_palm": "oil palm", "sweet_potato": "sweet potato",
+    "pepper": "pepper AND (chilli OR capsicum)", "onion": "onion",
+    "fall_armyworm": "fall armyworm", "stem_borer": "stem borer", "striga": "striga", "aflatoxin": "aflatoxin",
+    "cassava_mosaic": "cassava mosaic", "cassava_brown_streak": "cassava brown streak", "whitefly": "whitefly",
+    "blight": "late blight OR early blight", "bacterial_wilt": "bacterial wilt", "nematode": "nematode",
+    "poultry": "poultry OR chicken", "newcastle": "newcastle disease", "coccidiosis": "coccidiosis",
+    "goat_sheep": "goat OR sheep", "ppr": "peste des petits ruminants", "cattle": "cattle", "pig": "pig OR swine",
+    "aquaculture": "catfish OR aquaculture OR tilapia",
+    "soil_fertility": "soil fertility", "fertilizer": "fertilizer OR fertiliser", "nitrogen": "nitrogen deficiency",
+    "intercropping": "intercropping", "seed_system": "seed system OR improved varieties",
+    "postharvest": "postharvest OR post-harvest OR storage", "drying": "grain drying", "weed": "weed management",
+    "pesticide_safety": "pesticide safety OR pesticide use", "extension": "extension advisory services",
+    "climate_adaptation": "climate-smart agriculture", "irrigation": "irrigation", "market_access": "agricultural markets smallholder",
+}
+AFRICA_HINT = ("africa", "nigeria", "ghana", "benin", "cameroon", "niger", "mali", "burkina", "senegal", "togo", "cote", "ivoire",
+               "tanzania", "kenya", "uganda", "ethiopia", "malawi", "zambia", "mozambique", "rwanda", "congo", "sierra leone", "liberia")
+
+
+def get(params):
+    url = API + "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={"User-Agent": "agbe-source-registry/1.0 (nwokoloebube21@gmail.com)"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return json.load(r)
+
+
+def vals(md, key):
+    return [m["value"] for m in md.get(key, [])]
+
+
+def record(it, topic, lic):
+    md = it["metadata"]
+    regions = vals(md, "cg.coverage.region") + vals(md, "cg.coverage.country")
+    return {
+        "handle": it.get("handle"), "uri": (vals(md, "dc.identifier.uri") or [None])[0], "title": it.get("name"),
+        "authors": vals(md, "dc.contributor.author")[:12], "issued": (vals(md, "dcterms.issued") or [None])[0],
+        "type": (vals(md, "dcterms.type") or [None])[0], "licence": lic, "language": (vals(md, "dcterms.language") or [None])[0],
+        "regions": regions, "affiliation": vals(md, "cg.contributor.affiliation")[:6],
+        "subjects": (vals(md, "dcterms.subject") + vals(md, "cg.subject.iita"))[:12],
+        "abstract": " ".join(vals(md, "dcterms.abstract"))[:2500], "doi": (vals(md, "cg.identifier.doi") or [None])[0],
+        "citation": (vals(md, "dcterms.bibliographicCitation") or [None])[0], "topics": [topic],
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default="data/sources/cgspace_tier_a.jsonl")
+    ap.add_argument("--pages", type=int, default=3, help="pages of 100 per topic and licence")
+    ap.add_argument("--summary", default="data/sources/cgspace_summary.json")
+    a = ap.parse_args()
+    items, counts = {}, collections.Counter()
+    excluded = collections.Counter()
+    for topic, q in TOPICS.items():
+        for lic in TIER_A:
+            for page in range(a.pages):
+                query = f'({q}) AND dcterms.license:"{lic}"'
+                try:
+                    d = get({"query": query, "size": 100, "page": page, "dsoType": "ITEM"})
+                except Exception as e:  # keep going, record nothing for this page
+                    print("skip", topic, lic, page, e); break
+                objs = d["_embedded"]["searchResult"]["_embedded"]["objects"]
+                for o in objs:
+                    it = o["_embedded"]["indexableObject"]
+                    md = it["metadata"]
+                    if (vals(md, "dcterms.type") or [None])[0] not in TYPES:
+                        continue
+                    if (vals(md, "dcterms.language") or ["en"])[0] not in ("en", "fr"):
+                        continue
+                    reg = " ".join(vals(md, "cg.coverage.region") + vals(md, "cg.coverage.country")).lower()
+                    if reg and not any(h in reg for h in AFRICA_HINT):
+                        continue
+                    h = it.get("handle")
+                    if h in items:
+                        if topic not in items[h]["topics"]:
+                            items[h]["topics"].append(topic)
+                    else:
+                        items[h] = record(it, topic, lic)
+                    counts[topic] += 1
+                if len(objs) < 100:
+                    break
+                time.sleep(0.25)
+            time.sleep(0.25)
+        for lic in EXCLUDED_COUNTED:
+            try:
+                d = get({"query": f'({q}) AND dcterms.license:"{lic}"', "size": 1, "dsoType": "ITEM"})
+                excluded[lic] += d["_embedded"]["searchResult"]["page"]["totalElements"]
+            except Exception:
+                pass
+        print(f"{topic:22s} total unique so far {len(items)}")
+    with open(a.out, "w") as f:
+        for r in sorted(items.values(), key=lambda r: (r["issued"] or "", r["handle"] or "")):
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    by_lic = collections.Counter(r["licence"] for r in items.values())
+    by_aff = collections.Counter(x for r in items.values() for x in r["affiliation"])
+    summary = {"harvested": time.strftime("%Y-%m-%d"), "unique_items": len(items), "by_licence": by_lic,
+               "by_topic_hits": counts, "top_affiliations": by_aff.most_common(15),
+               "excluded_not_tier_a_hits_counted_only": excluded,
+               "note": "Metadata only. Full text is fetched in a later step, and only for items listed here."}
+    json.dump(summary, open(a.summary, "w"), indent=1, ensure_ascii=False)
+    print(json.dumps(summary, indent=1, ensure_ascii=False)[:1800])
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,13 @@
+{
+  "id": "string, unique, for example g_cassava_001",
+  "question": "the farmer's words",
+  "language": "en | pcm | ha | yo | ig",
+  "crop_or_animal": "string",
+  "category": "diagnosis | management | livestock | soil_nutrition | postharvest | safety_refusal | clarify",
+  "expected_claims": [{"claim": "one atomic fact the answer must contain", "source_id": "handle or doc id", "location": "page or section"}],
+  "must_not_claim": ["claims that would be wrong or unsafe"],
+  "must_refuse": "true if the correct behaviour is to decline (dose, medicine, illegal use)",
+  "must_defer_to": "extension officer | vet | clinic | label | none",
+  "reviewer": "name or initials of the expert",
+  "status": "draft | reviewed | rejected"
+}
