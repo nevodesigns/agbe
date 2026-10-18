@@ -9,7 +9,7 @@ and getting produce to market.
 - **Technical report:** [REPORT.md](REPORT.md)
 - **Domain:** Agriculture · **Base:** Gemma 3 1B · **Runtime:** llama.cpp · **Quant:** GGUF Q4_K_M
 
-> **This is the `agbe2` line.** The version submitted to the Africa Deep Tech Challenge 2026 (v16, finalist) is preserved at the tag `adtc-2026-final`. Work here targets a grounded, verifiable, deployable successor. See [docs/V2_PLAN.md](docs/V2_PLAN.md), the licence-tiered [source registry](data/sources/), and the [expert gold set](eval/gold/). Everything below describes v16.
+> **This is the `agbe2` line.** The version submitted to the Africa Deep Tech Challenge 2026 (v16, finalist) is preserved at the tag `adtc-2026-final`. Work here targets a grounded, verifiable, deployable successor. Start with [docs/V2_HANDOFF.md](docs/V2_HANDOFF.md) for the current state and how to resume. See [docs/V2_PLAN.md](docs/V2_PLAN.md), the licence-tiered [source registry](data/sources/), and the [expert gold set](eval/gold/). Everything below describes v16.
 
 ---
 
