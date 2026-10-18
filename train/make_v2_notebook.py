@@ -5,7 +5,7 @@
 """
 import json, pathlib
 
-OUT = pathlib.Path(__file__).resolve().parent / "AGBE_v2_Kaggle.ipynb"
+HERE = pathlib.Path(__file__).resolve().parent
 cells = []
 
 
@@ -19,11 +19,7 @@ md("""
 Run the cells from top to bottom. Each stage saves its result to a private Hugging Face dataset repo, so if Kaggle disconnects you
 can start the notebook again and it picks up where it stopped (cells skip work that is already done).
 
-**How to run it (three sessions, each one click):** the whole pipeline is too long for one free GPU session, so it has stage switches. In the first code cell set `STAGES` and press **Save Version, Save & Run All**. Kaggle then runs it in the background and you can close the browser.
-- Session 1: `STAGES = ["A"]` (bake-off, about 2 to 3 hours). Read the result table.
-- Session 2: `STAGES = ["B"]` (claims, questions, training data, about 3 to 4 hours).
-- Session 3: `STAGES = ["C", "D", "E"]` (pick base, train, export, re-test, about 3 hours).
-Each session starts by restoring the previous ones from your Hugging Face repo.
+**This is session @@N@@ of 3: @@WHAT@@.** Nothing to edit. Press **Save Version, then Save & Run All**: Kaggle runs it in the background and you can close the browser. When it finishes, open the next notebook (the three share their work through your Hugging Face repo, so each one starts by restoring the earlier ones).
 
 **Before you start (once):**
 1. Right side, **Session options**: Accelerator **GPU T4 x2**, Internet **On**.
@@ -41,7 +37,7 @@ from kaggle_secrets import UserSecretsClient
 _s = UserSecretsClient()
 try: os.environ["HF_TOKEN"] = _s.get_secret("HF_WRITE_TOKEN")   # your write token wins
 except Exception: os.environ["HF_TOKEN"] = _s.get_secret("HF_TOKEN")
-STAGES = ["A"]                         # session 1: ["A"], session 2: ["B"], session 3: ["C", "D", "E"]
+STAGES = @@STAGES@@                    # already set for this notebook, nothing to edit
 HF_REPO = "NEVODESIGN/agbe-v2-work"   # private dataset repo that keeps your work between sessions (change if your token cannot write there)
 RUN = "run1"
 BAKEOFF_SAMPLE = 60                    # prompts per model in the bake-off; raise it later for a fuller test
@@ -143,6 +139,16 @@ In the right panel, **Output**, under `work/`: `agbe-v2-q4_k_m.gguf` (the model)
 Send the stage E table back, and the model is next measured on the real target (CPU speed and memory).
 """)
 
-nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
-OUT.write_text(json.dumps(nb, indent=1))
-print("wrote", OUT, len(cells), "cells")
+SESSIONS = [
+    (1, '["A"]', "the bake-off of base models, about 2 to 3 hours", "AGBE_v2_1_bakeoff.ipynb"),
+    (2, '["B"]', "claims, questions and training data, about 3 to 4 hours", "AGBE_v2_2_data.ipynb"),
+    (3, '["C", "D", "E"]', "pick the base, train, export the GGUF and re-test, about 3 hours", "AGBE_v2_3_train.ipynb"),
+]
+meta = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}}
+for n, stages, what, fname in SESSIONS:
+    out_cells = []
+    for c in cells:
+        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", str(n)).replace("@@WHAT@@", what)
+        out_cells.append(dict(c, source=src.splitlines(keepends=True)))
+    (HERE / fname).write_text(json.dumps({"cells": out_cells, "metadata": meta, "nbformat": 4, "nbformat_minor": 5}, indent=1))
+    print("wrote", fname)
