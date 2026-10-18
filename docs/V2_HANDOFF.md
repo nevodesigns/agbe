@@ -2,6 +2,23 @@
 
 Read this first if you are picking the work up cold, whether you are me in a new session or a person. It records what exists, why, what is verified, what is not, and what to do next. Update it when something meaningful changes. Last updated 18 October 2026 (evening).
 
+## 0. Status board (19 October 2026, end of day)
+
+| Item | State |
+|---|---|
+| v16 competition record | Frozen at tag `adtc-2026-final` (commit 1d32e67). ADTC finished 17 Oct. The live-event result is not recorded here. |
+| Tier A data | 7,890 items listed; 8,062 passages from 279 documents in `data/fulltext_v1/` |
+| Guard, endpoint, evaluation, CI | Built and tested on CPU (all unit tests pass, CI green) |
+| Kaggle notebook 1 (bake-off) | Done. Results in `docs/BAKEOFF_RESULTS.md` |
+| Kaggle notebook 2 (claims, questions, training data) | Was running (about 168 of 590 passages when last seen). Outputs save to the private Hugging Face repo `NEVODESIGN/agbe-v2-work` |
+| Kaggle notebook 3 (train three bases, export GGUF, held-out test) | Ready, not run. Re-import the newest file after notebook 2 finishes |
+| Trained v2 model | None yet |
+| Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
+| Agronomist | Not found yet |
+| Untested on a GPU | batched extraction, question generation, `train_grounded.py`, `merge_adapter.py`, `export_gguf.sh` |
+
+The complete private record (people, accounts, business arrangements, all file locations) is kept outside this repository.
+
 ## 1. Where things stand
 
 AGBE v16 (1B Gemma, GGUF Q4_K_M) was submitted to the Africa Deep Tech Challenge 2026 and reached the final (10 of 291 submissions). The competition is over. The goal now is a production-grade, deployable, grounded successor that stands up against global entries: a model, an endpoint, and a system that can run as a local LLM or as a feature inside another product.
