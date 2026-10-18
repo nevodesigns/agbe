@@ -1,0 +1,14 @@
+# docker compose up. Put the GGUF in ./model and the passages in ./data/fulltext/passages.jsonl first.
+# Set AGBE_API_KEYS to require a key. Untested until built on a machine with docker.
+services:
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: ["-m", "/models/agbe-1b-q4_k_m.gguf", "--host", "0.0.0.0", "--port", "8080", "-c", "4096", "-t", "4"]
+    volumes: ["./model:/models:ro"]
+  agbe:
+    build: .
+    depends_on: [llama]
+    environment:
+      - AGBE_API_KEYS=${AGBE_API_KEYS:-}
+    volumes: ["./data/fulltext:/data:ro"]
+    ports: ["8080:8080"]

@@ -1,0 +1,22 @@
+name: tests
+on:
+  push:
+    branches: [agbe2]
+  pull_request:
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r serve/requirements.txt httpx
+      - name: Claim checker
+        run: cd eval && python -m unittest test_claim_check
+      - name: Claim extraction verifier
+        run: cd tools && python -m unittest test_extract_claims
+      - name: Inference guard and endpoint
+        run: AGBE_AUTOSTART=0 python -m unittest serve.test_guard serve.test_app
+      - name: Guard rules against the attack batteries
+        run: python eval/measure_guard.py
