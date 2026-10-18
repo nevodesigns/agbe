@@ -18,7 +18,7 @@
       "status": "verified",
       "verified": "2026-10-17 via the CGSpace API: 30,587 items state CC-BY-4.0",
       "action": "harvest metadata (done), fetch full text next",
-      "harvested": "2026-10-18: 4,785 Tier A items (metadata), 1,438 IITA-affiliated; sample limited to 200 per topic"
+      "harvested": "2026-10-18: 7,890 Tier A items (metadata), 2,962 IITA-affiliated; a sample (up to 500 per topic) of the 30,587 CC-BY-4.0 items on CGSpace"
     },
     {
       "id": "iita_unlicensed",

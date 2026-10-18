@@ -1,121 +1,103 @@
 {
- "harvested": "2026-10-18",
- "unique_items": 4785,
+ "merged": "2026-10-18",
+ "unique_items": 7890,
  "by_licence": {
-  "CC-BY-4.0": 4597,
-  "CC0-1.0": 55,
+  "CC-BY-4.0": 7702,
   "CC-BY-3.0": 132,
+  "CC0-1.0": 55,
   "Public Domain": 1
  },
- "by_topic_hits": {
-  "maize": 149,
-  "cassava": 157,
-  "yam": 182,
-  "rice": 113,
-  "sorghum": 162,
-  "cowpea": 157,
-  "groundnut": 167,
-  "tomato": 133,
-  "plantain": 154,
-  "soybean": 156,
-  "cocoa": 124,
-  "oil_palm": 88,
-  "sweet_potato": 118,
-  "pepper": 150,
-  "onion": 115,
-  "fall_armyworm": 170,
-  "stem_borer": 156,
-  "striga": 189,
-  "aflatoxin": 161,
-  "cassava_mosaic": 146,
-  "cassava_brown_streak": 158,
-  "whitefly": 143,
-  "blight": 124,
-  "bacterial_wilt": 150,
-  "nematode": 158,
-  "poultry": 146,
-  "newcastle": 154,
-  "coccidiosis": 39,
-  "goat_sheep": 134,
-  "ppr": 148,
-  "cattle": 120,
-  "pig": 120,
-  "aquaculture": 114,
-  "soil_fertility": 160,
-  "fertilizer": 157,
-  "nitrogen": 178,
-  "intercropping": 149,
-  "seed_system": 161,
-  "postharvest": 157,
-  "drying": 168,
-  "weed": 149,
-  "pesticide_safety": 119,
-  "extension": 154,
-  "climate_adaptation": 112,
-  "irrigation": 111,
-  "market_access": 131,
-  "any": 188
- },
+ "iita_affiliated": 2962,
  "top_affiliations": [
   [
    "International Institute of Tropical Agriculture",
-   1437
+   1920
   ],
   [
    "International Livestock Research Institute",
-   957
+   1717
   ],
   [
    "International Center for Tropical Agriculture",
-   524
-  ],
-  [
-   "International Food Policy Research Institute",
-   278
+   908
   ],
   [
    "International Potato Center",
-   264
+   526
+  ],
+  [
+   "International Food Policy Research Institute",
+   506
   ],
   [
    "International Maize and Wheat Improvement Center",
-   251
+   435
   ],
   [
    "Bioversity International",
-   246
+   426
   ],
   [
    "International Water Management Institute",
-   163
-  ],
-  [
-   "International Crops Research Institute for the Semi-Arid Tropics",
-   151
+   301
   ],
   [
    "Bioversity International and International Center for Tropical Agriculture",
-   150
+   264
   ],
   [
    "Wageningen University & Research",
-   142
+   246
+  ]
+ ],
+ "top_topics": [
+  [
+   "striga",
+   419
   ],
   [
-   "Makerere University",
-   141
+   "cowpea",
+   413
   ],
   [
-   "International Center for Agricultural Research in the Dry Areas",
-   136
+   "sorghum",
+   411
   ],
   [
-   "International Rice Research Institute",
-   119
+   "nitrogen",
+   409
   ],
   [
-   "University of Ibadan",
-   111
+   "yam",
+   409
+  ],
+  [
+   "seed_system",
+   397
+  ],
+  [
+   "soil_fertility",
+   396
+  ],
+  [
+   "drying",
+   392
+  ],
+  [
+   "soybean",
+   392
+  ],
+  [
+   "groundnut",
+   390
+  ],
+  [
+   "fertilizer",
+   389
+  ],
+  [
+   "maize",
+   387
   ]
  ],
  "excluded_not_tier_a_total_items_on_cgspace_counted_only": {
@@ -124,5 +106,5 @@
   "CC-BY-SA-4.0": 607,
   "CC-BY-NC-3.0": 231
  },
- "note": "Metadata only. Full text is fetched in a later step, and only for items listed here. Limited to 100 x pages per topic, so this is a sample, not the whole of Tier A."
+ "note": "Merge of the 200-per-topic and 500-per-topic harvests. Metadata only. Still a sample of the 30,587 CC-BY-4.0 items on CGSpace."
 }
