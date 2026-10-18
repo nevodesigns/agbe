@@ -41,7 +41,7 @@ EXTRACT_PASSAGES = 1000                # best passages to extract claims from; r
 PROFILE = "edge"                       # "edge" trains the best model of about 2B parameters or less, "server" the best model overall
 ''')
 code('''
-!git clone -q -b agbe2 https://github.com/nevodesigns/agbe.git /kaggle/working/agbe
+!git clone -q --depth 1 -b agbe2 https://github.com/nevodesigns/agbe.git /kaggle/working/agbe
 %cd /kaggle/working/agbe
 !pip -q install -U "transformers>=4.46" accelerate bitsandbytes peft trl datasets huggingface_hub
 WORK = pathlib.Path("/kaggle/working/work"); WORK.mkdir(exist_ok=True)
