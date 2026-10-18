@@ -23,6 +23,8 @@ import argparse, json, random
 def to_prompt_completion(tok, rec):
     msgs = rec["messages"]
     prompt = tok.apply_chat_template(msgs[:-1], tokenize=False, add_generation_prompt=True)
+    if tok.bos_token and prompt.startswith(tok.bos_token):  # the trainer adds BOS itself, so a second one would be a double BOS
+        prompt = prompt[len(tok.bos_token):]
     return {"prompt": prompt, "completion": msgs[-1]["content"] + (tok.eos_token or "")}
 
 
