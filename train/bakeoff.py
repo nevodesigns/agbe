@@ -53,6 +53,18 @@ def build_messages(q: str, passages: list[dict] | None):
     return [{"role": "system", "content": SYSTEM + "\n\n" + RAG_RULE + src}, {"role": "user", "content": q}]
 
 
+def encode_chat(tok, messages, device):
+    """Chat-template the messages and move them to the device. Works across transformers versions: newer ones return a
+    BatchEncoding (a dict) from apply_chat_template, older ones return a bare tensor."""
+    try:
+        enc = tok.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt", return_dict=True, enable_thinking=False)
+    except TypeError:
+        enc = tok.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt", return_dict=True)
+    if not hasattr(enc, "keys"):
+        enc = {"input_ids": enc}
+    return {k: v.to(device) for k, v in enc.items()}
+
+
 def load_generator(model_id: str, load_4bit: bool, max_new: int):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -65,12 +77,9 @@ def load_generator(model_id: str, load_4bit: bool, max_new: int):
     model = AutoModelForCausalLM.from_pretrained(model_id, **kw)
 
     def gen(messages):
-        try:
-            ids = tok.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt", enable_thinking=False).to(model.device)
-        except TypeError:
-            ids = tok.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt").to(model.device)
-        out = model.generate(ids, max_new_tokens=max_new, do_sample=False, repetition_penalty=1.05)
-        return tok.decode(out[0][ids.shape[1]:], skip_special_tokens=True).strip()
+        enc = encode_chat(tok, messages, model.device)
+        out = model.generate(**enc, max_new_tokens=max_new, do_sample=False, repetition_penalty=1.05)
+        return tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
 
     def close():
         nonlocal model
@@ -150,7 +159,12 @@ def main():
             print("could not load", m, str(e)[:120], flush=True)
             continue
         for mode in a.modes:
-            res = run_model(m, gen, rows, retr, mode)
+            try:
+                res = run_model(m, gen, rows, retr, mode)
+            except Exception:
+                import traceback
+                print("MODEL FAILED", m, mode, "\n", traceback.format_exc()[-600:], flush=True)
+                continue
             slug = re.sub(r"[^A-Za-z0-9]+", "_", m) + "_" + mode
             (out / f"{slug}.json").write_text(json.dumps(res, indent=1))
             table[f"{m} [{mode}]"] = summarise(res)
