@@ -25,7 +25,9 @@ import argparse, collections, gc, json, math, pathlib, re, statistics, sys, time
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "eval"))
 import run_eval  # noqa: E402
-from claim_check import check_answer, content_tokens  # noqa: E402
+from claim_check import check_answer  # noqa: E402
+sys.path.insert(0, str(ROOT))
+from serve.retrieval import Retriever  # noqa: E402
 
 DEFAULT_MODELS = [
     "google/gemma-3-1b-it", "google/gemma-3-4b-it", "Qwen/Qwen3-1.7B", "Qwen/Qwen3-4B-Instruct-2507",
@@ -42,28 +44,6 @@ Rules:
 - If you are not sure, say you do not know. Do not invent pests, products or numbers."""
 
 RAG_RULE = """Use only the numbered sources below. Cite them like [1]. If the sources do not answer the question, say you do not have a source for that and suggest asking an extension officer.\n\nSources:\n"""
-
-
-class Retriever:
-    """Small BM25 over passages, so the bake-off needs no extra libraries."""
-
-    def __init__(self, path: pathlib.Path):
-        self.rows = [json.loads(l) for l in open(path)] if path.exists() else []
-        self.toks = [content_tokens(r["text"]) for r in self.rows]
-        df = collections.Counter(t for ts in self.toks for t in ts)
-        n = max(1, len(self.rows))
-        self.idf = {t: math.log(1 + (n - c + 0.5) / (c + 0.5)) for t, c in df.items()}
-        self.avg = statistics.mean([len(t) for t in self.toks]) if self.toks else 1
-
-    def top(self, q: str, k: int = 3):
-        qt = content_tokens(q)
-        scored = []
-        for i, ts in enumerate(self.toks):
-            s = sum(self.idf.get(t, 0) * (1.5 + 1) / (1 + 1.5 * (1 - 0.75 + 0.75 * len(ts) / self.avg)) for t in qt if t in ts)
-            if s > 0:
-                scored.append((s, i))
-        scored.sort(reverse=True)
-        return [self.rows[i] for _, i in scored[:k]]
 
 
 def build_messages(q: str, passages: list[dict] | None):

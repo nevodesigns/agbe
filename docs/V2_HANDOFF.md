@@ -1,6 +1,6 @@
 # AGBE v2 handoff
 
-Read this first if you are picking the work up cold, whether you are me in a new session or a person. It records what exists, why, what is verified, what is not, and what to do next. Update it when something meaningful changes. Last updated 18 October 2026.
+Read this first if you are picking the work up cold, whether you are me in a new session or a person. It records what exists, why, what is verified, what is not, and what to do next. Update it when something meaningful changes. Last updated 18 October 2026 (evening).
 
 ## 1. Where things stand
 
@@ -45,9 +45,12 @@ Registry with statuses: `data/sources/registry.json`. This is not legal advice.
 | `eval/claim_check.py`, `eval/test_claim_check.py` | Claim-level answer scorer (baseline, lexical), 6 tests pass | baseline |
 | `eval/run_eval.py` | The competition scorer. `score(row, answer)` is now a function, verified equal to the stored results on 994 rows | current |
 | `eval/gold/` | Expert gold-set schema, stub template, README. No stub is reviewed. | needs an agronomist |
+| `serve/` | The inference guard (hard rules, retrieval, claim check, stop policy), BM25 retriever, llama.cpp and OpenAI-style backends, FastAPI app with `/advise` and `/v1/chat/completions`, 14 tests. See `serve/README.md`. | works, tested |
 | `train/bakeoff.py`, `train/KAGGLE_BAKEOFF.md` | Base-model bake-off, plain and with retrieved sources. CPU dry run passes. | ready, needs a GPU session |
 
 ## 5. Findings so far
+
+- **v16 ignores retrieved sources** (it answers from its fine-tuned memory), so the guard abstains on everything when v16 is the generator. An instruction-following model (Qwen2.5-3B) gives cited, supported answers through the same guard. The v2 model must be trained to answer from sources.
 
 - A claim is accepted only if code proves it: the quote is verbatim in the passage, numbers match, content words match, it is not study language, and it is not a chemical rate (those go to `review`).
 - A rule-based extractor produces mostly research sentences and is useless for relevance. Its first dose detector let "10 ml herbicide diluted to 1 litre" through. The detector now flags any chemical word with a quantity, any mass or volume per area or volume, and dose wording.
@@ -56,18 +59,18 @@ Registry with statuses: `data/sources/registry.json`. This is not legal advice.
 
 ## 6. Resume here (in order)
 
-1. **Deeper harvest.** Started 18 Oct with `python3 tools/cgspace_harvest.py --pages 5 --out data/sources/cgspace_tier_a_deep.jsonl --summary data/sources/cgspace_summary_deep.json`. About 85% done when this was written (log at `/tmp/claude-1000/harvest3.log`, may be gone). If the files exist, merge them into the registry, gzip the jsonl, update `data/sources/README.md` and `registry.json`, commit. If not, rerun the command (about 2 hours).
+1. **Deeper harvest: DONE** (merged 18 Oct, 7,890 items). Originally started 18 Oct with `python3 tools/cgspace_harvest.py --pages 5 --out data/sources/cgspace_tier_a_deep.jsonl --summary data/sources/cgspace_summary_deep.json`. About 85% done when this was written (log at `/tmp/claude-1000/harvest3.log`, may be gone). If the files exist, merge them into the registry, gzip the jsonl, update `data/sources/README.md` and `registry.json`, commit. If not, rerun the command (about 2 hours).
 2. **Bake-off on Kaggle.** The owner runs `train/KAGGLE_BAKEOFF.md` and sends `summary.md`. Choose the top two models from that, not from any assumption.
 3. **Claim extraction at scale on Kaggle.** `python3 tools/extract_claims.py --backend transformers --model Qwen/Qwen2.5-7B-Instruct --passages passages.jsonl --out claims.jsonl`. Fetch more full text first (`tools/fetch_fulltext.py --all --limit 2000`, or `--pilot N` for a balanced sample). Prefer practical documents (manuals, briefs, extension material).
 4. **Agronomist audit** of a random sample of accepted claims, and the 500-question gold set.
 5. **Retrieval and inference guard:** index the verified claims and passages, add the claim-level checker at inference, and an answer-then-stop policy.
 6. **Staged training** on the best base: grounded SFT, preference training on supported versus unsupported answers, quantisation-aware export.
-7. **Serving and packaging:** OpenAI-compatible endpoint plus `/advise` with citations and confidence, container image, auth and quotas, CI gate on the batteries, model card, data-licence manifest, a phone build.
+7. **Serving and packaging (guard, endpoint and backends are built; still to do: source-grounded training, container image, CI gate, model card, phone build):** OpenAI-compatible endpoint plus `/advise` with citations and confidence, container image, auth and quotas, CI gate on the batteries, model card, data-licence manifest, a phone build.
 8. **Pilot** with one extension service.
 
 ## 7. For the owner (things only a person can do)
 
-- Send the permission emails. Confirm each address first. Known: FAO copyright@fao.org (and the licence request form), CABI enquiries@cabi.org. Find IITA's and NAERLS's contact pages.
+- Send the permission emails (now complete, with verified addresses, in `docs/outreach/permission-emails.md`). Confirm the Cc addresses flagged there first. Known: FAO copyright@fao.org (and the licence request form), CABI enquiries@cabi.org. Find IITA's and NAERLS's contact pages.
 - Find an agronomist.
 - Run the Kaggle notebooks.
 
