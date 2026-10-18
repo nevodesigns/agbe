@@ -44,3 +44,9 @@ Free tiers only for now: Kaggle (T4, weekly GPU quota) and Colab free. A 1B mode
 8. Pilot with an extension service.
 
 An agronomist is the single biggest lever. See `docs/AGRONOMIST_ROLE.md`.
+
+## Status (18 Oct 2026)
+
+- Done: licence-tiered registry; 4,785 Tier A items listed; full-text fetch and passage cutting (70 documents, 1,974 passages); claim verifier with tests; LLM extraction pilot (see `data/claims/README.md`); claim-level scorer; the competition scorer exposed as `eval/run_eval.score()` and checked against 994 stored rows with no differences; base-model bake-off script with a CPU dry run; Kaggle guide (`train/KAGGLE_BAKEOFF.md`).
+- Next, needs a GPU session: run the bake-off on Kaggle, and run claim extraction with a 7B model over the Tier A passages.
+- Next, needs a person: an agronomist to audit claims and write the gold set; sending the permission emails.

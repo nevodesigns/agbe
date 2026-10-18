@@ -24,3 +24,5 @@ internal/
 # video production tooling: the demo lives on YouTube, not in the submission
 video/
 data/sources/cgspace_tier_a.jsonl
+data/fulltext/
+data/claims/claims_extractive.jsonl
