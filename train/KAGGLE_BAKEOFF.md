@@ -1,3 +1,9 @@
+# Start here: the one-notebook route
+
+Upload **`train/AGBE_v2_Kaggle.ipynb`** (copy at `~/Downloads/agbe-kaggle/AGBE_v2_Kaggle.ipynb`) to Kaggle: Create, New Notebook, File, Import Notebook. It clones this repository, which already contains the passages (`data/fulltext_v1/`), so there is nothing else to upload. Set GPU T4 x2, Internet On, add the `HF_TOKEN` secret (write access), accept the Gemma and Llama terms on Hugging Face, then run the cells top to bottom. It does the bake-off, picks the base, extracts claims, builds the training set, trains, exports a GGUF and re-tests it, saving every stage to a private Hugging Face dataset repo so a disconnect loses nothing.
+
+Everything below is the manual version of stage A only.
+
 # Running the bake-off on free Kaggle compute
 
 1. New Kaggle notebook, accelerator **GPU T4 x2**, internet **on**.

@@ -126,10 +126,16 @@ def main():
     ap.add_argument("--load-4bit", action="store_true", help="use for 3B and 4B models on a 16 GB T4")
     ap.add_argument("--max-new", type=int, default=220)
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--sample", type=int, default=0, help="random sample of N prompts, taken across the prompt files in proportion (fixed seed)")
     ap.add_argument("--out", default=str(ROOT / "train/bakeoff_results"))
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
-    rows = [json.loads(l) for p in a.prompts for l in open(p) if l.strip()]
+    per_file = [[json.loads(l) for l in open(p) if l.strip()] for p in a.prompts]
+    rows = [r for f in per_file for r in f]
+    if a.sample and a.sample < len(rows):
+        import random
+        rnd = random.Random(1)
+        rows = [r for f in per_file for r in rnd.sample(f, max(1, round(a.sample * len(f) / len(rows))))]
     if a.limit:
         rows = rows[: a.limit]
     retr = Retriever(pathlib.Path(a.passages))

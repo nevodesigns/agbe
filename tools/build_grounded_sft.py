@@ -56,19 +56,28 @@ def stage_questions(a):
     passages = [p for p in passages if p["passage_id"] in accepted]
     if a.limit:
         passages = passages[: a.limit]
+    done_path = pathlib.Path(a.out + ".done")
+    done = set(done_path.read_text().split()) if a.resume and done_path.exists() else set()
+    todo = [p for p in passages if p["passage_id"] not in done]
+    print(f"{len(passages)} passages with accepted claims, {len(done)} done, {len(todo)} to do", flush=True)
     prompt = Q_PROMPT.format(n=2)
     if a.backend == "transformers":
-        gen = ec.make_transformers(a.model, prompt, ec.parse_string_list)
+        gen = ec.make_transformers(a.model, prompt, ec.parse_string_list, load_4bit=a.load_4bit, max_new=120)
     elif a.backend == "openai":
         gen = ec.make_openai(a.url, a.model, prompt, ec.parse_string_list)
     else:
         gen = ec.make_llamacli(a.model, prompt, ec.parse_string_list)
-    with open(a.out, "w") as out:
-        for i, p in enumerate(passages, 1):
-            out.write(json.dumps({"passage_id": p["passage_id"], "raw": gen(p)}) + "\n")
-            out.flush()
-            if i % 50 == 0:
-                print(i, len(passages), flush=True)
+    step = max(1, a.batch)
+    with open(a.out, "a" if a.resume else "w") as out, open(done_path, "a" if a.resume else "w") as dn:
+        for i in range(0, len(todo), step):
+            chunk = todo[i: i + step]
+            results = gen.batch(chunk) if (step > 1 and hasattr(gen, "batch")) else [gen(p) for p in chunk]
+            for p, qs in zip(chunk, results):
+                out.write(json.dumps({"passage_id": p["passage_id"], "raw": qs}) + "\n")
+                dn.write(p["passage_id"] + "\n")
+            out.flush(); dn.flush()
+            if (i // step) % 10 == 0:
+                print(i + len(chunk), "/", len(todo), flush=True)
 
 
 def overlap(q: str, claim: str) -> float:
@@ -139,6 +148,7 @@ def main():
     q.add_argument("--passages", required=True); q.add_argument("--claims", required=True); q.add_argument("--out", required=True)
     q.add_argument("--backend", choices=["transformers", "openai", "llamacli"], default="transformers")
     q.add_argument("--model", default="Qwen/Qwen2.5-7B-Instruct"); q.add_argument("--url", default="http://127.0.0.1:8080"); q.add_argument("--limit", type=int, default=0)
+    q.add_argument("--batch", type=int, default=1); q.add_argument("--load-4bit", action="store_true"); q.add_argument("--resume", action="store_true")
     c = sub.add_parser("compose")
     c.add_argument("--passages", required=True); c.add_argument("--claims", required=True); c.add_argument("--questions", required=True); c.add_argument("--out", required=True)
     c.add_argument("--abstain-share", type=float, default=0.15); c.add_argument("--refusal-share", type=float, default=0.12)

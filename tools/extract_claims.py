@@ -142,20 +142,33 @@ def parse_json_list(text: str) -> list[dict]:
     return out
 
 
-def make_transformers(model_id: str, prompt: str = None, parse=None):
+def make_transformers(model_id: str, prompt: str = None, parse=None, load_4bit: bool = False, max_new: int = 700):
+    """Hugging Face model on a GPU. run(p) does one passage, run.batch(ps) does several in one generate call (much faster).
+    UNTESTED without a GPU: written to the standard left-padded batch pattern."""
     import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
     tok = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16, device_map="auto")
-
+    tok.padding_side = "left"
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
+    kw = {"device_map": "auto"}
+    if load_4bit:
+        kw["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
+    else:
+        kw["torch_dtype"] = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+    model = AutoModelForCausalLM.from_pretrained(model_id, **kw)
     prompt = prompt or PROMPT
     parse = parse or parse_json_list
 
+    def batch(passages):
+        texts = [tok.apply_chat_template([{"role": "user", "content": prompt + p["text"]}], add_generation_prompt=True, tokenize=False) for p in passages]
+        enc = tok(texts, return_tensors="pt", padding=True, add_special_tokens=False).to(model.device)
+        out = model.generate(**enc, max_new_tokens=max_new, do_sample=False, pad_token_id=tok.pad_token_id)
+        return [parse(tok.decode(o[enc.input_ids.shape[1]:], skip_special_tokens=True)) for o in out]
+
     def run(passage):
-        msgs = [{"role": "user", "content": prompt + passage["text"]}]
-        ids = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt").to(model.device)
-        out = model.generate(ids, max_new_tokens=700, do_sample=False)
-        return parse(tok.decode(out[0][ids.shape[1]:], skip_special_tokens=True))
+        return batch([passage])[0]
+    run.batch = batch
     return run
 
 
@@ -191,6 +204,20 @@ def make_llamacli(gguf: str, prompt: str = None, parse=None):
     return run
 
 
+def prioritise(passages: list[dict], limit: int) -> list[dict]:
+    """Best first: instruction-like passages with no study language. A passage a farmer could act on scores high."""
+    scored = []
+    for p in passages:
+        if FIRST_PERSON.search(p["text"]):
+            continue
+        s = len(SIGNAL.findall(p["text"]))
+        if s >= 3 and 40 <= len(p["text"].split()) <= 260:
+            scored.append((s, p))
+    scored.sort(key=lambda t: -t[0])
+    out = [p for _, p in scored]
+    return out[:limit] if limit else out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--passages", required=True)
@@ -198,43 +225,60 @@ def main():
     ap.add_argument("--backend", choices=["extractive", "transformers", "openai", "llamacli"], default="extractive")
     ap.add_argument("--model", default="Qwen/Qwen2.5-7B-Instruct")
     ap.add_argument("--url", default="http://127.0.0.1:8080")
-    ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--limit", type=int, default=0, help="process at most this many passages (best first with --prioritise)")
+    ap.add_argument("--prioritise", action="store_true", help="skip study-language passages and process the most instruction-like first")
+    ap.add_argument("--batch", type=int, default=1, help="passages per generate call (transformers backend)")
+    ap.add_argument("--load-4bit", action="store_true")
+    ap.add_argument("--resume", action="store_true", help="skip passages already processed in --out")
     a = ap.parse_args()
     run = extractive if a.backend == "extractive" else None
     if a.backend == "transformers":
-        run = make_transformers(a.model)
+        run = make_transformers(a.model, load_4bit=a.load_4bit)
     elif a.backend == "openai":
         run = make_openai(a.url, a.model)
     elif a.backend == "llamacli":
         run = make_llamacli(a.model)
     out = pathlib.Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    done_path = pathlib.Path(str(out) + ".done")
+    passages = [json.loads(l) for l in open(a.passages) if l.strip()]
+    passages = prioritise(passages, a.limit) if a.prioritise else (passages[: a.limit] if a.limit else passages)
+    done = set(done_path.read_text().split()) if a.resume and done_path.exists() else set()
     seen, stats = set(), {"accepted": 0, "review": 0, "rejected": 0}
-    with open(a.passages) as f, open(out, "w") as o:
-        for n, line in enumerate(f, 1):
-            if a.limit and n > a.limit:
-                break
-            p = json.loads(line)
+    if a.resume and out.exists():
+        for l in open(out):
+            c = json.loads(l)
+            stats[c["status"]] += 1
+            if c["status"] == "accepted":
+                seen.add(norm(c["claim"]))
+    todo = [p for p in passages if p["passage_id"] not in done]
+    print(f"{len(passages)} selected, {len(done)} already done, {len(todo)} to do", flush=True)
+    with open(out, "a" if a.resume else "w") as o, open(done_path, "a" if a.resume else "w") as dn:
+        for i in range(0, len(todo), max(1, a.batch)):
+            chunk = todo[i: i + max(1, a.batch)]
             try:
-                items = run(p)
+                results = run.batch(chunk) if (a.batch > 1 and hasattr(run, "batch")) else [run(p) for p in chunk]
             except Exception as e:
-                print("error", p["passage_id"], str(e)[:80], file=sys.stderr)
+                print("error", chunk[0]["passage_id"], str(e)[:100], file=sys.stderr)
                 continue
-            for it in items:
-                status, why = verify(it["claim"], it["quote"], p["text"])
-                key = norm(it["claim"])
-                if status == "accepted" and key in seen:
-                    status, why = "rejected", ["duplicate"]
-                if status == "accepted":
-                    seen.add(key)
-                stats[status] += 1
-                cid = hashlib.sha1((p["passage_id"] + key).encode()).hexdigest()[:12]
-                o.write(json.dumps({"claim_id": cid, "claim": it["claim"], "quote": it["quote"], "status": status, "reasons": why,
-                                    "crop_or_animal": it.get("crop_or_animal", ""), "type": it.get("type", "other"),
-                                    "handle": p["handle"], "page": p["page"], "passage_id": p["passage_id"], "licence": p["licence"],
-                                    "uri": p["uri"], "title": p["title"]}, ensure_ascii=False) + "\n")
-            if n % 200 == 0:
-                print(n, stats, flush=True)
+            for p, items in zip(chunk, results):
+                for it in items:
+                    status, why = verify(it["claim"], it["quote"], p["text"])
+                    key = norm(it["claim"])
+                    if status == "accepted" and key in seen:
+                        status, why = "rejected", ["duplicate"]
+                    if status == "accepted":
+                        seen.add(key)
+                    stats[status] += 1
+                    cid = hashlib.sha1((p["passage_id"] + key).encode()).hexdigest()[:12]
+                    o.write(json.dumps({"claim_id": cid, "claim": it["claim"], "quote": it["quote"], "status": status, "reasons": why,
+                                        "crop_or_animal": it.get("crop_or_animal", ""), "type": it.get("type", "other"),
+                                        "handle": p["handle"], "page": p["page"], "passage_id": p["passage_id"], "licence": p["licence"],
+                                        "uri": p["uri"], "title": p["title"]}, ensure_ascii=False) + "\n")
+                dn.write(p["passage_id"] + "\n")
+            o.flush(); dn.flush()
+            if (i // max(1, a.batch)) % 10 == 0:
+                print(i + len(chunk), "/", len(todo), stats, flush=True)
     print("done", stats)
 
 
