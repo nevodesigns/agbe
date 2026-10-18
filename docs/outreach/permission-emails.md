@@ -1,4 +1,13 @@
-# Permission emails, ready to send
+# Permission emails
+
+## Status (updated 18 October 2026)
+
+- Sent by the owner on 18 October 2026, from nwokoloebube21@gmail.com.
+- **e.ezomo@cgiar.org bounced** (550 Invalid recipient). The IITA email reached iita@cgiar.org. Next step for IITA: use the contact form on iita.org/contact-us, and ask in a reply to iita@cgiar.org for the right person in the Knowledge Center.
+- Follow up once on or after 1 November 2026. If there is no written reply, the material stays Tier C and is not used.
+- Replies go in this file under a heading per organisation, with the date, and the permitted titles go in `data/sources/registry.json`.
+
+## The emails as sent
 
 Send from nwokoloebube21@gmail.com. One email per organisation. Each one below is complete: copy the subject and the body, put the "To" address in the To field and the others in Cc.
 

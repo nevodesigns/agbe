@@ -28,7 +28,8 @@
       "status": "verified",
       "verified": "2026-10-17",
       "action": "ask IITA for written permission",
-      "note": "IITA items dated 2019 onward mostly carry CC-BY-4.0 and are already in the Tier A list; older items without a licence field stay Tier C"
+      "note": "IITA items dated 2019 onward mostly carry CC-BY-4.0 and are already in the Tier A list; older items without a licence field stay Tier C",
+      "outreach": "email sent 2026-10-18 to iita@cgiar.org; the Cc e.ezomo@cgiar.org bounced; follow up on or after 2026-11-01"
     },
     {
       "id": "fao_openknowledge",
@@ -37,7 +38,8 @@
       "licence": "CC BY-NC-SA 3.0 IGO, commercial use needs a separate request",
       "status": "verified",
       "verified": "2026-10-17 from FAO copyright pages",
-      "action": "evaluation only until FAO grants a licence"
+      "action": "evaluation only until FAO grants a licence",
+      "outreach": "email sent 2026-10-18; also submit the licence request form; follow up on or after 2026-11-01"
     },
     {
       "id": "cabi_plantwise",
@@ -46,7 +48,8 @@
       "licence": "set per item, the CABI dataset on Hugging Face is CC BY-NC 4.0",
       "status": "verified",
       "verified": "2026-10-17",
-      "action": "ask CABI for a commercial licence"
+      "action": "ask CABI for a commercial licence",
+      "outreach": "email sent 2026-10-18; follow up on or after 2026-11-01"
     },
     {
       "id": "naerls",
@@ -54,7 +57,8 @@
       "tier": "C",
       "licence": "unknown",
       "status": "to_verify",
-      "action": "ask NAERLS for permission and for an extension reviewer"
+      "action": "ask NAERLS for permission and for an extension reviewer",
+      "outreach": "email sent 2026-10-18 to director@naerls.gov.ng; follow up on or after 2026-11-01"
     },
     {
       "id": "agrovoc",

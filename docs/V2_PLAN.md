@@ -58,3 +58,9 @@ An agronomist is the single biggest lever. See `docs/AGRONOMIST_ROLE.md`.
 - `serve/` built and tested (14 tests): guard, retriever, backends, FastAPI endpoint with an OpenAI-compatible route and API-key auth.
 - Finding: v16 ignores retrieved sources, so retrieval needs a model trained to use them. See `serve/README.md`.
 - A larger full-text fetch (350 items) was running in the background.
+
+## Status (18 Oct 2026, night)
+
+- Guard rules extended and measured (53/62 dev attacks, 28/30 holdout, 0 false blocks). CI green.
+- Grounded training-data builder and a GPU trainer script written (trainer untested). Permission emails sent; IITA Cc bounced.
+- Everything left before retraining needs either a GPU session (bake-off, 7B extraction, question generation) or a person (agronomist, replies from the data owners).

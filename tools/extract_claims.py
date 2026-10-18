@@ -112,6 +112,16 @@ Passage:
 """
 
 
+def parse_string_list(text: str) -> list[str]:
+    m = re.search(r"\[.*\]", text, re.S)
+    if not m:
+        return []
+    try:
+        return [x.strip() for x in json.loads(m.group(0)) if isinstance(x, str) and 8 <= len(x) <= 200]
+    except Exception:
+        return []
+
+
 def parse_json_list(text: str) -> list[dict]:
     """Parse a JSON array of claim objects, recovering whole objects when the model was cut off mid-list."""
     m = re.search(r"\[.*\]", text, re.S)
@@ -132,44 +142,52 @@ def parse_json_list(text: str) -> list[dict]:
     return out
 
 
-def make_transformers(model_id: str):
+def make_transformers(model_id: str, prompt: str = None, parse=None):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(model_id)
     model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16, device_map="auto")
 
+    prompt = prompt or PROMPT
+    parse = parse or parse_json_list
+
     def run(passage):
-        msgs = [{"role": "user", "content": PROMPT + passage["text"]}]
+        msgs = [{"role": "user", "content": prompt + passage["text"]}]
         ids = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt").to(model.device)
         out = model.generate(ids, max_new_tokens=700, do_sample=False)
-        return parse_json_list(tok.decode(out[0][ids.shape[1]:], skip_special_tokens=True))
+        return parse(tok.decode(out[0][ids.shape[1]:], skip_special_tokens=True))
     return run
 
 
-def make_openai(url: str, model: str):
+def make_openai(url: str, model: str, prompt: str = None, parse=None):
     import urllib.request
+    prompt = prompt or PROMPT
+    parse = parse or parse_json_list
 
     def run(passage):
         body = json.dumps({"model": model, "temperature": 0, "max_tokens": 700,
-                           "messages": [{"role": "user", "content": PROMPT + passage["text"]}]}).encode()
+                           "messages": [{"role": "user", "content": prompt + passage["text"]}]}).encode()
         req = urllib.request.Request(url.rstrip("/") + "/v1/chat/completions", body, {"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=300) as r:
-            return parse_json_list(json.load(r)["choices"][0]["message"]["content"])
+            return parse(json.load(r)["choices"][0]["message"]["content"])
     return run
 
 
-def make_llamacli(gguf: str):
+def make_llamacli(gguf: str, prompt: str = None, parse=None):
     """Local CPU backend: llama-cli on a GGUF. Slow, but needs no GPU and no server."""
     import subprocess
+    base_prompt = prompt or PROMPT
+    parse = parse or parse_json_list
 
     def run(passage):
-        prompt = PROMPT + passage["text"]
+        prompt = base_prompt + passage["text"]
         out = subprocess.run(["llama-cli", "-m", gguf, "-t", "4", "-ngl", "0", "-c", "4096", "-n", "520", "--temp", "0", "-st",
                               "--simple-io", "--no-warmup", "-p", prompt], capture_output=True, text=True, timeout=1200,
                              stdin=subprocess.DEVNULL).stdout
         out = out.split("[ Prompt:")[0]
         i = out.rfind("Passage:")  # skip any echo of the instructions and their example object
-        return [d for d in parse_json_list(out[i:] if i >= 0 else out) if d.get("claim") != "..."]
+        got = parse(out[i:] if i >= 0 else out)
+        return [d for d in got if not (isinstance(d, dict) and d.get("claim") == "...")]
     return run
 
 
