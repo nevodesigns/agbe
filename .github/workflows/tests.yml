@@ -16,6 +16,8 @@ jobs:
         run: cd eval && python -m unittest test_claim_check
       - name: Claim extraction verifier
         run: cd tools && python -m unittest test_extract_claims
+      - name: Source-following scorer
+        run: cd train && python -m unittest test_rag_eval
       - name: Inference guard and endpoint
         run: AGBE_AUTOSTART=0 python -m unittest serve.test_guard serve.test_app
       - name: Guard rules against the attack batteries

@@ -61,5 +61,31 @@ class Compose(unittest.TestCase):
             self.assertEqual(r["messages"][-1]["content"], REPLIES[r["rule"]])
 
 
+class Holdout(unittest.TestCase):
+    def test_held_out_passages_are_excluded_from_training_and_written_to_the_eval_file(self):
+        d = pathlib.Path(tempfile.mkdtemp())
+        for n, rows in (("p", P), ("c", C), ("q", Q)):
+            (d / f"{n}.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+        a = type("A", (), dict(passages=str(d / "p.jsonl"), claims=str(d / "c.jsonl"), questions=str(d / "q.jsonl"), out=str(d / "o.jsonl"),
+                               abstain_share=0.0, refusal_share=0.12, holdout=1.0, eval_out=str(d / "e.jsonl")))
+        b.stage_compose(a)
+        train = [json.loads(l) for l in (d / "o.jsonl").read_text().splitlines()]
+        ev = [json.loads(l) for l in (d / "e.jsonl").read_text().splitlines()]
+        self.assertEqual([r for r in train if r["kind"] != "refusal"], [])          # everything was held out
+        self.assertTrue(any(r["kind"] == "grounded" for r in ev) and any(r["kind"] == "abstain" for r in ev))
+        g = [r for r in ev if r["kind"] == "grounded"][0]
+        self.assertEqual(g["sources"][g["expected_index"] - 1]["passage_id"], g["passage_id"])
+        ab = [r for r in ev if r["kind"] == "abstain"][0]
+        self.assertNotIn(ab["passage_id"], [s["passage_id"] for s in ab["sources"]])
+
+    def test_no_holdout_by_default(self):
+        d = pathlib.Path(tempfile.mkdtemp())
+        for n, rows in (("p", P), ("c", C), ("q", Q)):
+            (d / f"{n}.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+        a = type("A", (), dict(passages=str(d / "p.jsonl"), claims=str(d / "c.jsonl"), questions=str(d / "q.jsonl"), out=str(d / "o.jsonl"), abstain_share=0.0, refusal_share=0.12))
+        b.stage_compose(a)
+        self.assertTrue(any(json.loads(l)["kind"] == "grounded" for l in (d / "o.jsonl").read_text().splitlines()))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -68,6 +68,9 @@ Registry with statuses: `data/sources/registry.json`. This is not legal advice.
 - **Outreach**: the four permission emails were sent by the owner on 18 October. The IITA Cc e.ezomo@cgiar.org bounced. Follow up on or after 1 November 2026.
 - **Full-text fetch**: a larger run (350 items) lost its network partway (DNS errors), was resumed, and was still running slowly when this was written. `data/fulltext/` is git-ignored: rerun `python3 tools/fetch_fulltext.py --pilot 400 --workers 3` to rebuild it.
 
+## 5b2. Bake-off result (19 October 2026)
+See `docs/BAKEOFF_RESULTS.md`. Qwen3-4B-Instruct is the only clear winner (0 leaks, 33/60). The small models tie within noise, and the old batteries are the wrong shape for retrieval, so notebook 3 now holds out 10% of passages, scores every base on a source-following test (`train/rag_eval.py`), trains gemma-3-1b-it, Qwen3-1.7B and Qwen3-4B-Instruct, and compares each with its base. Notebook 2 was already running when this changed; notebook 3 recomposes the training data with the held-out split itself.
+
 ## 5c. The one-notebook route (19 October 2026)
 
 **Run it as three notebooks, one per session**, generated with the stages preset by `train/make_v2_notebook.py`: `AGBE_v2_1_bakeoff.ipynb` (stage A), `AGBE_v2_2_data.ipynb` (B), `AGBE_v2_3_train.ipynb` (C, D, E). Import each into Kaggle, Save Version, Save & Run All (background run, the browser can be closed). Nothing needs editing. Each session restores the earlier ones from the Hugging Face repo. The notebook uses `HF_WRITE_TOKEN` if present, else `HF_TOKEN`. Passages: 8,062 from 279 documents in `data/fulltext_v1/` (the larger fetch finished: 280 downloaded, 61 had no PDF, 9 failed on incomplete reads).

@@ -17,7 +17,7 @@ Questions come from an LLM (stage 1, run on Kaggle or locally) because template 
 """
 from __future__ import annotations
 
-import argparse, collections, json, pathlib, random, re, sys
+import argparse, collections, hashlib, json, pathlib, random, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -106,7 +106,12 @@ def stage_compose(a):
         if c["status"] == "accepted":
             claims[c["passage_id"]].append(c)
     retr = Retriever(a.passages)
-    out, stats = [], collections.Counter()
+    out, stats, evals = [], collections.Counter(), []
+    holdout = getattr(a, "holdout", 0.0) or 0.0
+
+    def is_held_out(pid):  # a fixed, repeatable share of passages never reaches training
+        return holdout > 0 and int(hashlib.sha1(pid.encode()).hexdigest()[:8], 16) % 1000 < holdout * 1000
+
     for row in load(a.questions):
         pid = row["passage_id"]
         if pid not in claims or pid not in passages:
@@ -118,6 +123,14 @@ def stage_compose(a):
                 rnd.shuffle(others)
                 near += others[: 3 - len(near)]
             distract = [dict(d) for d in near[:2]]
+            if is_held_out(pid):
+                srcs = distract + [passages[pid]]
+                rnd.shuffle(srcs)
+                evals.append({"kind": "grounded", "question": q, "sources": srcs, "expected_index": [i for i, p in enumerate(srcs, 1) if p["passage_id"] == pid][0],
+                              "claims": [c["claim"] for c in claims[pid]], "passage_id": pid})
+                if near[:3]:
+                    evals.append({"kind": "abstain", "question": q, "sources": [dict(d) for d in near[:3]], "expected_index": None, "claims": [], "passage_id": pid})
+                continue
             if rnd.random() < a.abstain_share:
                 srcs = [dict(d) for d in near[:3]]
                 if not srcs:
@@ -139,6 +152,11 @@ def stage_compose(a):
         for r in out:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
     print(dict(stats), "->", a.out)
+    if getattr(a, "eval_out", None):
+        with open(a.eval_out, "w") as f:
+            for r in evals:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        print(f"{len(evals)} held-out evaluation records ->", a.eval_out)
 
 
 def main():
@@ -152,6 +170,7 @@ def main():
     c = sub.add_parser("compose")
     c.add_argument("--passages", required=True); c.add_argument("--claims", required=True); c.add_argument("--questions", required=True); c.add_argument("--out", required=True)
     c.add_argument("--abstain-share", type=float, default=0.15); c.add_argument("--refusal-share", type=float, default=0.12)
+    c.add_argument("--holdout", type=float, default=0.0, help="share of passages kept out of training for evaluation"); c.add_argument("--eval-out", default=None)
     a = ap.parse_args()
     stage_questions(a) if a.cmd == "questions" else stage_compose(a)
 

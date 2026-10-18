@@ -101,42 +101,64 @@ if "B" in STAGES:
 ''')
 
 md("""
-## C. Training
-First a data check, then a 20-step smoke test, then the real run (QLoRA, one GPU). The trainer script was written without a GPU: if the smoke test fails, stop and send the error.
+## C. Held-out test, baselines, training
+Three candidates are trained on the same data: **gemma-3-1b-it** (smallest, the continuity choice), **Qwen3-1.7B** (what the bake-off picked for the edge profile) and **Qwen3-4B-Instruct** (best in the bake-off, zero leaks, the server profile).
+The bake-off showed the small models are too close to call on a 60-prompt test, so the real choice is made after training, on passages the models never saw.
+First the training set is rebuilt with 10% of passages held out for testing, then every base is scored on the held-out test, then each is trained (a 20-step smoke test first).
 """)
 code('''
+BASES = {"gemma1b": ("google/gemma-3-1b-it", "1.5e-4"), "qwen17": ("Qwen/Qwen3-1.7B", "1.5e-4"), "qwen4b": ("Qwen/Qwen3-4B-Instruct-2507", "1e-4")}
 if "C" in STAGES:
-  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter_smoke --dry-data
-  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter_smoke --max-steps 20
+  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl --holdout 0.1 --eval-out {WORK}/rag_eval.jsonl
+  save()
+  print(sum(1 for _ in open(WORK / "sft.jsonl")), "training examples;", sum(1 for _ in open(WORK / "rag_eval.jsonl")), "held-out test cases")
 ''')
 code('''
 if "C" in STAGES:
-  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter --rank 32 --epochs 2
+  for key, (base, lr) in BASES.items():
+    if not (WORK / f"rageval_base_{key}.json").exists():
+      !python train/rag_eval.py --model {base} --eval {WORK}/rag_eval.jsonl --out {WORK}/rageval_base_{key}.json
   save()
 ''')
-
-md("## D. Merge and export to GGUF (Q4_K_M)")
 code('''
-if "D" in STAGES:
-  !python train/merge_adapter.py --base {BASE} --adapter {WORK}/adapter --out {WORK}/merged
-  !bash train/export_gguf.sh {WORK}/merged {WORK}/agbe-v2
-  save()
+if "C" in STAGES:
+  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base google/gemma-3-1b-it --out {WORK}/adapter_smoke --dry-data
+  for i, (key, (base, lr)) in enumerate(BASES.items()):
+    if (WORK / f"adapter_{key}").exists():
+      continue
+    if i == 0:
+      !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {base} --out {WORK}/adapter_smoke --max-steps 20
+    !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {base} --out {WORK}/adapter_{key} --rank 32 --epochs 2 --lr {lr}
+    save()
 ''')
 
 md("""
-## E. Does the new model beat its own base?
-Same prompts, same sources, same scorer. Compare the two rows. Only a better row, with zero leaks, is a result.
+## D and E. Merge, export to GGUF, and test each trained model
+For each model: merge the adapter, convert to GGUF (Q4_K_M), score it on the held-out test, then delete the big temporary files (Kaggle's disk is limited). The table at the end puts every base next to its trained version.
 """)
 code('''
-if "E" in STAGES:
-  !python train/bakeoff.py --modes rag --sample {BAKEOFF_SAMPLE} --max-new 160 --passages {PASSAGES} --out {WORK}/eval_v2 --models {WORK}/merged
-  save()
-for f in sorted(WORK.glob("*/summary.md")): print(f.parent.name); print(f.read_text())
+TMP = "/kaggle/temp"; os.makedirs(TMP, exist_ok=True)   # big temporary files go here, outside the 20 GB output limit
+if "D" in STAGES:
+  for key, (base, lr) in BASES.items():
+    if (WORK / f"agbe-v2-{key}-q4_k_m.gguf").exists():
+      continue
+    !python train/merge_adapter.py --base {base} --adapter {WORK}/adapter_{key} --out {TMP}/merged_{key}
+    !bash train/export_gguf.sh {TMP}/merged_{key} {TMP}/agbe-v2-{key}
+    !cp {TMP}/agbe-v2-{key}-q4_k_m.gguf {TMP}/agbe-v2-{key}-q4_k_m.gguf.sha256 {WORK}/
+    !python train/rag_eval.py --model {TMP}/merged_{key} --eval {WORK}/rag_eval.jsonl --out {WORK}/rageval_tuned_{key}.json
+    !rm -rf {TMP}/merged_{key} {TMP}/agbe-v2-{key}-*.gguf
+    save()
 ''')
+code('''
+if "E" in STAGES or "D" in STAGES:
+  !python train/rag_eval.py --table {WORK}/rageval_base_*.json {WORK}/rageval_tuned_*.json
+for f in sorted(WORK.glob("bakeoff_*/summary.md")): print(f.parent.name); print(f.read_text())
+''')
+
 md("""
 ## Done: what to download
-In the right panel, **Output**, under `work/`: `agbe-v2-q4_k_m.gguf` (the model), `adapter/` (the LoRA adapter), `claims.jsonl`, `sft.jsonl`, and every `summary.md`. Everything is also in your private Hugging Face repo.
-Send the stage E table back, and the model is next measured on the real target (CPU speed and memory).
+In the right panel, **Output**, under `work/`: `agbe-v2-<name>-q4_k_m.gguf` for each trained model, the `adapter_*` folders, `claims.jsonl`, `sft.jsonl`, `rag_eval.jsonl` and the `rageval_*.json` results. Everything is also in your private Hugging Face repo.
+Send the table printed at the end, and the models are next measured on the real target (CPU speed and memory).
 """)
 
 SESSIONS = [

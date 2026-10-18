@@ -75,7 +75,8 @@ def main():
     cfg = SFTConfig(output_dir=a.out, num_train_epochs=a.epochs, max_steps=a.max_steps, learning_rate=a.lr, lr_scheduler_type="cosine", warmup_ratio=0.05,
                     per_device_train_batch_size=a.batch, gradient_accumulation_steps=a.accum, max_length=a.max_len, fp16=True,
                     logging_steps=5, eval_strategy="steps", eval_steps=50, save_strategy="steps", save_steps=100, save_total_limit=2,
-                    completion_only_loss=True, report_to="none", seed=3)
+                    completion_only_loss=True, report_to="none", seed=3,
+                    gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
     SFTTrainer(model=model, args=cfg, train_dataset=train_ds, eval_dataset=val_ds, peft_config=lora, processing_class=tok).train()
     model.save_pretrained(a.out)
     tok.save_pretrained(a.out)
