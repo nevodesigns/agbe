@@ -19,9 +19,15 @@ md("""
 Run the cells from top to bottom. Each stage saves its result to a private Hugging Face dataset repo, so if Kaggle disconnects you
 can start the notebook again and it picks up where it stopped (cells skip work that is already done).
 
+**How to run it (three sessions, each one click):** the whole pipeline is too long for one free GPU session, so it has stage switches. In the first code cell set `STAGES` and press **Save Version, Save & Run All**. Kaggle then runs it in the background and you can close the browser.
+- Session 1: `STAGES = ["A"]` (bake-off, about 2 to 3 hours). Read the result table.
+- Session 2: `STAGES = ["B"]` (claims, questions, training data, about 3 to 4 hours).
+- Session 3: `STAGES = ["C", "D", "E"]` (pick base, train, export, re-test, about 3 hours).
+Each session starts by restoring the previous ones from your Hugging Face repo.
+
 **Before you start (once):**
 1. Right side, **Session options**: Accelerator **GPU T4 x2**, Internet **On**.
-2. **Add-ons, Secrets**: add a secret named `HF_TOKEN` with a Hugging Face token that has **write** access.
+2. **Add-ons, Secrets**: a secret named `HF_WRITE_TOKEN` (or `HF_TOKEN`) with **write** access. If both exist, the write one is used.
 3. On Hugging Face, open the pages of `google/gemma-3-1b-it`, `google/gemma-3-4b-it` and `meta-llama/Llama-3.2-1B-Instruct` and accept their terms (a model you did not accept is skipped, not fatal).
 
 Stages: A bake-off of base models (with retrieved sources), B claim extraction + questions + training data, C training, D export to GGUF,
@@ -32,7 +38,10 @@ md("## 0. Setup")
 code('''
 import os, json, pathlib, subprocess
 from kaggle_secrets import UserSecretsClient
-os.environ["HF_TOKEN"] = UserSecretsClient().get_secret("HF_TOKEN")
+_s = UserSecretsClient()
+try: os.environ["HF_TOKEN"] = _s.get_secret("HF_WRITE_TOKEN")   # your write token wins
+except Exception: os.environ["HF_TOKEN"] = _s.get_secret("HF_TOKEN")
+STAGES = ["A"]                         # session 1: ["A"], session 2: ["B"], session 3: ["C", "D", "E"]
 HF_REPO = "NEVODESIGN/agbe-v2-work"   # private dataset repo that keeps your work between sessions (change if your token cannot write there)
 RUN = "run1"
 BAKEOFF_SAMPLE = 60                    # prompts per model in the bake-off; raise it later for a fuller test
@@ -58,18 +67,20 @@ Every candidate answers the same prompts with retrieved passages in front of it,
 Small models run in full precision, 3B and 4B models in 4-bit. A model that cannot be loaded (terms not accepted) is skipped. About 2 to 3 hours in total.
 """)
 code('''
-if not (WORK / "bakeoff_small" / "summary.json").exists():
+if "A" in STAGES and not (WORK / "bakeoff_small" / "summary.json").exists():
     !python train/bakeoff.py --modes rag --sample {BAKEOFF_SAMPLE} --max-new 160 --passages {PASSAGES} --out {WORK}/bakeoff_small --models google/gemma-3-1b-it Qwen/Qwen3-1.7B meta-llama/Llama-3.2-1B-Instruct
     save()
-if not (WORK / "bakeoff_big" / "summary.json").exists():
+if "A" in STAGES and not (WORK / "bakeoff_big" / "summary.json").exists():
     !python train/bakeoff.py --modes rag --sample {BAKEOFF_SAMPLE} --max-new 160 --load-4bit --passages {PASSAGES} --out {WORK}/bakeoff_big --models google/gemma-3-4b-it Qwen/Qwen3-4B-Instruct-2507 HuggingFaceTB/SmolLM3-3B meta-llama/Llama-3.2-3B-Instruct
     save()
 ''')
 code('''
-!python tools/pick_base.py {WORK}/bakeoff_*/summary.json --out {WORK}/chosen_base.json
-choice = json.load(open(WORK / "chosen_base.json"))
-BASE = (choice["best_small"] or choice["best"]) if PROFILE == "edge" else choice["best"]
-print("\\nTraining base for profile", PROFILE, "->", BASE)
+if set(STAGES) & set("ACDE"):
+    !python tools/pick_base.py {WORK}/bakeoff_*/summary.json --out {WORK}/chosen_base.json
+    choice = json.load(open(WORK / "chosen_base.json"))
+    BASE = (choice["best_small"] or choice["best"]) if PROFILE == "edge" else choice["best"]
+    print("\\nTraining base for profile", PROFILE, "->", BASE)
+    save()
 ''')
 
 md("""
@@ -78,17 +89,19 @@ A 7B model proposes facts from the passages. Code keeps only facts whose quote i
 Then the model writes farmer questions, and the builder composes grounded, abstain and refusal examples. Resumable. About 2 to 4 hours for 1,000 passages.
 """)
 code('''
-!python tools/extract_claims.py --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 8 --prioritise --limit {EXTRACT_PASSAGES} --resume --passages {PASSAGES} --out {WORK}/claims.jsonl
-save()
-import collections
-print(collections.Counter(json.loads(l)["status"] for l in open(WORK / "claims.jsonl")))
+if "B" in STAGES:
+  !python tools/extract_claims.py --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 8 --prioritise --limit {EXTRACT_PASSAGES} --resume --passages {PASSAGES} --out {WORK}/claims.jsonl
+  save()
+  import collections
+  print(collections.Counter(json.loads(l)["status"] for l in open(WORK / "claims.jsonl")))
 ''')
 code('''
-!python tools/build_grounded_sft.py questions --passages {PASSAGES} --claims {WORK}/claims.jsonl --out {WORK}/questions.jsonl --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 16 --resume
-!python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl
-save()
-n = sum(1 for _ in open(WORK / "sft.jsonl")); print(n, "training examples")
-if n < 600: print("WARNING: fewer than 600 examples. Raise EXTRACT_PASSAGES and rerun stage B before training.")
+if "B" in STAGES:
+  !python tools/build_grounded_sft.py questions --passages {PASSAGES} --claims {WORK}/claims.jsonl --out {WORK}/questions.jsonl --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 16 --resume
+  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl
+  save()
+  n = sum(1 for _ in open(WORK / "sft.jsonl")); print(n, "training examples")
+  if n < 600: print("WARNING: fewer than 600 examples. Raise EXTRACT_PASSAGES and rerun stage B before training.")
 ''')
 
 md("""
@@ -96,19 +109,22 @@ md("""
 First a data check, then a 20-step smoke test, then the real run (QLoRA, one GPU). The trainer script was written without a GPU: if the smoke test fails, stop and send the error.
 """)
 code('''
-!CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter_smoke --dry-data
-!CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter_smoke --max-steps 20
+if "C" in STAGES:
+  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter_smoke --dry-data
+  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter_smoke --max-steps 20
 ''')
 code('''
-!CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter --rank 32 --epochs 2
-save()
+if "C" in STAGES:
+  !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {BASE} --out {WORK}/adapter --rank 32 --epochs 2
+  save()
 ''')
 
 md("## D. Merge and export to GGUF (Q4_K_M)")
 code('''
-!python train/merge_adapter.py --base {BASE} --adapter {WORK}/adapter --out {WORK}/merged
-!bash train/export_gguf.sh {WORK}/merged {WORK}/agbe-v2
-save()
+if "D" in STAGES:
+  !python train/merge_adapter.py --base {BASE} --adapter {WORK}/adapter --out {WORK}/merged
+  !bash train/export_gguf.sh {WORK}/merged {WORK}/agbe-v2
+  save()
 ''')
 
 md("""
@@ -116,8 +132,9 @@ md("""
 Same prompts, same sources, same scorer. Compare the two rows. Only a better row, with zero leaks, is a result.
 """)
 code('''
-!python train/bakeoff.py --modes rag --sample {BAKEOFF_SAMPLE} --max-new 160 --passages {PASSAGES} --out {WORK}/eval_v2 --models {WORK}/merged
-save()
+if "E" in STAGES:
+  !python train/bakeoff.py --modes rag --sample {BAKEOFF_SAMPLE} --max-new 160 --passages {PASSAGES} --out {WORK}/eval_v2 --models {WORK}/merged
+  save()
 for f in sorted(WORK.glob("*/summary.md")): print(f.parent.name); print(f.read_text())
 ''')
 md("""
