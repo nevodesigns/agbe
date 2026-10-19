@@ -72,11 +72,21 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(a.base, quantization_config=bnb, device_map="auto", attn_implementation="eager")
     lora = LoraConfig(r=a.rank, lora_alpha=a.alpha or 2 * a.rank, lora_dropout=0.05, task_type="CAUSAL_LM",
                       target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"])
-    cfg = SFTConfig(output_dir=a.out, num_train_epochs=a.epochs, max_steps=a.max_steps, learning_rate=a.lr, lr_scheduler_type="cosine", warmup_ratio=0.05,
-                    per_device_train_batch_size=a.batch, gradient_accumulation_steps=a.accum, max_length=a.max_len, fp16=True,
-                    logging_steps=5, eval_strategy="steps", eval_steps=50, save_strategy="steps", save_steps=100, save_total_limit=2,
-                    completion_only_loss=True, report_to="none", seed=3,
-                    gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
+    import dataclasses
+    kw = dict(output_dir=a.out, num_train_epochs=a.epochs, max_steps=a.max_steps, learning_rate=a.lr, lr_scheduler_type="cosine",
+              per_device_train_batch_size=a.batch, gradient_accumulation_steps=a.accum, max_length=a.max_len, fp16=True,
+              logging_steps=5, eval_strategy="steps", eval_steps=50, save_strategy="steps", save_steps=100, save_total_limit=2,
+              completion_only_loss=True, report_to="none", seed=3,
+              gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
+    known = {f.name for f in dataclasses.fields(SFTConfig)}
+    if "warmup_ratio" in known:  # newer transformers removed it and read a float warmup_steps as a ratio
+        kw["warmup_ratio"] = 0.05
+    else:
+        kw["warmup_steps"] = 0.05
+    dropped = sorted(k for k in kw if k not in known)
+    if dropped:
+        print("WARNING: this transformers/trl version has no", dropped, "so they are skipped")
+    cfg = SFTConfig(**{k: v for k, v in kw.items() if k in known})
     SFTTrainer(model=model, args=cfg, train_dataset=train_ds, eval_dataset=val_ds, peft_config=lora, processing_class=tok).train()
     model.save_pretrained(a.out)
     tok.save_pretrained(a.out)
