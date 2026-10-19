@@ -85,12 +85,19 @@ def overlap(q: str, claim: str) -> float:
     return len(qt & ct) / (len(qt) or 1)
 
 
-def compose_answer(question: str, claims: list[dict], n: int, max_claims: int = 4) -> str:
-    ranked = sorted(claims, key=lambda c: -overlap(question, c["claim"]))[:max_claims]
+SURVEY = re.compile(r"^(most|many|some|few|farmers|respondents|households|participants)\b", re.I)
+MIN_LEAD, MIN_REST = 0.15, 0.05  # a lead claim must share words with the question, or the example teaches answering off-topic
+
+
+def compose_answer(question: str, claims: list[dict], n: int, max_claims: int = 4) -> str | None:
+    claims = [c for c in claims if not SURVEY.match(c["claim"])]  # survey findings describe people, not advice
+    ranked = sorted(claims, key=lambda c: -overlap(question, c["claim"]))
+    if not ranked or overlap(question, ranked[0]["claim"]) < MIN_LEAD:
+        return None
     lead = ranked[0]
-    rest = [c for c in claims if c is not lead and c in ranked]
-    rest.sort(key=lambda c: claims.index(c))
-    return " ".join(f"{c['claim'].rstrip('.')}. [{n}]" for c in [lead] + rest)
+    keep = [c for c in ranked[1:] if overlap(question, c["claim"]) >= MIN_REST][: max_claims - 1]
+    keep.sort(key=lambda c: claims.index(c))
+    return " ".join(f"{c['claim'].rstrip('.')}. [{n}]" for c in [lead] + keep)
 
 
 def messages(question, sources, answer):
@@ -145,7 +152,11 @@ def stage_compose(a):
                 srcs = pool + [passages[pid]]
                 rnd.shuffle(srcs)
                 n = [i for i, p in enumerate(srcs, 1) if p["passage_id"] == pid][0]
-                out.append({"messages": messages(q, srcs, compose_answer(q, claims[pid], n, max_claims=4 if variant == 0 else 3)), "kind": "grounded", "passage_id": pid}); stats["grounded"] += 1
+                ans = compose_answer(q, claims[pid], n, max_claims=4 if variant == 0 else 3)
+                if ans is None:
+                    stats["skipped_off_topic"] += 1
+                    break
+                out.append({"messages": messages(q, srcs, ans), "kind": "grounded", "passage_id": pid}); stats["grounded"] += 1
     total = len(out)
     gold_refusals = []
     gp = ROOT / "corpus" / "gold.jsonl"
