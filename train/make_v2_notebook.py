@@ -170,7 +170,7 @@ Send the table printed at the end, and the models are next measured on the real 
 SESSIONS = [  # (label, stages, what, file, run folder, base keys, epochs)
     ("1", '["A"]', "the bake-off of base models, about 2 to 3 hours", "AGBE_v2_1_bakeoff.ipynb", "run1", "None", "None"),
     ("2", '["B"]', "claims, questions and training data, about 3 to 4 hours (already done once; this is the first pass)", "AGBE_v2_2_data.ipynb", "run1", "None", "None"),
-    ("2b", '["B"]', "MORE training data: it resumes from the passages already done and adds about 1,150 more, about 5 to 8 hours", "AGBE_v2_2b_more_data.ipynb", "run1", "None", "None"),
+    ("2b", '["B"]', "MORE training data: it resumes from the passages already done and adds about 1,150 more, about 3 to 4 hours (the first run took 7.7 s per passage)", "AGBE_v2_2b_more_data.ipynb", "run1", "None", "None"),
     ("3s", '["C", "D", "E"]', "SMOKE TEST of training, export and testing on the data so far, one base and one epoch, about 1 to 2 hours. Its results go to a separate folder and are not the final models", "AGBE_v2_3s_smoketest.ipynb", "smoke", '["gemma1b"]', "1"),
     ("3", '["C", "D", "E"]', "train the three bases on the full data, export the GGUFs and re-test, about 4 to 6 hours. Run it after 2b has finished", "AGBE_v2_3_train.ipynb", "run1", "None", "None"),
 ]
