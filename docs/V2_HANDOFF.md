@@ -6,7 +6,7 @@ Read this first if you are picking the work up cold, whether you are me in a new
 
 | Item | State |
 |---|---|
-| v16 competition record | Frozen at tag `adtc-2026-final` (commit 1d32e67). ADTC finished 17 Oct. The live-event result is not recorded here. |
+| v16 competition record | Frozen at tag `adtc-2026-final` (commit 1d32e67). ADTC finished 17 Oct: top 10 finalist (not top 3), GPU credits awarded, not yet redeemed. |
 | Tier A data | 7,890 items listed; 8,062 passages from 279 documents in `data/fulltext_v1/` |
 | Guard, endpoint, evaluation, CI | Built and tested on CPU (all unit tests pass, CI green) |
 | Kaggle notebook 1 (bake-off) | Done. Results in `docs/BAKEOFF_RESULTS.md` |
