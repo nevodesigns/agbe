@@ -58,6 +58,8 @@ class Compose(unittest.TestCase):
         rows = [r for r in self.run_compose() if r["kind"] == "refusal"]
         self.assertTrue(rows)
         for r in rows:
+            if r["rule"] == "gold":      # the v16 hand-written refusals are reused as they are
+                self.assertEqual(r["messages"][0]["role"], "system"); continue
             self.assertEqual(r["messages"][-1]["content"], REPLIES[r["rule"]])
 
 

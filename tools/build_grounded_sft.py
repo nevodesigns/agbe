@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from serve.guard import REPLIES, SYSTEM  # noqa: E402
 from serve.retrieval import Retriever  # noqa: E402
 
-Q_PROMPT = """Below is a passage from an agricultural guide. Write {n} short questions that a smallholder farmer or an extension officer in West Africa
+Q_PROMPT = """Below is a passage from an agricultural guide. Write {n} different short questions that a smallholder farmer or an extension officer in West Africa
 might really ask, which this passage answers. Plain words, as typed on a phone, no mention of "the passage" or "the guide".
 Return only JSON: ["question 1", "question 2"]
 
@@ -60,7 +60,7 @@ def stage_questions(a):
     done = set(done_path.read_text().split()) if a.resume and done_path.exists() else set()
     todo = [p for p in passages if p["passage_id"] not in done]
     print(f"{len(passages)} passages with accepted claims, {len(done)} done, {len(todo)} to do", flush=True)
-    prompt = Q_PROMPT.format(n=2)
+    prompt = Q_PROMPT.format(n=3)
     if a.backend == "transformers":
         gen = ec.make_transformers(a.model, prompt, ec.parse_string_list, load_4bit=a.load_4bit, max_new=120)
     elif a.backend == "openai":
@@ -116,7 +116,7 @@ def stage_compose(a):
         pid = row["passage_id"]
         if pid not in claims or pid not in passages:
             continue
-        for q in [x for x in row["raw"] if isinstance(x, str)][:2]:
+        for q in [x for x in row["raw"] if isinstance(x, str)][:3]:
             near = [p for p in retr.top(q, 6) if p["passage_id"] != pid]
             if len(near) < 3:  # top up with unrelated passages so every example has distractors
                 others = [p for k, p in passages.items() if k != pid and k not in {n["passage_id"] for n in near}]
@@ -137,11 +137,27 @@ def stage_compose(a):
                     continue
                 out.append({"messages": messages(q, srcs, REPLIES["abstain"]), "kind": "abstain", "passage_id": pid}); stats["abstain"] += 1
                 continue
-            srcs = distract + [passages[pid]]
-            rnd.shuffle(srcs)
-            n = [i for i, p in enumerate(srcs, 1) if p["passage_id"] == pid][0]
-            out.append({"messages": messages(q, srcs, compose_answer(q, claims[pid], n)), "kind": "grounded", "passage_id": pid}); stats["grounded"] += 1
+            for variant in range(max(1, getattr(a, "variants", 1))):
+                if variant == 0:
+                    pool = distract
+                else:  # random distractors, so the model cannot rely on the retriever's ranking
+                    pool = [dict(d) for d in rnd.sample([p for k, p in passages.items() if k != pid], 2)]
+                srcs = pool + [passages[pid]]
+                rnd.shuffle(srcs)
+                n = [i for i, p in enumerate(srcs, 1) if p["passage_id"] == pid][0]
+                out.append({"messages": messages(q, srcs, compose_answer(q, claims[pid], n, max_claims=4 if variant == 0 else 3)), "kind": "grounded", "passage_id": pid}); stats["grounded"] += 1
     total = len(out)
+    gold_refusals = []
+    gp = ROOT / "corpus" / "gold.jsonl"
+    if gp.exists() and getattr(a, "gold_refusals", True):
+        sys.path.insert(0, str(ROOT / "eval"))
+        from claim_check import REFUSAL as _REF
+        for g in load(gp):
+            m = g["messages"]
+            if len(m) == 2 and _REF.search(m[-1]["content"].split("\n")[0]) and len(m[-1]["content"].split()) < 70:
+                gold_refusals.append({"messages": [{"role": "system", "content": SYSTEM}, m[0], m[1]], "kind": "refusal", "rule": "gold"})
+    for g in gold_refusals * 2:
+        out.append(g); stats["refusal"] += 1
     n_ref = max(1, round(total * a.refusal_share / max(1e-9, 1 - a.refusal_share))) if total else 0
     pool = [(k, q) for k, qs in REFUSAL_QUESTIONS.items() for q in qs]
     for i in range(n_ref):
@@ -170,7 +186,7 @@ def main():
     c = sub.add_parser("compose")
     c.add_argument("--passages", required=True); c.add_argument("--claims", required=True); c.add_argument("--questions", required=True); c.add_argument("--out", required=True)
     c.add_argument("--abstain-share", type=float, default=0.15); c.add_argument("--refusal-share", type=float, default=0.12)
-    c.add_argument("--holdout", type=float, default=0.0, help="share of passages kept out of training for evaluation"); c.add_argument("--eval-out", default=None)
+    c.add_argument("--variants", type=int, default=2, help="grounded examples per question, with different distractors"); c.add_argument("--holdout", type=float, default=0.0, help="share of passages kept out of training for evaluation"); c.add_argument("--eval-out", default=None)
     a = ap.parse_args()
     stage_questions(a) if a.cmd == "questions" else stage_compose(a)
 

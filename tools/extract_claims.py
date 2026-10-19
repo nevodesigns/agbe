@@ -204,17 +204,18 @@ def make_llamacli(gguf: str, prompt: str = None, parse=None):
     return run
 
 
-def prioritise(passages: list[dict], limit: int) -> list[dict]:
-    """Best first: instruction-like passages with no study language. A passage a farmer could act on scores high."""
+def prioritise(passages: list[dict], limit: int, max_hits: int = 2, min_signal: int = 2) -> list[dict]:
+    """Best first. A passage scores its instruction-like words minus twice its study-language hits, and is kept if it has at least
+    `min_signal` instruction words and at most `max_hits` study-language hits. (The first version excluded any passage with a single hit,
+    including a year in a citation, which threw away 93% of the text. The claim verifier rejects study-language claims anyway.)"""
     scored = []
     for p in passages:
-        if FIRST_PERSON.search(p["text"]):
-            continue
+        hits = len(FIRST_PERSON.findall(p["text"]))
         s = len(SIGNAL.findall(p["text"]))
-        if s >= 3 and 40 <= len(p["text"].split()) <= 260:
-            scored.append((s, p))
-    scored.sort(key=lambda t: -t[0])
-    out = [p for _, p in scored]
+        if hits <= max_hits and s >= min_signal and 40 <= len(p["text"].split()) <= 260:
+            scored.append((s - 2 * hits, p["passage_id"], p))
+    scored.sort(key=lambda t: (-t[0], t[1]))
+    out = [p for _, _, p in scored]
     return out[:limit] if limit else out
 
 
@@ -227,6 +228,7 @@ def main():
     ap.add_argument("--url", default="http://127.0.0.1:8080")
     ap.add_argument("--limit", type=int, default=0, help="process at most this many passages (best first with --prioritise)")
     ap.add_argument("--prioritise", action="store_true", help="skip study-language passages and process the most instruction-like first")
+    ap.add_argument("--max-study-hits", type=int, default=2); ap.add_argument("--min-signal", type=int, default=2)
     ap.add_argument("--batch", type=int, default=1, help="passages per generate call (transformers backend)")
     ap.add_argument("--load-4bit", action="store_true")
     ap.add_argument("--resume", action="store_true", help="skip passages already processed in --out")
@@ -242,7 +244,7 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     done_path = pathlib.Path(str(out) + ".done")
     passages = [json.loads(l) for l in open(a.passages) if l.strip()]
-    passages = prioritise(passages, a.limit) if a.prioritise else (passages[: a.limit] if a.limit else passages)
+    passages = prioritise(passages, a.limit, a.max_study_hits, a.min_signal) if a.prioritise else (passages[: a.limit] if a.limit else passages)
     done = set(done_path.read_text().split()) if a.resume and done_path.exists() else set()
     seen, stats = set(), {"accepted": 0, "review": 0, "rejected": 0}
     if a.resume and out.exists():

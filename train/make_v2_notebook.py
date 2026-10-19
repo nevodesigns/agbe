@@ -19,7 +19,7 @@ md("""
 Run the cells from top to bottom. Each stage saves its result to a private Hugging Face dataset repo, so if Kaggle disconnects you
 can start the notebook again and it picks up where it stopped (cells skip work that is already done).
 
-**This is session @@N@@ of 3: @@WHAT@@.** Nothing to edit. Press **Save Version, then Save & Run All**: Kaggle runs it in the background and you can close the browser. When it finishes, open the next notebook (the three share their work through your Hugging Face repo, so each one starts by restoring the earlier ones).
+**This is session @@N@@: @@WHAT@@.** Nothing to edit. Press **Save Version, then Save & Run All**: Kaggle runs it in the background and you can close the browser. When it finishes, open the next notebook (the three share their work through your Hugging Face repo, so each one starts by restoring the earlier ones).
 
 **Before you start (once):**
 1. Right side, **Session options**: Accelerator **GPU T4 x2**, Internet **On**.
@@ -38,22 +38,27 @@ _s = UserSecretsClient()
 try: os.environ["HF_TOKEN"] = _s.get_secret("HF_WRITE_TOKEN")   # your write token wins
 except Exception: os.environ["HF_TOKEN"] = _s.get_secret("HF_TOKEN")
 STAGES = @@STAGES@@                    # already set for this notebook, nothing to edit
-HF_REPO = "NEVODESIGN/agbe-v2-work"   # private dataset repo that keeps your work between sessions (change if your token cannot write there)
-RUN = "run1"
-BAKEOFF_SAMPLE = 60                    # prompts per model in the bake-off; raise it later for a fuller test
-EXTRACT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-EXTRACT_PASSAGES = 1000                # best passages to extract claims from; raise it if you have GPU hours left
-PROFILE = "edge"                       # "edge" trains the best model of about 2B parameters or less, "server" the best model overall
+HF_REPO = "NEVODESIGN/agbe-v2-work"   # private dataset repo that keeps your work between sessions
+DATA_RUN = "run1"                      # the folder this notebook starts from
+RUN = "@@RUN@@"                        # the folder this notebook saves to (the smoke test uses its own, so it cannot disturb run1)
+BASE_KEYS = @@KEYS@@                   # which bases to train; None means all in train/session_config.json
+EPOCHS_OVERRIDE = @@EPOCHS@@           # None means the epochs in train/session_config.json
+PROFILE = "edge"
 ''')
 code('''
 !git clone -q --depth 1 -b agbe2 https://github.com/nevodesigns/agbe.git /kaggle/working/agbe
 %cd /kaggle/working/agbe
 !pip -q install -U "transformers>=4.46" accelerate bitsandbytes peft trl datasets huggingface_hub
+CFG = json.load(open("train/session_config.json"))   # every tunable number lives in this file, in the repo
+BAKEOFF_SAMPLE, EXTRACT_MODEL, EXTRACT_PASSAGES = CFG["bakeoff_sample"], CFG["extract_model"], CFG["extract_passages"]
+EPOCHS = EPOCHS_OVERRIDE or CFG["epochs"]
+BASES = {k: tuple(v) for k, v in CFG["bases"].items() if BASE_KEYS is None or k in BASE_KEYS}
+print("config:", CFG, "| bases this run:", list(BASES), "| epochs:", EPOCHS)
 WORK = pathlib.Path("/kaggle/working/work"); WORK.mkdir(exist_ok=True)
 PASSAGES = WORK / "passages.jsonl"
 !gunzip -c data/fulltext_v1/passages.jsonl.gz > {PASSAGES}
 !wc -l {PASSAGES}
-!python train/hf_persist.py pull {HF_REPO} {WORK} --path-in-repo {RUN}
+!python train/hf_persist.py pull {HF_REPO} {WORK} --path-in-repo {DATA_RUN}
 def save(): subprocess.run(["python", "train/hf_persist.py", "push", HF_REPO, str(WORK), "--path-in-repo", RUN])
 ''')
 
@@ -71,7 +76,7 @@ if "A" in STAGES and not (WORK / "bakeoff_big" / "summary.json").exists():
     save()
 ''')
 code('''
-if set(STAGES) & set("ACDE"):
+if "A" in STAGES:
     !python tools/pick_base.py {WORK}/bakeoff_*/summary.json --out {WORK}/chosen_base.json
     choice = json.load(open(WORK / "chosen_base.json"))
     BASE = (choice["best_small"] or choice["best"]) if PROFILE == "edge" else choice["best"]
@@ -86,7 +91,7 @@ Then the model writes farmer questions, and the builder composes grounded, absta
 """)
 code('''
 if "B" in STAGES:
-  !python tools/extract_claims.py --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 8 --prioritise --limit {EXTRACT_PASSAGES} --resume --passages {PASSAGES} --out {WORK}/claims.jsonl
+  !python tools/extract_claims.py --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 8 --prioritise --max-study-hits 2 --min-signal 2 --limit {EXTRACT_PASSAGES} --resume --passages {PASSAGES} --out {WORK}/claims.jsonl
   save()
   import collections
   print(collections.Counter(json.loads(l)["status"] for l in open(WORK / "claims.jsonl")))
@@ -94,10 +99,11 @@ if "B" in STAGES:
 code('''
 if "B" in STAGES:
   !python tools/build_grounded_sft.py questions --passages {PASSAGES} --claims {WORK}/claims.jsonl --out {WORK}/questions.jsonl --backend transformers --model {EXTRACT_MODEL} --load-4bit --batch 16 --resume
-  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl
+  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl --variants {CFG["variants"]}
   save()
   n = sum(1 for _ in open(WORK / "sft.jsonl")); print(n, "training examples")
-  if n < 600: print("WARNING: fewer than 600 examples. Raise EXTRACT_PASSAGES and rerun stage B before training.")
+  if n < 600: print("WARNING: fewer than 600 examples. Raise extract_passages in train/session_config.json and rerun stage B before training.")
+  !python train/diagnose_data.py --claims {WORK}/claims.jsonl --sft {WORK}/sft.jsonl
 ''')
 
 md("""
@@ -107,11 +113,11 @@ The bake-off showed the small models are too close to call on a 60-prompt test, 
 First the training set is rebuilt with 10% of passages held out for testing, then every base is scored on the held-out test, then each is trained (a 20-step smoke test first).
 """)
 code('''
-BASES = {"gemma1b": ("google/gemma-3-1b-it", "1.5e-4"), "qwen17": ("Qwen/Qwen3-1.7B", "1.5e-4"), "qwen4b": ("Qwen/Qwen3-4B-Instruct-2507", "1e-4")}
 if "C" in STAGES:
-  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl --holdout 0.1 --eval-out {WORK}/rag_eval.jsonl
+  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl --variants {CFG["variants"]} --holdout {CFG["holdout"]} --eval-out {WORK}/rag_eval.jsonl
   save()
   print(sum(1 for _ in open(WORK / "sft.jsonl")), "training examples;", sum(1 for _ in open(WORK / "rag_eval.jsonl")), "held-out test cases")
+  !python train/diagnose_data.py --sft {WORK}/sft.jsonl
 ''')
 code('''
 if "C" in STAGES:
@@ -128,7 +134,7 @@ if "C" in STAGES:
       continue
     if i == 0:
       !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {base} --out {WORK}/adapter_smoke --max-steps 20
-    !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {base} --out {WORK}/adapter_{key} --rank 32 --epochs 2 --lr {lr}
+    !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {base} --out {WORK}/adapter_{key} --rank 32 --epochs {EPOCHS} --lr {lr}
     save()
 ''')
 
@@ -161,16 +167,18 @@ In the right panel, **Output**, under `work/`: `agbe-v2-<name>-q4_k_m.gguf` for 
 Send the table printed at the end, and the models are next measured on the real target (CPU speed and memory).
 """)
 
-SESSIONS = [
-    (1, '["A"]', "the bake-off of base models, about 2 to 3 hours", "AGBE_v2_1_bakeoff.ipynb"),
-    (2, '["B"]', "claims, questions and training data, about 3 to 4 hours", "AGBE_v2_2_data.ipynb"),
-    (3, '["C", "D", "E"]', "pick the base, train, export the GGUF and re-test, about 3 hours", "AGBE_v2_3_train.ipynb"),
+SESSIONS = [  # (label, stages, what, file, run folder, base keys, epochs)
+    ("1", '["A"]', "the bake-off of base models, about 2 to 3 hours", "AGBE_v2_1_bakeoff.ipynb", "run1", "None", "None"),
+    ("2", '["B"]', "claims, questions and training data, about 3 to 4 hours (already done once; this is the first pass)", "AGBE_v2_2_data.ipynb", "run1", "None", "None"),
+    ("2b", '["B"]', "MORE training data: it resumes from the passages already done and adds about 1,150 more, about 5 to 8 hours", "AGBE_v2_2b_more_data.ipynb", "run1", "None", "None"),
+    ("3s", '["C", "D", "E"]', "SMOKE TEST of training, export and testing on the data so far, one base and one epoch, about 1 to 2 hours. Its results go to a separate folder and are not the final models", "AGBE_v2_3s_smoketest.ipynb", "smoke", '["gemma1b"]', "1"),
+    ("3", '["C", "D", "E"]', "train the three bases on the full data, export the GGUFs and re-test, about 4 to 6 hours. Run it after 2b has finished", "AGBE_v2_3_train.ipynb", "run1", "None", "None"),
 ]
 meta = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}}
-for n, stages, what, fname in SESSIONS:
+for n, stages, what, fname, run, keys, epochs in SESSIONS:
     out_cells = []
     for c in cells:
-        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", str(n)).replace("@@WHAT@@", what)
+        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", n).replace("@@RUN@@", run).replace("@@KEYS@@", keys).replace("@@EPOCHS@@", epochs).replace("@@WHAT@@", what)
         out_cells.append(dict(c, source=src.splitlines(keepends=True)))
     (HERE / fname).write_text(json.dumps({"cells": out_cells, "metadata": meta, "nbformat": 4, "nbformat_minor": 5}, indent=1))
     print("wrote", fname)
