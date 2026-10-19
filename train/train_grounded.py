@@ -92,7 +92,7 @@ def main():
         if prm.requires_grad and prm.dtype != torch.float32:
             prm.data = prm.data.float()
     trainer.train()
-    model.save_pretrained(a.out)
+    trainer.model.save_pretrained(a.out)  # the PEFT-wrapped model: writes adapter_config.json and the adapter weights, not the whole base
     tok.save_pretrained(a.out)
     print("adapter saved to", a.out)
 

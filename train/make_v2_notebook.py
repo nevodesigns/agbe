@@ -130,7 +130,7 @@ code('''
 if "C" in STAGES:
   !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base google/gemma-3-1b-it --out {WORK}/adapter_smoke --dry-data
   for i, (key, (base, lr)) in enumerate(BASES.items()):
-    if (WORK / f"adapter_{key}").exists():
+    if (WORK / f"adapter_{key}" / "adapter_config.json").exists():
       continue
     if i == 0:
       !CUDA_VISIBLE_DEVICES=0 python train/train_grounded.py --data {WORK}/sft.jsonl --base {base} --out {WORK}/adapter_smoke --max-steps 20
