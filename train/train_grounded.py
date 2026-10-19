@@ -69,7 +69,7 @@ def main():
     nval = max(8, int(len(data) * a.val_share))
     train_ds, val_ds = Dataset.from_list(data[nval:]), Dataset.from_list(data[:nval])
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16, bnb_4bit_use_double_quant=True)
-    model = AutoModelForCausalLM.from_pretrained(a.base, quantization_config=bnb, device_map="auto", attn_implementation="eager")
+    model = AutoModelForCausalLM.from_pretrained(a.base, quantization_config=bnb, device_map="auto", attn_implementation="eager", torch_dtype=torch.float16)  # T4 has no bf16, and fp16 training cannot unscale bf16 grads
     lora = LoraConfig(r=a.rank, lora_alpha=a.alpha or 2 * a.rank, lora_dropout=0.05, task_type="CAUSAL_LM",
                       target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"])
     import dataclasses
@@ -87,7 +87,11 @@ def main():
     if dropped:
         print("WARNING: this transformers/trl version has no", dropped, "so they are skipped")
     cfg = SFTConfig(**{k: v for k, v in kw.items() if k in known})
-    SFTTrainer(model=model, args=cfg, train_dataset=train_ds, eval_dataset=val_ds, peft_config=lora, processing_class=tok).train()
+    trainer = SFTTrainer(model=model, args=cfg, train_dataset=train_ds, eval_dataset=val_ds, peft_config=lora, processing_class=tok)
+    for prm in trainer.model.parameters():  # the fp16 grad scaler needs float32 trainable weights
+        if prm.requires_grad and prm.dtype != torch.float32:
+            prm.data = prm.data.float()
+    trainer.train()
     model.save_pretrained(a.out)
     tok.save_pretrained(a.out)
     print("adapter saved to", a.out)
