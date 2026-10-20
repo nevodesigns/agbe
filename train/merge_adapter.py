@@ -23,8 +23,46 @@ ap.add_argument("--adapter", required=True)
 ap.add_argument("--out", required=True)
 a = ap.parse_args()
 tok = AutoTokenizer.from_pretrained(a.base)
-model = AutoModelForCausalLM.from_pretrained(a.base, torch_dtype=torch.float16, device_map="cpu")
-model = PeftModel.from_pretrained(model, a.adapter).merge_and_unload()
+try:  # float32 so the small LoRA changes are not rounded away when added; newer transformers calls the argument dtype
+    model = AutoModelForCausalLM.from_pretrained(a.base, dtype=torch.float32, device_map="cpu")
+except TypeError:
+    model = AutoModelForCausalLM.from_pretrained(a.base, torch_dtype=torch.float32, device_map="cpu")
+probe_name = next(n for n, _ in model.named_parameters() if "layers.0.self_attn.q_proj.weight" in n)
+before = dict(model.named_parameters())[probe_name].detach().clone()
+pm = PeftModel.from_pretrained(model, a.adapter)
+
+SOURCE = "[1] (Maize guide, p.3) Plant maize at the onset of rains. Space rows 75 cm apart and plants 25 cm apart within the row. Thin to one plant per stand two weeks after planting."
+MSG = [{"role": "system", "content": "You are AGBE, an agricultural advisor. Use only the numbered sources provided. Cite them like [1].\n\nSources:\n" + SOURCE},
+       {"role": "user", "content": "How far apart should I plant maize?"}]
+
+
+def sample(m):
+    enc = tok.apply_chat_template(MSG, add_generation_prompt=True, return_tensors="pt", return_dict=True)
+    with torch.no_grad():
+        out = m.generate(**enc, max_new_tokens=60, do_sample=False)
+    return tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
+
+
+try:  # three-way sanity check: base, adapter applied but not merged, merged
+    with pm.disable_adapter():
+        s_base = sample(pm)
+    s_adapter = sample(pm)
+except Exception as e:
+    s_base = s_adapter = "sanity check failed: %r" % (e,)
+model = pm.merge_and_unload()
+after = dict(model.named_parameters())[probe_name].detach()
+delta = float((after - before).abs().max())
+print("MERGE CHECK: largest change in", probe_name, "=", delta)
+try:
+    s_merged = sample(model)
+except Exception as e:
+    s_merged = "sanity check failed: %r" % (e,)
+print("SANITY base    :", s_base)
+print("SANITY adapter :", s_adapter)
+print("SANITY merged  :", s_merged)
+if delta == 0.0:
+    sys.exit("the merge changed nothing: the adapter was not applied")
+model = model.to(torch.float16)
 model.save_pretrained(a.out, safe_serialization=True)
 tok.save_pretrained(a.out)
 # the converter wants the original tokenizer files, and the older config key; newer transformers saves both differently
