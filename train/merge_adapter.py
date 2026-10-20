@@ -69,6 +69,18 @@ for attr in ("dtype", "torch_dtype"):  # newer transformers saves weights in the
     except Exception:
         pass
 model.save_pretrained(a.out, safe_serialization=True)
+# the evaluation and the GGUF both start from the saved file, so prove the file still behaves like the merged model
+try:
+    del model, pm
+    try:
+        reloaded = AutoModelForCausalLM.from_pretrained(a.out, dtype=torch.float16, device_map="cpu")
+    except TypeError:
+        reloaded = AutoModelForCausalLM.from_pretrained(a.out, torch_dtype=torch.float16, device_map="cpu")
+    s_saved = sample(reloaded)
+    print("SANITY saved   :", s_saved)
+    print("SAVED FILE KEEPS THE TRAINING:", s_saved != s_base and s_saved == s_merged, "(same as merged:", s_saved == s_merged, "| differs from base:", s_saved != s_base, ")")
+except Exception as e:
+    print("saved-file check failed:", repr(e))
 tok.save_pretrained(a.out)
 # the converter wants the original tokenizer files, and the older config key; newer transformers saves both differently
 import json, os, shutil
