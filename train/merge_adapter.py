@@ -43,6 +43,33 @@ def sample(m):
     return tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
 
 
+import json as _json, pathlib as _pl
+ROOT = _pl.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+PROBES = []
+try:
+    from serve.guard import build_messages
+    ev = _pl.Path(a.adapter).parent / "rag_eval.jsonl"
+    recs = [_json.loads(l) for l in open(ev) if l.strip()]
+    PROBES = [build_messages(r["question"], r["sources"]) for r in recs if r["kind"] == "grounded"][:3]
+except Exception as e:
+    print("real-prompt probes unavailable:", repr(e))
+
+
+def probe(m, tag):
+    for i, msgs in enumerate(PROBES):
+        enc = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt", return_dict=True)
+        with torch.no_grad():
+            out = m.generate(**enc, max_new_tokens=70, do_sample=False)
+        print(f"PROBE{i} {tag}:", tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip().replace("\n", " ")[:260])
+
+
+try:
+    with pm.disable_adapter():
+        probe(pm, "base   ")
+    probe(pm, "adapter")
+except Exception as e:
+    print("probe failed:", repr(e))
 try:  # three-way sanity check: base, adapter applied but not merged, merged
     with pm.disable_adapter():
         s_base = sample(pm)
@@ -60,6 +87,10 @@ except Exception as e:
 print("SANITY base    :", s_base)
 print("SANITY adapter :", s_adapter)
 print("SANITY merged  :", s_merged)
+try:
+    probe(model, "merged ")
+except Exception as e:
+    print("probe failed:", repr(e))
 if delta == 0.0:
     sys.exit("the merge changed nothing: the adapter was not applied")
 model = model.to(torch.float16)
