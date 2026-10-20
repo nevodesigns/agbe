@@ -86,11 +86,13 @@ def overlap(q: str, claim: str) -> float:
 
 
 SURVEY = re.compile(r"^(most|many|some|few|farmers|respondents|households|participants)\b", re.I)
-MIN_LEAD, MIN_REST = 0.15, 0.05  # a lead claim must share words with the question, or the example teaches answering off-topic
+HUMAN = re.compile(r"\b(fever|malaria|patients?|infants?|weaning|lactating|convalescing|diarrh\w+|vomit\w*|cough|pregnan\w*|human health|breastfe\w+|medicine|medical)\b", re.I)
+BAD_Q = re.compile(r"\b(the (study|passage|guide|text|document|paper|article|authors?|researchers?)|this study|participants?)\b", re.I)  # teaches "mentioned in the passage" phrasing
+MIN_LEAD, MIN_REST = 0.15, 0.10  # a lead claim must share words with the question, or the example teaches answering off-topic
 
 
 def compose_answer(question: str, claims: list[dict], n: int, max_claims: int = 4) -> str | None:
-    claims = [c for c in claims if not SURVEY.match(c["claim"])]  # survey findings describe people, not advice
+    claims = [c for c in claims if not SURVEY.match(c["claim"]) and not HUMAN.search(c["claim"])]  # survey findings describe people; human health is out of scope
     ranked = sorted(claims, key=lambda c: -overlap(question, c["claim"]))
     if not ranked or overlap(question, ranked[0]["claim"]) < MIN_LEAD:
         return None
@@ -123,7 +125,7 @@ def stage_compose(a):
         pid = row["passage_id"]
         if pid not in claims or pid not in passages:
             continue
-        for q in [x for x in row["raw"] if isinstance(x, str)][:3]:
+        for q in [x for x in row["raw"] if isinstance(x, str) and not BAD_Q.search(x)][:3]:
             near = [p for p in retr.top(q, 6) if p["passage_id"] != pid]
             if len(near) < 3:  # top up with unrelated passages so every example has distractors
                 others = [p for k, p in passages.items() if k != pid and k not in {n["passage_id"] for n in near}]

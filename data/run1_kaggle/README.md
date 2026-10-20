@@ -2,9 +2,9 @@
 
 Fetched with `kaggle kernels output`. All passages come from Tier A (CC-BY) sources, see data/fulltext_v1/ATTRIBUTION.md.
 
-- claims.jsonl: 800 claims from 590 passages by Qwen2.5-7B-Instruct (570 accepted, 7 review, 223 rejected by the verifier)
+- claims.jsonl: 1,765 claims from 1,739 passages (run 1 plus notebook 2b): 1,205 accepted, 12 review, 548 rejected
 - questions.jsonl: questions written for the 191 passages that have an accepted claim
-- sft.jsonl: the 375 training conversations from the first composer (before the off-topic filter)
+- sft.jsonl: 1,457 training conversations from the composer before the extra filters
 - notebook1_bakeoff_log.txt, notebook2_log.txt: the Kaggle logs
 
 Quality check (19 Oct 2026, train/diagnose_data.py): accepted claims are mostly sound advice sentences quoted verbatim.
