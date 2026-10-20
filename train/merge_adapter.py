@@ -63,6 +63,11 @@ print("SANITY merged  :", s_merged)
 if delta == 0.0:
     sys.exit("the merge changed nothing: the adapter was not applied")
 model = model.to(torch.float16)
+for attr in ("dtype", "torch_dtype"):  # newer transformers saves weights in the dtype named in the config
+    try:
+        setattr(model.config, attr, torch.float16)
+    except Exception:
+        pass
 model.save_pretrained(a.out, safe_serialization=True)
 tok.save_pretrained(a.out)
 # the converter wants the original tokenizer files, and the older config key; newer transformers saves both differently
