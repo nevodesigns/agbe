@@ -73,7 +73,9 @@ def load_generator(model_id: str, load_4bit: bool, max_new: int):
     if load_4bit:
         kw["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16, bnb_4bit_quant_type="nf4")
     else:
-        kw["torch_dtype"] = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
+        # T4 reports bf16 support but has no native bf16; bf16 compute there washes out small fine-tuning changes, so use it only on Ampere or newer
+        native_bf16 = torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8
+        kw["torch_dtype"] = torch.bfloat16 if native_bf16 else torch.float16
     model = AutoModelForCausalLM.from_pretrained(model_id, **kw)
 
     def gen(messages):
