@@ -4,7 +4,14 @@ UNTESTED until run on a GPU session.
 
     python3 train/merge_adapter.py --base google/gemma-3-1b-it --adapter adapter-1b --out merged-1b
 """
-import argparse
+import argparse, importlib.metadata as md, subprocess, sys
+
+# Kaggle ships an old torchao that peft refuses to import next to; it is not needed here, so remove it
+try:
+    if tuple(int(x) for x in md.version("torchao").split(".")[:2]) < (0, 16):
+        subprocess.run([sys.executable, "-m", "pip", "-q", "uninstall", "-y", "torchao"], check=False)
+except md.PackageNotFoundError:
+    pass
 
 import torch
 from peft import PeftModel
