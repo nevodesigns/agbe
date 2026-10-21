@@ -11,8 +11,8 @@ Read this first if you are picking the work up cold, whether you are me in a new
 | Claims and training data | Done. 1,205 accepted claims from 429 passages; 1,280 training examples and 140 held-out cases after filters. Raw copies in `data/run1_kaggle/` |
 | Guard, endpoint, evaluation, CI | Built and tested on CPU, CI green |
 | Kaggle pipeline | Runs end to end (train, merge, GGUF, held-out evaluation). Five generated notebooks, see `docs/V2_ENGINEERING_LOG.md` |
-| Trained v2 model | First smoke model scored (Gemma 3 1B, 1 epoch): grounded pass 7.1% to 64.3%, right source 11.4% to 47.1%, correct abstention 0% to 35.7%, wrongly abstains 28.6%. Merge fault fixed and confirmed (f2f464d). Not the final model |
-| Full training (three bases) | Ready to run: `AGBE_v2_3_train.ipynb`, about 4 to 6 hours |
+| Trained v2 models | Three bases trained and scored (21 Oct): Qwen3 4B 88.6% grounded pass, 71.4% correct abstention; Qwen3 1.7B 87.1% and 41.4%; Gemma 3 1B 65.7% and 35.7%. Adapters and Q4_K_M GGUFs in the private HF repo, folder `run1`. Quantised models not yet timed or scored |
+| Full training (three bases) | Done. Next: CPU speed, memory and quantised quality; abstain data; wire the guard |
 | Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
 | Agronomist | Not found yet |
 | Not yet verified | the scored v2 model, the GGUF quantised model on a CPU, container build, phone build |

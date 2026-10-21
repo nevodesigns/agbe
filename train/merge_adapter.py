@@ -46,6 +46,7 @@ def sample(m):
 import json as _json, pathlib as _pl
 ROOT = _pl.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+BASE_PROBES = []
 PROBES = []
 try:
     from serve.guard import build_messages
@@ -57,16 +58,20 @@ except Exception as e:
 
 
 def probe(m, tag):
+    outs = []
     for i, msgs in enumerate(PROBES):
         enc = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt", return_dict=True)
         with torch.no_grad():
             out = m.generate(**enc, max_new_tokens=70, do_sample=False)
-        print(f"PROBE{i} {tag}:", tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip().replace("\n", " ")[:260])
+        t = tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip().replace("\n", " ")
+        outs.append(t)
+        print(f"PROBE{i} {tag}:", t[:260])
+    return outs
 
 
 try:
     with pm.disable_adapter():
-        probe(pm, "base   ")
+        BASE_PROBES = probe(pm, "base   ")
     probe(pm, "adapter")
 except Exception as e:
     print("probe failed:", repr(e))
@@ -139,6 +144,6 @@ try:  # final proof on the finished folder, after every file copy
         out = final.generate(**enc, max_new_tokens=60, do_sample=False)
     txt = tok_final.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip().replace("\n", " ")
     print("FINAL FOLDER ANSWER:", txt[:240])
-    print("FINAL FOLDER IS THE TUNED MODEL:", "[1]" in txt or "[2]" in txt or "[3]" in txt)
+    print("FINAL FOLDER IS THE TUNED MODEL:", bool(BASE_PROBES) and txt != BASE_PROBES[0])  # differs from the untrained answer on the same prompt
 except Exception as e:
     print("final folder check failed:", repr(e))

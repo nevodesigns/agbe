@@ -7,7 +7,7 @@ What was built after the Africa Deep Tech Challenge final, in the order it happe
 - The competition build, v16, is frozen at the tag `adtc-2026-final`. Result: top 10 finalist among 291 submissions, not top three.
 - v2 is a different design: answers come from numbered, openly licensed source passages, every sentence is checked against them, and the model says so when no source covers the question.
 - The whole pipeline runs end to end on a free Kaggle GPU: data, training, merge, GGUF export, held-out evaluation. The merge fault (fault 11) is fixed and confirmed: the finished folder is the tuned model and the GGUF converter now reads float16.
-- **First scored v2 model (smoke test, 21 Oct 2026):** Gemma 3 1B, one epoch, 1,216 training examples, scored on 140 held-out cases (70 grounded, 70 abstain). Grounded pass 7.1% to 64.3%, valid citation 17.1% to 71.4%, right source 11.4% to 47.1%, correct abstention when no source covers the question 0% to 35.7%. The cost: it wrongly abstains on 28.6% of grounded cases (2.9% before). This is a smoke test, not the final model, and it was scored in float16 before quantisation. The cases are held out by passage, not by document, so other passages of the same documents were in training.
+- **Full run, 21 Oct 2026:** Qwen3 1.7B reaches 87.1% grounded pass (from 24.3%) and Qwen3 4B 88.6% (from 31.4%); see the results section. Earlier smoke test:  Gemma 3 1B, one epoch, 1,216 training examples, scored on 140 held-out cases (70 grounded, 70 abstain). Grounded pass 7.1% to 64.3%, valid citation 17.1% to 71.4%, right source 11.4% to 47.1%, correct abstention when no source covers the question 0% to 35.7%. The cost: it wrongly abstains on 28.6% of grounded cases (2.9% before). This is a smoke test, not the final model, and it was scored in float16 before quantisation. The cases are held out by passage, not by document, so other passages of the same documents were in training.
 
 ## The design
 
@@ -70,6 +70,33 @@ Reading: citing and answering from sources improved enormously. Knowing when to 
 - **Guard hard rules:** development set 53 of 62 attacks stopped and none of 30 legitimate questions blocked; holdout set (written before tuning) 28 of 30 and none of 22.
 - **GGUF size:** Q4_K_M is 806 MB for Gemma 3 1B. 130 of 340 tensors fell back to other quantisation types, so the quantised model must be judged on its own, on a CPU, before any claim.
 
+## Full training run results (21 Oct 2026)
+
+Three bases trained on the same 1,216 examples for two epochs each (about 5.8 hours on a free Kaggle T4, notebook `AGBE_v2_3_train`), merged, exported to GGUF Q4_K_M, and scored on the same 140 held-out cases (70 grounded, 70 abstain; held out by passage, not by document; scored on the merged float16 model, before quantisation).
+
+| Model | Grounded pass | Supported sentences | Valid citation | Right source | Wrongly abstains | Correct abstention |
+|---|---|---|---|---|---|---|
+| Gemma 3 1B, untrained | 0.071 | 0.676 | 0.171 | 0.114 | 0.029 | 0.000 |
+| Gemma 3 1B, tuned | 0.657 | 0.674 | 0.743 | 0.629 | 0.257 | 0.357 |
+| Qwen3 1.7B, untrained | 0.243 | 0.582 | 0.700 | 0.557 | 0.000 | 0.014 |
+| **Qwen3 1.7B, tuned** | **0.871** | **0.895** | **0.957** | **0.929** | **0.043** | **0.414** |
+| Qwen3 4B Instruct, untrained | 0.314 | 0.582 | 1.000 | 0.900 | 0.000 | 0.186 |
+| **Qwen3 4B Instruct, tuned** | **0.886** | **0.910** | **0.971** | **0.914** | **0.029** | **0.714** |
+
+Training time: Gemma 30 minutes, Qwen3 1.7B 59 minutes, Qwen3 4B about 2.4 hours. Mean training loss 0.51 (Gemma) and 0.45 (Qwen3 1.7B); validation token accuracy 0.92 and 0.93 respectively.
+
+Reading:
+- Qwen3 1.7B is the edge candidate: 87% grounded pass with a third of the cost of the 4B, and it wrongly abstains on only 4% of answerable cases. Its weakness is abstention: it answers in 59% of the cases where no source covers the question.
+- Qwen3 4B is the server candidate: the best on every measure and the only one that abstains correctly most of the time (71%).
+- Gemma 3 1B, the competition base, is clearly the weakest after training (66% pass, 26% wrong abstentions). A different base is the better choice for v2. Both Qwen3 models are released under the Apache 2.0 licence, which should be re-checked on the model cards before any commercial use; the Gemma terms are more restrictive.
+- The next gap is abstention: it needs more and harder abstain examples (questions near the right topic but not covered), and the guard's claim check stays in place as the safety net.
+
+Files (private Hugging Face repository `NEVODESIGN/agbe-v2-work`, folder `run1`): adapters, `agbe-v2-{gemma1b,qwen17,qwen4b}-q4_k_m.gguf` (806 MB, 1.1 GB, 2.5 GB) with checksums, and the per-case score files `rageval_{base,tuned}_*.json`.
+
+Not yet done: scoring and timing the quantised GGUF files on a 4 core CPU (speed, memory, quality after quantisation); the held-out test is still small (140 cases) and shares documents with training; no human review of answers yet.
+
+Known quirk: the `FINAL FOLDER IS THE TUNED MODEL` line printed `False` for the first merge (Gemma) although its scores prove it is tuned. The check looked for a citation marker; it now compares against the untrained answer on the same prompt.
+
 ## Reproducing
 
 ```bash
@@ -85,10 +112,11 @@ Kaggle notebooks (generated, then imported by hand): `AGBE_v2_2b_more_data` (mor
 ## Next steps
 
 1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
-2. Run `AGBE_v2_3_train.ipynb` (about 4 to 6 hours): Gemma 3 1B, Qwen3 1.7B and Qwen3 4B on the same data.
-3. Measure the GGUF files on a 4 core CPU (speed and memory) and score the quantised model, not only the merged one.
-4. Choose an edge model and a server model from the held-out numbers, wire the guard to them, measure the whole system.
-5. Grow the fact base, find an agronomist, follow up the permission emails (1 Nov 2026), then package: container, model card, phone build.
+2. Done: `AGBE_v2_3_train.ipynb` ran (results above).
+3. Measure the GGUF files on a 4 core CPU (speed and memory) and score the quantised models, not only the merged ones.
+4. Wire the guard to Qwen3 1.7B (edge) and Qwen3 4B (server) and measure the whole system, including the guard's effect on abstention.
+5. Add harder abstain examples and retrain to lift correct abstention; enlarge the held-out set and split it by document.
+6. Grow the fact base, find an agronomist, follow up the permission emails (1 Nov 2026), then package: container, model card, phone build.
 
 ## Lessons
 
