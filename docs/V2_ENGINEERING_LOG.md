@@ -113,7 +113,7 @@ Kaggle notebooks (generated, then imported by hand): `AGBE_v2_2b_more_data` (mor
 
 1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
 2. Done: `AGBE_v2_3_train.ipynb` ran (results above).
-3. Measure the GGUF files on a 4 core CPU (speed and memory) and score the quantised models, not only the merged ones.
+3. Measure the GGUF files on a 4 core CPU (speed and memory) and score the quantised models, not only the merged ones: notebook `AGBE_v2_4_gguf_cpu` (llama.cpp built from the same source, one `llama-server` per model, `train/gguf_eval.py`) is written and tested against a fake server; not yet run on Kaggle.
 4. Wire the guard to Qwen3 1.7B (edge) and Qwen3 4B (server) and measure the whole system, including the guard's effect on abstention.
 5. Add harder abstain examples and retrain to lift correct abstention; enlarge the held-out set and split it by document.
 6. Grow the fact base, find an agronomist, follow up the permission emails (1 Nov 2026), then package: container, model card, phone build.
