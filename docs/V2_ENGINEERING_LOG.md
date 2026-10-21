@@ -6,8 +6,8 @@ What was built after the Africa Deep Tech Challenge final, in the order it happe
 
 - The competition build, v16, is frozen at the tag `adtc-2026-final`. Result: top 10 finalist among 291 submissions, not top three.
 - v2 is a different design: answers come from numbered, openly licensed source passages, every sentence is checked against them, and the model says so when no source covers the question.
-- The whole pipeline now runs end to end on a free Kaggle GPU: data, training, merge, GGUF export, held-out evaluation. The last bug found (the merge overwrote the trained weights, see fault 8) is fixed but its fix has not yet been confirmed by a scored run.
-- No v2 model has been scored yet. Nothing in this log claims v2 quality.
+- The whole pipeline runs end to end on a free Kaggle GPU: data, training, merge, GGUF export, held-out evaluation. The merge fault (fault 11) is fixed and confirmed: the finished folder is the tuned model and the GGUF converter now reads float16.
+- **First scored v2 model (smoke test, 21 Oct 2026):** Gemma 3 1B, one epoch, 1,216 training examples, scored on 140 held-out cases (70 grounded, 70 abstain). Grounded pass 7.1% to 64.3%, valid citation 17.1% to 71.4%, right source 11.4% to 47.1%, correct abstention when no source covers the question 0% to 35.7%. The cost: it wrongly abstains on 28.6% of grounded cases (2.9% before). This is a smoke test, not the final model, and it was scored in float16 before quantisation. The cases are held out by passage, not by document, so other passages of the same documents were in training.
 
 ## The design
 
@@ -54,6 +54,19 @@ Each was found by a test or by reading the real data. Keeping this list is the p
 - **Bake-off (60 prompts, retrieval mode):** Qwen3-4B-Instruct 33/60 with 0 leaks; Gemma 3 1B 25/60, 7 leaks; Qwen3-1.7B 23/60, 4 leaks; Gemma 3 4B 23/60; SmolLM3-3B 25/60, 9 leaks. The small models are within noise. See `docs/BAKEOFF_RESULTS.md`.
 - **Held-out baseline, untrained Gemma 3 1B, 140 cases:** grounded pass 7.1%, valid citation 17.1%, right source 11.4%, abstain pass 0%. (11.4% pass in earlier runs used bfloat16 loading; float16 is the correct setting on a T4.) These are the numbers training must beat.
 - **Training, 1 epoch, 1,216 examples:** loss 2.8 to 0.44, token accuracy 0.89, 14 minutes on a T4.
+- **First tuned model on the same 140 held-out cases (merged, float16, not yet quantised):**
+
+| Measure | Untrained | Tuned, 1 epoch |
+|---|---|---|
+| Grounded pass | 0.071 | 0.643 |
+| Supported sentences | 0.676 | 0.657 |
+| Valid citation | 0.171 | 0.714 |
+| Right source | 0.114 | 0.471 |
+| Wrongly abstained (grounded cases) | 0.029 | 0.286 |
+| Abstain pass (no source) | 0.0 | 0.357 |
+| Answered although no source | 1.0 | 0.643 |
+
+Reading: citing and answering from sources improved enormously. Knowing when to abstain improved but is still weak, and the model now abstains too often on answerable questions. Supported-sentence share did not improve, so the claim check in the guard stays necessary. Two epochs, larger bases and more abstain examples are the next levers.
 - **Guard hard rules:** development set 53 of 62 attacks stopped and none of 30 legitimate questions blocked; holdout set (written before tuning) 28 of 30 and none of 22.
 - **GGUF size:** Q4_K_M is 806 MB for Gemma 3 1B. 130 of 340 tensors fell back to other quantisation types, so the quantised model must be judged on its own, on a CPU, before any claim.
 
@@ -71,7 +84,7 @@ Kaggle notebooks (generated, then imported by hand): `AGBE_v2_2b_more_data` (mor
 
 ## Next steps
 
-1. Run the smoke test once more. Expected: `FINAL FOLDER IS THE TUNED MODEL: True`, tuned scores clearly above the baseline.
+1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
 2. Run `AGBE_v2_3_train.ipynb` (about 4 to 6 hours): Gemma 3 1B, Qwen3 1.7B and Qwen3 4B on the same data.
 3. Measure the GGUF files on a 4 core CPU (speed and memory) and score the quantised model, not only the merged one.
 4. Choose an edge model and a server model from the held-out numbers, wire the guard to them, measure the whole system.

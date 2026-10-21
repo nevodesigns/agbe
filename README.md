@@ -13,7 +13,7 @@ and getting produce to market.
 
 > **This is the `agbe2` line.** The version submitted to the Africa Deep Tech Challenge 2026 (v16) reached the final as **one of the top 10 finalists among 291 submissions** and is preserved at the tag `adtc-2026-final`. Work here targets a grounded, verifiable, deployable v2: answers come from numbered, openly licensed source passages, every sentence is checked against them, and the model says so when no source covers the question.
 >
-> **v2 status (21 Oct 2026):** the data pipeline (8,062 passages, 1,205 verified claims, 1,280 training examples), the guard, the endpoint and the Kaggle training pipeline are built and run end to end. No v2 model has been scored yet, so nothing on this page about quality refers to v2. The faults found along the way, the measurements and the next steps are in [docs/V2_ENGINEERING_LOG.md](docs/V2_ENGINEERING_LOG.md).
+> **v2 status (21 Oct 2026):** the data pipeline (8,062 passages, 1,205 verified claims, 1,280 training examples), the guard, the endpoint and the Kaggle training pipeline are built and run end to end. The first v2 smoke model (Gemma 3 1B, one epoch) lifts held-out grounded pass from 7.1% to 64.3% and right-source citation from 11.4% to 47.1%, but it also abstains too often (28.6% of answerable cases); it is a test, not the final model, and nothing else on this page about quality refers to v2. The faults found along the way, the measurements and the next steps are in [docs/V2_ENGINEERING_LOG.md](docs/V2_ENGINEERING_LOG.md).
 
 ---
 
