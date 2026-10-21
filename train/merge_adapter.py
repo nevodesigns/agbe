@@ -116,12 +116,29 @@ tok.save_pretrained(a.out)
 # the converter wants the original tokenizer files, and the older config key; newer transformers saves both differently
 import json, os, shutil
 from huggingface_hub import snapshot_download
-snap = snapshot_download(a.base, allow_patterns=["tokenizer*", "special_tokens_map.json", "added_tokens.json", "chat_template*", "generation_config.json"])
-for f in os.listdir(snap):
-    shutil.copy2(os.path.join(snap, f), os.path.join(a.out, f))
+import fnmatch
+KEEP = ["tokenizer*", "special_tokens_map.json", "added_tokens.json", "chat_template*", "generation_config.json"]
+snap = snapshot_download(a.base, allow_patterns=KEEP)
+for f in os.listdir(snap):  # only the tokenizer files: the snapshot folder also holds the BASE weights and config, which must never overwrite the merge
+    if any(fnmatch.fnmatch(f, pat) for pat in KEEP):
+        shutil.copy2(os.path.join(snap, f), os.path.join(a.out, f))
 cfgp = os.path.join(a.out, "config.json")
 cfg = json.load(open(cfgp))
 if "torch_dtype" not in cfg:
     cfg["torch_dtype"] = cfg.get("dtype", "float16")
     json.dump(cfg, open(cfgp, "w"), indent=2)
 print("merged model saved to", a.out)
+try:  # final proof on the finished folder, after every file copy
+    try:
+        final = AutoModelForCausalLM.from_pretrained(a.out, dtype=torch.float16, device_map="cpu")
+    except TypeError:
+        final = AutoModelForCausalLM.from_pretrained(a.out, torch_dtype=torch.float16, device_map="cpu")
+    tok_final = AutoTokenizer.from_pretrained(a.out)
+    enc = tok_final.apply_chat_template(PROBES[0] if PROBES else MSG, add_generation_prompt=True, return_tensors="pt", return_dict=True)
+    with torch.no_grad():
+        out = final.generate(**enc, max_new_tokens=60, do_sample=False)
+    txt = tok_final.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip().replace("\n", " ")
+    print("FINAL FOLDER ANSWER:", txt[:240])
+    print("FINAL FOLDER IS THE TUNED MODEL:", "[1]" in txt or "[2]" in txt or "[3]" in txt)
+except Exception as e:
+    print("final folder check failed:", repr(e))
