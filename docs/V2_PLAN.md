@@ -1,5 +1,7 @@
 # AGBE v2 plan
 
+> Current state and the faults found since this plan was written: see [V2_ENGINEERING_LOG.md](V2_ENGINEERING_LOG.md).
+
 AGBE v16 (tag `adtc-2026-final`) is the competition record. This branch is the next version: a grounded, verifiable, deployable offline farm advisor.
 
 ## Targets (to be tightened once the expert gold set exists)

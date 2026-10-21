@@ -1,5 +1,7 @@
 # AGBE, an offline agricultural extension model for 8 GB laptops
 
+<img src="docs/assets/badge-top10-finalist.svg" alt="Top 10 finalist, Africa Deep Tech Challenge 2026, 10 of 291 submissions" width="120" align="right">
+
 **Àgbẹ̀** is Yoruba for *farmer*. AGBE answers farming questions on an ordinary
 laptop with the internet switched off: crops, pests, livestock, soils, storage
 and getting produce to market.
@@ -9,7 +11,9 @@ and getting produce to market.
 - **Technical report:** [REPORT.md](REPORT.md)
 - **Domain:** Agriculture · **Base:** Gemma 3 1B · **Runtime:** llama.cpp · **Quant:** GGUF Q4_K_M
 
-> **This is the `agbe2` line.** The version submitted to the Africa Deep Tech Challenge 2026 (v16, finalist) is preserved at the tag `adtc-2026-final`. Work here targets a grounded, verifiable, deployable successor. Start with [docs/V2_HANDOFF.md](docs/V2_HANDOFF.md) for the current state and how to resume. See [docs/V2_PLAN.md](docs/V2_PLAN.md), the licence-tiered [source registry](data/sources/), and the [expert gold set](eval/gold/). Everything below describes v16.
+> **This is the `agbe2` line.** The version submitted to the Africa Deep Tech Challenge 2026 (v16) reached the final as **one of the top 10 finalists among 291 submissions** and is preserved at the tag `adtc-2026-final`. Work here targets a grounded, verifiable, deployable v2: answers come from numbered, openly licensed source passages, every sentence is checked against them, and the model says so when no source covers the question.
+>
+> **v2 status (21 Oct 2026):** the data pipeline (8,062 passages, 1,205 verified claims, 1,280 training examples), the guard, the endpoint and the Kaggle training pipeline are built and run end to end. No v2 model has been scored yet, so nothing on this page about quality refers to v2. The faults found along the way, the measurements and the next steps are in [docs/V2_ENGINEERING_LOG.md](docs/V2_ENGINEERING_LOG.md).
 
 ---
 

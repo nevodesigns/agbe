@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 220 220" role="img" aria-labelledby="t d">
+  <title id="t">Top 10 finalist</title>
+  <desc id="d">Africa Deep Tech Challenge 2026, one of 10 finalists out of 291 submissions. AGBE's own marker, not an official logo of the competition.</desc>
+  <defs>
+    <path id="arcTop" d="M 34 110 A 76 76 0 0 1 186 110"/>
+    <path id="arcBottom" d="M 24 110 A 86 86 0 0 0 196 110"/>
+  </defs>
+  <circle cx="208.00" cy="110.00" r="9" fill="#E4C77A"/><circle cx="205.54" cy="131.81" r="9" fill="#E4C77A"/><circle cx="198.29" cy="152.52" r="9" fill="#E4C77A"/><circle cx="186.62" cy="171.10" r="9" fill="#E4C77A"/><circle cx="171.10" cy="186.62" r="9" fill="#E4C77A"/><circle cx="152.52" cy="198.29" r="9" fill="#E4C77A"/><circle cx="131.81" cy="205.54" r="9" fill="#E4C77A"/><circle cx="110.00" cy="208.00" r="9" fill="#E4C77A"/><circle cx="88.19" cy="205.54" r="9" fill="#E4C77A"/><circle cx="67.48" cy="198.29" r="9" fill="#E4C77A"/><circle cx="48.90" cy="186.62" r="9" fill="#E4C77A"/><circle cx="33.38" cy="171.10" r="9" fill="#E4C77A"/><circle cx="21.71" cy="152.52" r="9" fill="#E4C77A"/><circle cx="14.46" cy="131.81" r="9" fill="#E4C77A"/><circle cx="12.00" cy="110.00" r="9" fill="#E4C77A"/><circle cx="14.46" cy="88.19" r="9" fill="#E4C77A"/><circle cx="21.71" cy="67.48" r="9" fill="#E4C77A"/><circle cx="33.38" cy="48.90" r="9" fill="#E4C77A"/><circle cx="48.90" cy="33.38" r="9" fill="#E4C77A"/><circle cx="67.48" cy="21.71" r="9" fill="#E4C77A"/><circle cx="88.19" cy="14.46" r="9" fill="#E4C77A"/><circle cx="110.00" cy="12.00" r="9" fill="#E4C77A"/><circle cx="131.81" cy="14.46" r="9" fill="#E4C77A"/><circle cx="152.52" cy="21.71" r="9" fill="#E4C77A"/><circle cx="171.10" cy="33.38" r="9" fill="#E4C77A"/><circle cx="186.62" cy="48.90" r="9" fill="#E4C77A"/><circle cx="198.29" cy="67.48" r="9" fill="#E4C77A"/><circle cx="205.54" cy="88.19" r="9" fill="#E4C77A"/>
+  <circle cx="110" cy="110" r="100" fill="#E4C77A"/>
+  <circle cx="110" cy="110" r="90" fill="#2E4633"/>
+  <circle cx="110" cy="110" r="88" fill="none" stroke="#E4C77A" stroke-width="1.3"/>
+  <circle cx="110" cy="110" r="52" fill="none" stroke="#E4C77A" stroke-width="1" opacity="0.55"/>
+  <text font-family="ui-sans-serif, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="10.6" font-weight="700" letter-spacing="2.2" fill="#F7F2E7">
+    <textPath href="#arcTop" xlink:href="#arcTop" startOffset="50%" text-anchor="middle">AFRICA DEEP TECH CHALLENGE</textPath>
+  </text>
+  <text x="110" y="86" text-anchor="middle" font-family="ui-sans-serif, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="3.4" fill="#E4C77A">TOP</text>
+  <text x="110" y="132" text-anchor="middle" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="58" font-weight="700" fill="#F7F2E7">10</text>
+  <text x="110" y="153" text-anchor="middle" font-family="ui-sans-serif, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="3.4" fill="#E4C77A">FINALIST</text>
+  <text font-family="ui-sans-serif, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="9.6" font-weight="600" letter-spacing="2" fill="#F7F2E7" opacity="0.95">
+    <textPath href="#arcBottom" xlink:href="#arcBottom" startOffset="50%" text-anchor="middle">2026 &#183; 10 OF 291 SUBMISSIONS</textPath>
+  </text>
+</svg>
