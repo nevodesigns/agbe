@@ -144,6 +144,16 @@ Reading:
 
 Decision candidates: **Qwen3 1.7B for the edge** (2.0 GB, 0.73x v16 speed, 87.1% pass) and **Qwen3 4B for a server or a strong laptop** (4.5 GB, 0.35x v16 speed, 80.0% correct abstention).
 
+## Prepared next (22 Oct 2026, not yet run): shorter prompt, model plus guard, harder abstention
+
+Three pieces are built, tested and committed (`95ab0ff`); two Kaggle notebooks run them.
+
+1. **Model plus guard** (`serve/guard.py:review_answer`, `train/guard_eval.py`). The guard's answer review (drop unsupported sentences and any chemical rate, cap the length, abstain if nothing supported survives) is now one function, used by the live advisor and by the scorer. The scorer applies it to the answers a model already gave and re-scores them, so the product (model behind the guard) is measured without another model run. It is the first part of `AGBE_v2_6_prompt_and_guard`. The guard tests, the attack batteries (53/62 and 28/30 stopped, none of the legitimate questions blocked) and CI all still pass.
+2. **Shorter prompt** (`serve/prompt.py`, `GuardedAdvisor(compact=(passages, words))`, `gguf_eval.py --sources K --max-words W`). The passages are ranked by how many question words they share, the best K are kept, and each is trimmed to the sentences that matter, in their original order. The guard still checks the answer against the full passages that were shown. In the evaluation the passage the model should cite is looked up again after ranking, so a retriever miss counts against the setting. Notebook 6 runs Qwen3 1.7B on all 140 held-out cases at three settings (3 passages of 100 words, 2 of 80, 2 of 50) and prints speed and quality side by side with the full prompt. The point is the trade: seconds per answer against the pass rate. Nothing is adopted until it is measured.
+3. **Harder abstention** (`build_grounded_sft.py --hard-negatives --abstain-share 0.30`, notebook `AGBE_v2_3a_retrain_abstain`). The weakest result was correct abstention (41% for Qwen3 1.7B). Abstain examples now use passages of the same document that look relevant but do not answer, and a candidate is dropped if any accepted claim of the answer passage is supported by it (test: a same-document copy of the answer is never used), so the example never teaches abstention when the sources do contain the answer. Abstain examples rise from 118 to 247 of about 1,240 and the training set has fewer grounded ones (798, from 964), so the wrong-abstention rate must be watched. The retraining keeps the existing held-out cases (`FRESH_EVAL = False`), so before and after are comparable, trains only Qwen3 1.7B, and saves to the folder `run2` so `run1` is untouched. The held-out cases use their own random generator and the hard negatives another, so changing the abstain share cannot change the held-out set.
+
+Also added: `hf_persist.py pull --ignore` (skip the GGUF and adapter files when a notebook only needs the data), CI now runs the new tests, and the notebook guide lists the two new notebooks.
+
 ## Reproducing
 
 ```bash

@@ -15,6 +15,7 @@ Read this first if you are picking the work up cold, whether you are me in a new
 | Full training (three bases) | Done. Next: CPU speed, memory and quantised quality; abstain data; wire the guard |
 | Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
 | Agronomist | Not found yet |
+| Prepared, not yet run | notebooks `AGBE_v2_3a_retrain_abstain` (harder abstain data, GPU) and `AGBE_v2_6_prompt_and_guard` (shorter prompt, model plus guard, CPU), both in `~/Downloads/agbe-kaggle/` |
 | Not yet verified | speed on the real competition machine, answers reviewed by a person, a shorter prompt and its effect on speed, container build, phone build |
 
 The complete private record (people, accounts, business arrangements, all file locations) is kept outside this repository. The full chronology of faults, fixes and numbers is in `docs/V2_ENGINEERING_LOG.md`.
