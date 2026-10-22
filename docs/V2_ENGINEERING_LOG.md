@@ -191,6 +191,22 @@ Qwen3 4B abstains correctly in 85% of the truly unanswerable cases but answers o
 
 **Fix in the training data** (`tools/build_grounded_sft.py:clean_sources`, commit `2e8a45f`): abstain examples are built like the real cases (retrieved passages, from different documents), and a candidate is dropped if it supports any accepted claim of the answer passage. Checked on the real data: 200 abstain examples, none still containing the answer (the plain method left about four in ten). The notebook `AGBE_v2_3a_retrain_abstain` retrains Qwen3 1.7B with this (25% abstain share) on the same held-out cases, saving to `run2`. Not yet run with the fix.
 
+## Retraining Qwen3 1.7B with clean abstain examples (22 Oct 2026, notebook `AGBE_v2_3a_retrain_abstain`, folder `run2`)
+
+Same base, 2 epochs, same held-out cases, the corrected abstain data (200 abstain examples whose retrieved sources never contain the answer, 25% share; 868 grounded, 196 refusal), merged float16 scoring:
+
+| Measure | Before (run1) | After (this run) |
+|---|---|---|
+| Grounded pass | 0.871 | **0.943** |
+| Supported sentences | 0.895 | **0.967** |
+| Valid citation | 0.957 | **0.986** |
+| Right source | 0.929 | **0.957** |
+| Wrongly abstains | 0.043 | **0.014** |
+| Abstention, all 70 cases | 0.414 | 0.443 |
+| Abstention, 41 clean cases | 0.512 | 0.488 |
+
+Reading: answering and citing improved clearly (the filtered abstain examples stopped teaching abstention where the answer was present, and the answerable cases are no longer penalised); abstention on the clean cases did not move (20 of 41 against 21 of 41). Wrong abstentions are now 1.4%, which leaves room to push abstention harder. The 4-bit file of this retrained model is saved (`run2/agbe-v2-qwen17-q4_k_m.gguf`) but has not been scored yet; the earlier 4-bit files matched their float16 scores. This model replaces run1 as the edge candidate.
+
 ## Reproducing
 
 ```bash
