@@ -63,12 +63,12 @@ for name, k, w in VARIANTS:
     cmd = f"python train/gguf_eval.py --server {LC}/build/bin/llama-server --gguf {GGUF} --tokenizer Qwen/Qwen3-1.7B --eval {EVAL} --out {out} --threads {THREADS} --ctx {CTX} --sources {k} --max-words {w}"
     print(cmd, flush=True)
     !{cmd}
-    !python train/guard_eval.py --eval {EVAL} --rows {out} --out {WORK}/guard_prompt_{name}.json
+    !python train/guard_eval.py --eval {EVAL} --rows {out} --out {WORK}/guard_prompt_{name}.json --sources {k} --max-words {w}
 """)
 md("## 3. The table")
 code("""
 def line(tag, summ, sp=None, g=None):
-    s = f"{tag:30} pass {summ['grounded_pass']:.3f} | supported {summ['supported_ratio']:.3f} | cite {summ['valid_citation']:.3f} | right source {summ['right_source']:.3f} | wrong abstain {summ['wrongly_abstained']:.3f} | abstain {summ['abstain_pass']:.3f}"
+    s = f"{tag:30} pass {summ['grounded_pass']:.3f} | supported {summ['supported_ratio']:.3f} | cite {summ['valid_citation']:.3f} | right source {summ['right_source']:.3f} | wrong abstain {summ['wrongly_abstained']:.3f} | abstain {summ['abstain_pass']:.3f} (clean {summ.get('abstain_clean_pass')})"
     if sp: s += f" | {sp['mean_prompt_tokens']} prompt tokens | {sp['mean_seconds_per_answer']} s per answer"
     if g: s += f" | WITH GUARD pass {g['grounded_pass']:.3f}, abstain {g['abstain_pass']:.3f}, supported {g['supported_ratio']:.3f}"
     print(s)

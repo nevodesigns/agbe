@@ -38,5 +38,18 @@ class Api(unittest.TestCase):
         self.assertEqual(c.post("/advise", json={"question": "a" * 700}).status_code, 422)
 
 
+class CompactSetting(unittest.TestCase):
+    def test_default_and_off(self):
+        import os
+        from serve.app import compact_setting
+        os.environ.pop("AGBE_COMPACT", None)
+        self.assertEqual(compact_setting(), (3, 100))
+        os.environ["AGBE_COMPACT"] = "off"
+        self.assertIsNone(compact_setting())
+        os.environ["AGBE_COMPACT"] = "2,80"
+        self.assertEqual(compact_setting(), (2, 80))
+        os.environ.pop("AGBE_COMPACT", None)
+
+
 if __name__ == "__main__":
     unittest.main()

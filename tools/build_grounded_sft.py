@@ -109,26 +109,23 @@ def messages(question, sources, answer):
     return [{"role": "system", "content": SYSTEM + "\n\nSources:\n" + src}, {"role": "user", "content": question}, {"role": "assistant", "content": answer}]
 
 
-def hard_negative_sources(question, pid, claim_rows, passages, by_doc, near, rng, want=3):
-    """Sources for an abstain example that look relevant but do not answer: passages of the SAME document, ranked by how much they share with
-    the question, topped up with retrieved ones. A candidate is dropped if any accepted claim of the answer passage is supported by it, so the
-    example never teaches 'abstain' when the sources do contain the answer."""
+def leaks(claim_rows, text) -> bool:
+    """True if this passage supports any accepted claim of the answer passage, that is, it would answer the question."""
     from claim_check import check_claim
-    from prompt import relevance
-    def answers(text):
-        return any(check_claim(c["claim"], [text]).supported for c in claim_rows)
-    cands = [passages[k] for k in by_doc.get(passages[pid].get("handle"), []) if k != pid]
-    cands.sort(key=lambda p: -relevance(question, p["text"]))
-    picked = [dict(p) for p in cands[:6] if not answers(p["text"])][:2]
-    for p in near:
-        if len(picked) >= want:
-            break
-        if p["passage_id"] != pid and all(p["passage_id"] != q_["passage_id"] for q_ in picked) and not answers(p["text"]):
+    return any(check_claim(c["claim"], [text]).supported for c in claim_rows)
+
+
+def clean_sources(claim_rows, candidates, want=3):
+    """Sources for an abstain example: the retrieved passages, in retrieval order, that do NOT answer the question. About four in ten
+    abstain examples built the plain way still contained the answer, because other documents repeat the same advice, and that taught the
+    model to abstain on answerable questions. The sources keep the shape of the real cases (retrieved, from different documents)."""
+    picked = []
+    for p in candidates:
+        if not leaks(claim_rows, p["text"]):
             picked.append(dict(p))
-    if len(picked) < want:
-        return None
-    rng.shuffle(picked)
-    return picked[:want]
+        if len(picked) == want:
+            return picked
+    return None
 
 
 def stage_compose(a):
@@ -139,10 +136,7 @@ def stage_compose(a):
         if c["status"] == "accepted":
             claims[c["passage_id"]].append(c)
     retr = Retriever(a.passages)
-    by_doc = collections.defaultdict(list)
-    for k_, p_ in passages.items():
-        by_doc[p_.get("handle")].append(k_)
-    hn_rng = random.Random(13)      # separate from rnd, so adding hard negatives never changes the held-out evaluation cases
+    ab_rng = random.Random(17)      # its own generator, so abstain sources never change the held-out evaluation cases
     out, stats, evals = [], collections.Counter(), []
     holdout = getattr(a, "holdout", 0.0) or 0.0
 
@@ -169,10 +163,15 @@ def stage_compose(a):
                     evals.append({"kind": "abstain", "question": q, "sources": [dict(d) for d in near[:3]], "expected_index": None, "claims": [], "passage_id": pid})
                 continue
             if rnd.random() < a.abstain_share:
-                srcs = [dict(d) for d in near[:3]]
-                if getattr(a, "hard_negatives", False):
-                    srcs = hard_negative_sources(q, pid, claims[pid], passages, by_doc, near, hn_rng) or srcs
+                cands = [p for p in retr.top(q, 12) if p["passage_id"] != pid]
+                if len(cands) < 12:      # top up with random others so a short retrieval list still leaves enough to filter
+                    have = {p["passage_id"] for p in cands} | {pid}
+                    others = [p for k_, p in passages.items() if k_ not in have]
+                    ab_rng.shuffle(others)
+                    cands += others[: 12 - len(cands)]
+                srcs = clean_sources(claims[pid], cands) if not getattr(a, "keep_leaky_abstain", False) else [dict(d) for d in cands[:3]]
                 if not srcs:
+                    stats["skipped_no_clean_sources"] += 1
                     continue
                 out.append({"messages": messages(q, srcs, REPLIES["abstain"]), "kind": "abstain", "passage_id": pid}); stats["abstain"] += 1
                 continue
@@ -229,7 +228,7 @@ def main():
     c = sub.add_parser("compose")
     c.add_argument("--passages", required=True); c.add_argument("--claims", required=True); c.add_argument("--questions", required=True); c.add_argument("--out", required=True)
     c.add_argument("--abstain-share", type=float, default=0.15); c.add_argument("--refusal-share", type=float, default=0.12)
-    c.add_argument("--hard-negatives", action="store_true", help="build abstain examples from same-document passages that look relevant but do not answer")
+    c.add_argument("--keep-leaky-abstain", action="store_true", help="old behaviour: do not filter out abstain sources that contain the answer")
     c.add_argument("--variants", type=int, default=2, help="grounded examples per question, with different distractors"); c.add_argument("--holdout", type=float, default=0.0, help="share of passages kept out of training for evaluation"); c.add_argument("--eval-out", default=None)
     a = ap.parse_args()
     stage_questions(a) if a.cmd == "questions" else stage_compose(a)

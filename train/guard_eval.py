@@ -13,13 +13,17 @@ import argparse, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "eval")); sys.path.insert(0, str(ROOT / "train"))
-from rag_eval import score, summarise  # noqa: E402
+from rag_eval import mark_leaky, score, summarise  # noqa: E402
+from gguf_eval import case  # noqa: E402
 from serve.guard import review_answer  # noqa: E402
 
 
-def apply_guard(recs, answers, threshold: float = 0.6):
+def apply_guard(recs, answers, threshold: float = 0.6, k: int = 0, max_words: int = 0):
+    """k and max_words must be the prompt setting the answers were produced with: the answer's [n] citations index the ranked, trimmed
+    passages the model was shown, and the guard checks against the full text of those same passages."""
     rows, changed = [], 0
-    for rec, ans in zip(recs, answers):
+    for rec0, ans in zip(recs, answers):
+        _, rec = case(rec0, k, max_words)
         advice = review_answer(ans, rec["sources"], threshold)
         final = advice.answer
         changed += final.strip() != ans.strip()
@@ -27,20 +31,26 @@ def apply_guard(recs, answers, threshold: float = 0.6):
     return rows, changed
 
 
+def mark_rows(rows, recs):
+    """Rows saved before the leaky flag existed: attach it by position."""
+    return [dict(r, leaky=rec.get("leaky")) if rec["kind"] == "abstain" else r for r, rec in zip(rows, recs)]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--eval", required=True); ap.add_argument("--rows", required=True); ap.add_argument("--out"); ap.add_argument("--threshold", type=float, default=0.6)
+    ap.add_argument("--sources", type=int, default=0); ap.add_argument("--max-words", type=int, default=0)
     a = ap.parse_args()
-    recs = [json.loads(l) for l in open(a.eval) if l.strip()]
+    recs = mark_leaky([json.loads(l) for l in open(a.eval) if l.strip()])
     model = json.load(open(a.rows))
     answers = [r["answer"] for r in model["rows"]]
     recs = recs[: len(answers)]
-    before = summarise(model["rows"])
-    rows, changed = apply_guard(recs, answers, a.threshold)
+    rows, changed = apply_guard(recs, answers, a.threshold, a.sources, a.max_words)
     after = summarise(rows)
     print(model.get("model"), "answers changed by the guard:", changed, "of", len(rows))
-    keys = ["grounded_pass", "supported_ratio", "valid_citation", "right_source", "wrongly_abstained", "abstain_pass", "answered_when_no_source"]
+    keys = ["grounded_pass", "supported_ratio", "valid_citation", "right_source", "wrongly_abstained", "abstain_pass", "abstain_clean_pass"]
     print(f"{'':26}" + "".join(f"{k[:14]:>16}" for k in keys))
+    before = summarise(mark_rows(model["rows"], recs))
     print(f"{'model alone':26}" + "".join(f"{before[k]:>16}" for k in keys))
     print(f"{'model plus guard':26}" + "".join(f"{after[k]:>16}" for k in keys))
     if a.out:

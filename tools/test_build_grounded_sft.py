@@ -89,26 +89,18 @@ class Holdout(unittest.TestCase):
         self.assertTrue(any(json.loads(l)["kind"] == "grounded" for l in (d / "o.jsonl").read_text().splitlines()))
 
 
-class HardNegatives(unittest.TestCase):
-    def test_same_document_passages_that_answer_are_never_used(self):
-        mk = lambda pid, text: {"passage_id": pid, "handle": "h/doc", "page": 1, "title": "Banana guide", "uri": "u", "licence": "CC-BY-4.0", "topics": [], "text": text}
+class CleanAbstainSources(unittest.TestCase):
+    def test_sources_that_answer_are_never_used(self):
+        mk = lambda pid, text: {"passage_id": pid, "handle": "h/" + pid, "page": 1, "title": "T", "uri": "u", "licence": "CC-BY-4.0", "topics": [], "text": text}
         answer = "Banana aphids spread banana bunchy top virus by feeding on infected plants and then moving to healthy plants."
-        passages = {"a": mk("a", answer + " Remove infected mats at once."),
-                    "dup": mk("dup", "In short: " + answer),                                    # same document, contains the answer
-                    "n1": mk("n1", "Banana suckers should be taken from clean nurseries and planted at three metres spacing."),
-                    "n2": mk("n2", "Banana plants need mulch and regular weeding to keep yields high in the dry season."),
-                    "far": {**mk("far", "Cassava cuttings sprout best when taken from healthy plants."), "handle": "h/other"}}
-        by_doc = {}
-        for k, p in passages.items():
-            by_doc.setdefault(p["handle"], []).append(k)
         claims = [{"claim": answer}]
-        import random
-        for seed in range(20):
-            got = b.hard_negative_sources("how does banana bunchy top spread", "a", claims, passages, by_doc, [passages["far"]], random.Random(seed))
-            self.assertIsNotNone(got)
-            ids = {p["passage_id"] for p in got}
-            self.assertNotIn("a", ids); self.assertNotIn("dup", ids)                           # never the answer, never a copy of it
-            self.assertEqual(ids, {"n1", "n2", "far"})
+        cands = [mk("dup", "Another guide says: " + answer),                                  # a different document that repeats the advice
+                 mk("n1", "Banana suckers should be taken from clean nurseries and planted at three metres spacing."),
+                 mk("n2", "Banana plants need mulch and regular weeding to keep yields high in the dry season."),
+                 mk("n3", "Cassava cuttings sprout best when taken from healthy plants.")]
+        got = b.clean_sources(claims, cands)
+        self.assertEqual([p["passage_id"] for p in got], ["n1", "n2", "n3"])                 # retrieval order kept, the copy skipped
+        self.assertIsNone(b.clean_sources(claims, cands[:3]))                                  # not enough clean sources: no example
 
 
 if __name__ == "__main__":

@@ -40,13 +40,23 @@ class Chat(BaseModel):
     messages: list[Msg]
 
 
+def compact_setting() -> tuple[int, int] | None:
+    """The shorter prompt: AGBE_COMPACT=3,100 keeps the best 3 passages trimmed to about 100 words each. That setting kept the pass rate of the
+    full prompt and cut the answer time by 39% on a CPU (see docs/V2_ENGINEERING_LOG.md); AGBE_COMPACT=off sends the whole passages."""
+    v = os.environ.get("AGBE_COMPACT", "3,100").strip().lower()
+    if v in ("", "off", "none", "0"):
+        return None
+    k, w = (int(x) for x in v.split(","))
+    return k, w
+
+
 def default_advisor() -> GuardedAdvisor:
     from serve import backends
     if os.environ.get("AGBE_BACKEND_URL"):
         gen = backends.openai_compatible(os.environ["AGBE_BACKEND_URL"], api_key=os.environ.get("AGBE_BACKEND_KEY", ""))
     else:
         gen = backends.llama_cli(os.environ.get("AGBE_GGUF", str(ROOT / "model/agbe-1b-q4_k_m.gguf")))
-    return GuardedAdvisor(Retriever(os.environ.get("AGBE_PASSAGES", str(ROOT / "data/fulltext/passages.jsonl"))), gen)
+    return GuardedAdvisor(Retriever(os.environ.get("AGBE_PASSAGES", str(ROOT / "data/fulltext/passages.jsonl"))), gen, compact=compact_setting())
 
 
 def create_app(advisor: GuardedAdvisor | None = None, api_keys: set[str] | None = None) -> FastAPI:

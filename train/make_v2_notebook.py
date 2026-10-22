@@ -117,7 +117,7 @@ code('''
 if "C" in STAGES:
   FLAGS = f'--variants {CFG["variants"]} --holdout {CFG["holdout"]}'
   if FRESH_EVAL: FLAGS += f' --eval-out {WORK}/rag_eval.jsonl'                                             # first time: write the held-out test cases
-  else: FLAGS += f' --abstain-share {CFG["abstain_share"]} --hard-negatives'                               # retraining: keep the SAME held-out cases, harder abstain examples
+  else: FLAGS += f' --abstain-share {CFG["abstain_share"]}'                                                # retraining: keep the SAME held-out cases; abstain sources never contain the answer
   !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl {FLAGS}
   save()
   print(sum(1 for _ in open(WORK / "sft.jsonl")), "training examples;", sum(1 for _ in open(WORK / "rag_eval.jsonl")), "held-out test cases")
@@ -176,7 +176,7 @@ SESSIONS = [  # (label, stages, what, file, run folder, base keys, epochs)
     ("2", '["B"]', "claims, questions and training data, about 3 to 4 hours (already done once; this is the first pass)", "AGBE_v2_2_data.ipynb", "run1", "None", "None"),
     ("2b", '["B"]', "MORE training data: it resumes from the passages already done and adds about 1,150 more, about 3 to 4 hours (the first run took 7.7 s per passage)", "AGBE_v2_2b_more_data.ipynb", "run1", "None", "None"),
     ("3s", '["C", "D", "E"]', "SMOKE TEST of training, export and testing on the data so far, one base and one epoch, about 1 to 2 hours. Its results go to a separate folder and are not the final models", "AGBE_v2_3s_smoketest.ipynb", "smoke", '["gemma1b"]', "1"),
-    ("3a", '["C", "D", "E"]', "RETRAIN Qwen3 1.7B with harder abstain examples (same-document passages that look relevant but do not answer, 30% abstain share), scored on the SAME held-out cases as before, about 1.5 hours. Saves to folder run2, so run1 is untouched", "AGBE_v2_3a_retrain_abstain.ipynb", "run2", '["qwen17"]', "None"),
+    ("3a", '["C", "D", "E"]', "RETRAIN Qwen3 1.7B with clean abstain examples (retrieved passages from different documents that never contain the answer, 25% abstain share), scored on the SAME held-out cases as before, about 1.5 hours. Saves to folder run2, so run1 is untouched", "AGBE_v2_3a_retrain_abstain.ipynb", "run2", '["qwen17"]', "None"),
     ("3", '["C", "D", "E"]', "train the three bases on the full data, export the GGUFs and re-test, about 4 to 6 hours. Run it after 2b has finished", "AGBE_v2_3_train.ipynb", "run1", "None", "None"),
 ]
 meta = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}}

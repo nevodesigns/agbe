@@ -14,7 +14,7 @@ import argparse, json, pathlib, platform, subprocess, sys, time, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "eval")); sys.path.insert(0, str(ROOT / "train"))
-from rag_eval import score, summarise  # noqa: E402
+from rag_eval import mark_leaky, score, summarise  # noqa: E402
 from serve.guard import build_messages  # noqa: E402
 from serve.prompt import prepare_sources  # noqa: E402
 
@@ -107,7 +107,7 @@ def main():
     a = ap.parse_args()
     from transformers import AutoTokenizer
     tok = AutoTokenizer.from_pretrained(a.tokenizer)
-    recs = [json.loads(l) for l in open(a.eval) if l.strip()]
+    recs = mark_leaky([json.loads(l) for l in open(a.eval) if l.strip()])
     if a.limit:
         recs = recs[: a.limit]
     base = f"http://127.0.0.1:{a.port}"

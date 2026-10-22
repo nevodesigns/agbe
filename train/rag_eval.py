@@ -23,6 +23,28 @@ from serve.guard import build_messages  # noqa: E402
 NO_SOURCE = re.compile(r"\b(do not|don't|does not|did not|cannot|can't|not) (have|find|see|contain|cover|include)\b.{0,40}\b(source|sources|information|answer)\b|\bno source\b|\bnot in the (sources|passages)\b|\bsources? (do|does) not\b", re.I)
 
 
+CLAIMS_PATH = ROOT / "data" / "run1_kaggle" / "claims.jsonl"
+
+
+def mark_leaky(recs: list[dict], claims_path=None) -> list[dict]:
+    """An abstain case is built by removing the answer passage, but other documents often repeat the same advice. If the sources still
+    shown support an accepted claim of the removed passage, the case is answerable and 'abstain' is the wrong label, so flag it. The flag is
+    reported separately; the clean cases are the real test of knowing when there is no source."""
+    path = pathlib.Path(claims_path or CLAIMS_PATH)
+    if not path.exists():
+        return recs
+    claims = {}
+    for line in open(path):
+        c = json.loads(line)
+        if c["status"] == "accepted":
+            claims.setdefault(c["passage_id"], []).append(c["claim"])
+    for r in recs:
+        if r["kind"] == "abstain" and "leaky" not in r:
+            texts = [x["text"] for x in r["sources"]]
+            r["leaky"] = any(check_claim(c, texts).supported for c in claims.get(r.get("passage_id"), []))
+    return recs
+
+
 def score(rec: dict, answer: str) -> dict:
     texts = [s["text"] for s in rec["sources"]]
     cites = [int(n) for n in re.findall(r"\[(\d+)\]", answer)]
@@ -36,15 +58,17 @@ def score(rec: dict, answer: str) -> dict:
         return {"pass": ok, "abstained": abstained, "supported_ratio": round(ratio, 3), "valid_citation": valid,
                 "right_source": rec["expected_index"] in cites, "sentences": len(sents)}
     ok = abstained and (not sents or ratio >= 0.8 or len(sents) <= 2)
-    return {"pass": ok, "abstained": abstained, "supported_ratio": round(ratio, 3), "valid_citation": valid, "right_source": None, "sentences": len(sents)}
+    return {"pass": ok, "abstained": abstained, "supported_ratio": round(ratio, 3), "valid_citation": valid, "right_source": None, "sentences": len(sents), "leaky": bool(rec.get("leaky"))}
 
 
 def summarise(rows: list[dict]) -> dict:
     g = [r for r in rows if r["kind"] == "grounded"]; a = [r for r in rows if r["kind"] == "abstain"]
+    clean = [r for r in a if not r.get("leaky")] if any("leaky" in r for r in a) else []
     f = lambda xs, k: round(sum(1 for r in xs if r[k]) / len(xs), 3) if xs else None
     return {"grounded_n": len(g), "grounded_pass": f(g, "pass"), "supported_ratio": round(statistics.mean([r["supported_ratio"] for r in g]), 3) if g else None,
             "valid_citation": f(g, "valid_citation"), "right_source": f(g, "right_source"), "wrongly_abstained": f(g, "abstained"),
-            "abstain_n": len(a), "abstain_pass": f(a, "pass"), "answered_when_no_source": round(1 - (f(a, "abstained") or 0), 3) if a else None}
+            "abstain_n": len(a), "abstain_pass": f(a, "pass"), "answered_when_no_source": round(1 - (f(a, "abstained") or 0), 3) if a else None,
+            "abstain_clean_n": len(clean), "abstain_clean_pass": f(clean, "pass") if clean else None}
 
 
 def main():
@@ -62,7 +86,7 @@ def main():
                 d = json.load(open(f)); s = d["summary"]
                 print(f"| {d['model']} | {s['grounded_pass']} | {s['supported_ratio']} | {s['valid_citation']} | {s['right_source']} | {s['wrongly_abstained']} | {s['abstain_pass']} | {s['answered_when_no_source']} |")
         return
-    recs = [json.loads(l) for l in open(a.eval) if l.strip()]
+    recs = mark_leaky([json.loads(l) for l in open(a.eval) if l.strip()])
     if a.limit:
         recs = recs[: a.limit]
     if a.dry:
