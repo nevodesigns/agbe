@@ -11,11 +11,11 @@ Read this first if you are picking the work up cold, whether you are me in a new
 | Claims and training data | Done. 1,205 accepted claims from 429 passages; 1,280 training examples and 140 held-out cases after filters. Raw copies in `data/run1_kaggle/` |
 | Guard, endpoint, evaluation, CI | Built and tested on CPU, CI green |
 | Kaggle pipeline | Runs end to end (train, merge, GGUF, held-out evaluation). Five generated notebooks, see `docs/V2_ENGINEERING_LOG.md` |
-| Trained v2 models | Three bases trained and scored (21 Oct): Qwen3 4B 88.6% grounded pass, 71.4% correct abstention; Qwen3 1.7B 87.1% and 41.4%; Gemma 3 1B 65.7% and 35.7%. Adapters and Q4_K_M GGUFs in the private HF repo, folder `run1`. Quantised models not yet timed or scored |
+| Trained v2 models | Three bases trained and scored (21 Oct). Shrunk to Q4_K_M and rescored on a CPU: Qwen3 4B 90.0% grounded pass and 80.0% correct abstention, Qwen3 1.7B 87.1% and 41.4%, Gemma 3 1B 72.9% and 38.6%; shrinking costs nothing measurable. Speed on a slow shared CPU: 13.5, 8.8 and 4.8 tokens/s, 21, 31 and 64 s per answer with 850-token prompts. Memory not yet trustworthy |
 | Full training (three bases) | Done. Next: CPU speed, memory and quantised quality; abstain data; wire the guard |
 | Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
 | Agronomist | Not found yet |
-| Not yet verified | the scored v2 model, the GGUF quantised model on a CPU, container build, phone build |
+| Not yet verified | memory of the 4-bit files (re-measure, notebook 5), speed against v16 on the same machine, answers reviewed by a person, container build, phone build |
 
 The complete private record (people, accounts, business arrangements, all file locations) is kept outside this repository. The full chronology of faults, fixes and numbers is in `docs/V2_ENGINEERING_LOG.md`.
 

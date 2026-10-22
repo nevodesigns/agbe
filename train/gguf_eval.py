@@ -88,7 +88,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--server", required=True); ap.add_argument("--gguf", required=True); ap.add_argument("--tokenizer", required=True)
     ap.add_argument("--eval", required=True); ap.add_argument("--out", required=True)
-    ap.add_argument("--threads", type=int, default=4); ap.add_argument("--ctx", type=int, default=4096); ap.add_argument("--port", type=int, default=8081)
+    ap.add_argument("--threads", type=int, default=4); ap.add_argument("--ctx", type=int, default=2048); ap.add_argument("--port", type=int, default=8081)
     ap.add_argument("--max-new", type=int, default=200); ap.add_argument("--limit", type=int, default=0)
     a = ap.parse_args()
     from transformers import AutoTokenizer
@@ -97,8 +97,20 @@ def main():
     if a.limit:
         recs = recs[: a.limit]
     base = f"http://127.0.0.1:{a.port}"
-    proc = subprocess.Popen([a.server, "-m", a.gguf, "-c", str(a.ctx), "-t", str(a.threads), "--host", "127.0.0.1", "--port", str(a.port), "-np", "1"],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    cmd = [a.server, "-m", a.gguf, "-c", str(a.ctx), "-t", str(a.threads), "--host", "127.0.0.1", "--port", str(a.port), "-np", "1"]
+    # recent llama-server keeps a RAM cache of earlier prompts (default up to 8 GB) and context checkpoints; they inflate the peak
+    # memory far beyond what the model needs, so switch them off when this build knows the flags
+    try:
+        helptext = subprocess.run([a.server, "--help"], capture_output=True, text=True, timeout=60)
+        helptext = helptext.stdout + helptext.stderr
+    except Exception:
+        helptext = ""
+    if "--cache-ram" in helptext:
+        cmd += ["--cache-ram", "0"]
+    if "--ctx-checkpoints" in helptext:
+        cmd += ["--ctx-checkpoints", "0"]
+    print("server command:", " ".join(cmd), flush=True)
+    proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         wait_ready(base)
         rows, speed = run(base, tok, recs, a.max_new)

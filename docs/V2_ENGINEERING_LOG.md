@@ -49,6 +49,8 @@ Each was found by a test or by reading the real data. Keeping this list is the p
 10. **GGUF export needs `virtualenv`.** Kaggle's Python has no `ensurepip`. `train/export_gguf.sh` falls back to virtualenv.
 11. **The merge overwrote the trained weights.** After merging, a copy step copied every file from the base model's cache folder into the merged folder. That folder also held the base weights and config, so the merged model was replaced by the untrained one. Every tuned evaluation matched the base exactly on all 140 cases, and the GGUF converter reported bfloat16, the base file's format. The in-script self-check passed because it ran before the copy. Real held-out prompts (the `PROBE` lines) proved the trained model does answer in short cited sentences, for example "Rotate kraal to maintain or increase soil fertility if manure is available. [1]" against the base's "According to [1], rotating kraal systems require more effort...". Fixed by copying only tokenizer files and re-checking the finished folder (`FINAL FOLDER IS THE TUNED MODEL`). All GGUF files produced before this fix are base models and must not be used.
 
+12. **The first CPU memory reading was wrong.** llama.cpp's server keeps a cache of earlier prompts, so a 1.1 GB model showed a 10 GB peak. Caught because the numbers could not be true; the scorer now disables the caches and the measurement is being repeated.
+
 ## Measurements so far
 
 - **Bake-off (60 prompts, retrieval mode):** Qwen3-4B-Instruct 33/60 with 0 leaks; Gemma 3 1B 25/60, 7 leaks; Qwen3-1.7B 23/60, 4 leaks; Gemma 3 4B 23/60; SmolLM3-3B 25/60, 9 leaks. The small models are within noise. See `docs/BAKEOFF_RESULTS.md`.
@@ -93,9 +95,36 @@ Reading:
 
 Files (private Hugging Face repository `NEVODESIGN/agbe-v2-work`, folder `run1`): adapters, `agbe-v2-{gemma1b,qwen17,qwen4b}-q4_k_m.gguf` (806 MB, 1.1 GB, 2.5 GB) with checksums, and the per-case score files `rageval_{base,tuned}_*.json`.
 
-Not yet done: scoring and timing the quantised GGUF files on a 4 core CPU (speed, memory, quality after quantisation); the held-out test is still small (140 cases) and shares documents with training; no human review of answers yet.
+Not yet done: trustworthy memory figures for the quantised files (see the CPU section); the held-out test is still small (140 cases) and shares documents with training; no human review of answers yet.
 
 Known quirk: the `FINAL FOLDER IS THE TUNED MODEL` line printed `False` for the first merge (Gemma) although its scores prove it is tuned. The check looked for a citation marker; it now compares against the untrained answer on the same prompt.
+
+## The shipped 4-bit files on a CPU (21 Oct 2026, notebook `AGBE_v2_4_gguf_cpu`)
+
+The three Q4_K_M GGUF files were scored on the same 140 held-out cases with llama.cpp's own `llama-server` (built from git main, the same source that made the files), greedy decoding, the chat template without thinking, 4 threads, on a Kaggle CPU (Intel Xeon 2.20 GHz, 4 cores, 31 GB RAM). Scorer: `train/gguf_eval.py`.
+
+| Model | Pass (fp16 to Q4) | Supported | Valid cite | Right source | Wrongly abstains | Correct abstention |
+|---|---|---|---|---|---|---|
+| Gemma 3 1B | 0.657 to 0.729 | 0.674 to 0.736 | 0.743 to 0.757 | 0.629 to 0.543 | 0.257 to 0.243 | 0.357 to 0.386 |
+| Qwen3 1.7B | 0.871 to 0.871 | 0.895 to 0.883 | 0.957 to 0.914 | 0.929 to 0.886 | 0.043 to 0.071 | 0.414 to 0.414 |
+| Qwen3 4B | 0.886 to 0.900 | 0.910 to 0.907 | 0.971 to 0.943 | 0.914 to 0.900 | 0.029 to 0.057 | 0.714 to 0.800 |
+
+Reading: shrinking to 4-bit costs essentially nothing in quality (differences of a few points in either direction on 70 cases are noise). Qwen3 4B reaches 90.0% pass and 80.0% correct abstention as a 2.5 GB file.
+
+Speed on that CPU (prompts average about 850 tokens: three retrieved passages plus the instructions):
+
+| Model | File | Generation | Prompt processing | Per answer |
+|---|---|---|---|---|
+| Gemma 3 1B | 806 MB | 13.5 tokens/s | 46 tokens/s | 21 s |
+| Qwen3 1.7B | 1.1 GB | 8.8 tokens/s | 35 tokens/s | 31 s |
+| Qwen3 4B | 2.5 GB | 4.8 tokens/s | 16 tokens/s | 64 s |
+
+Findings and caveats:
+- **Prompt processing dominates the answer time** (856 tokens at 35 tokens/s is about 25 of the 31 seconds for Qwen3 1.7B). The levers are fewer and shorter retrieved passages, and caching the fixed instruction prefix. Both are product changes, not model changes.
+- **This CPU is a shared cloud vCPU and slower than the competition machine** (v16 measured 24.08 tokens/s there; Gemma 3 1B here gives 13.5), so these absolute speeds are pessimistic. The comparison that means something is against v16 on the same machine (next notebook).
+- **The memory figures are not trustworthy.** The server reported peak memory of 4.7, 10.5 and 13.0 GB for files of 0.8, 1.1 and 2.5 GB. Recent `llama-server` keeps a RAM cache of earlier prompts (up to 8 GB by default) and context checkpoints, which inflates the peak. They are recorded in the raw log but must not be quoted. The scorer now switches those caches off when the build has the flags and uses the competition's 2,048-token context.
+
+Next: `AGBE_v2_5_speed_memory` (30 cases, caches off, context 2048, and the v16 competition file as a same-machine control). Not yet run.
 
 ## Reproducing
 
@@ -113,7 +142,7 @@ Kaggle notebooks (generated, then imported by hand): `AGBE_v2_2b_more_data` (mor
 
 1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
 2. Done: `AGBE_v2_3_train.ipynb` ran (results above).
-3. Measure the GGUF files on a 4 core CPU (speed and memory) and score the quantised models, not only the merged ones: notebook `AGBE_v2_4_gguf_cpu` (llama.cpp built from the same source, one `llama-server` per model, `train/gguf_eval.py`) is written and tested against a fake server; not yet run on Kaggle.
+3. Done for quality and a first speed (see the CPU section). Still to do: trustworthy memory and the v16 control, notebook `AGBE_v2_5_speed_memory`; then cut the prompt (fewer, shorter passages, cached prefix) and re-time.
 4. Wire the guard to Qwen3 1.7B (edge) and Qwen3 4B (server) and measure the whole system, including the guard's effect on abstention.
 5. Add harder abstain examples and retrain to lift correct abstention; enlarge the held-out set and split it by document.
 6. Grow the fact base, find an agronomist, follow up the permission emails (1 Nov 2026), then package: container, model card, phone build.
