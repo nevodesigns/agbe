@@ -11,11 +11,11 @@ Read this first if you are picking the work up cold, whether you are me in a new
 | Claims and training data | Done. 1,205 accepted claims from 429 passages; 1,280 training examples and 140 held-out cases after filters. Raw copies in `data/run1_kaggle/` |
 | Guard, endpoint, evaluation, CI | Built and tested on CPU, CI green |
 | Kaggle pipeline | Runs end to end (train, merge, GGUF, held-out evaluation). Five generated notebooks, see `docs/V2_ENGINEERING_LOG.md` |
-| Trained v2 models | Three bases trained and scored (21 Oct). Shrunk to Q4_K_M and rescored on a CPU: Qwen3 4B 90.0% grounded pass and 80.0% correct abstention, Qwen3 1.7B 87.1% and 41.4%, Gemma 3 1B 72.9% and 38.6%; shrinking costs nothing measurable. Speed on a slow shared CPU: 13.5, 8.8 and 4.8 tokens/s, 21, 31 and 64 s per answer with 850-token prompts. Memory not yet trustworthy |
+| Trained v2 models | Three bases trained and scored (21 Oct). Shrunk to Q4_K_M and rescored on a CPU: Qwen3 4B 90.0% grounded pass and 80.0% correct abstention, Qwen3 1.7B 87.1% and 41.4%, Gemma 3 1B 72.9% and 38.6%; shrinking costs nothing measurable. Memory (cache off): 1.0, 2.0 and 4.5 GB. Speed against v16 on the same CPU: 1.00x, 0.73x and 0.35x. Edge candidate Qwen3 1.7B, server candidate Qwen3 4B |
 | Full training (three bases) | Done. Next: CPU speed, memory and quantised quality; abstain data; wire the guard |
 | Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
 | Agronomist | Not found yet |
-| Not yet verified | memory of the 4-bit files (re-measure, notebook 5), speed against v16 on the same machine, answers reviewed by a person, container build, phone build |
+| Not yet verified | speed on the real competition machine, answers reviewed by a person, a shorter prompt and its effect on speed, container build, phone build |
 
 The complete private record (people, accounts, business arrangements, all file locations) is kept outside this repository. The full chronology of faults, fixes and numbers is in `docs/V2_ENGINEERING_LOG.md`.
 

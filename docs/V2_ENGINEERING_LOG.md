@@ -49,7 +49,7 @@ Each was found by a test or by reading the real data. Keeping this list is the p
 10. **GGUF export needs `virtualenv`.** Kaggle's Python has no `ensurepip`. `train/export_gguf.sh` falls back to virtualenv.
 11. **The merge overwrote the trained weights.** After merging, a copy step copied every file from the base model's cache folder into the merged folder. That folder also held the base weights and config, so the merged model was replaced by the untrained one. Every tuned evaluation matched the base exactly on all 140 cases, and the GGUF converter reported bfloat16, the base file's format. The in-script self-check passed because it ran before the copy. Real held-out prompts (the `PROBE` lines) proved the trained model does answer in short cited sentences, for example "Rotate kraal to maintain or increase soil fertility if manure is available. [1]" against the base's "According to [1], rotating kraal systems require more effort...". Fixed by copying only tokenizer files and re-checking the finished folder (`FINAL FOLDER IS THE TUNED MODEL`). All GGUF files produced before this fix are base models and must not be used.
 
-12. **The first CPU memory reading was wrong.** llama.cpp's server keeps a cache of earlier prompts, so a 1.1 GB model showed a 10 GB peak. Caught because the numbers could not be true; the scorer now disables the caches and the measurement is being repeated.
+12. **The first CPU memory reading was wrong.** llama.cpp's server keeps a cache of earlier prompts, so a 1.1 GB model showed a 10 GB peak. Caught because the numbers could not be true; the scorer now disables the caches and the repeat gave 1.0, 2.0 and 4.5 GB.
 
 ## Measurements so far
 
@@ -95,7 +95,7 @@ Reading:
 
 Files (private Hugging Face repository `NEVODESIGN/agbe-v2-work`, folder `run1`): adapters, `agbe-v2-{gemma1b,qwen17,qwen4b}-q4_k_m.gguf` (806 MB, 1.1 GB, 2.5 GB) with checksums, and the per-case score files `rageval_{base,tuned}_*.json`.
 
-Not yet done: trustworthy memory figures for the quantised files (see the CPU section); the held-out test is still small (140 cases) and shares documents with training; no human review of answers yet.
+Not yet done: speed on the real competition machine (only ratios to v16 on a cloud CPU); the held-out test is still small (140 cases) and shares documents with training; no human review of answers yet.
 
 Known quirk: the `FINAL FOLDER IS THE TUNED MODEL` line printed `False` for the first merge (Gemma) although its scores prove it is tuned. The check looked for a citation marker; it now compares against the untrained answer on the same prompt.
 
@@ -122,9 +122,27 @@ Speed on that CPU (prompts average about 850 tokens: three retrieved passages pl
 Findings and caveats:
 - **Prompt processing dominates the answer time** (856 tokens at 35 tokens/s is about 25 of the 31 seconds for Qwen3 1.7B). The levers are fewer and shorter retrieved passages, and caching the fixed instruction prefix. Both are product changes, not model changes.
 - **This CPU is a shared cloud vCPU and slower than the competition machine** (v16 measured 24.08 tokens/s there; Gemma 3 1B here gives 13.5), so these absolute speeds are pessimistic. The comparison that means something is against v16 on the same machine (next notebook).
-- **The memory figures are not trustworthy.** The server reported peak memory of 4.7, 10.5 and 13.0 GB for files of 0.8, 1.1 and 2.5 GB. Recent `llama-server` keeps a RAM cache of earlier prompts (up to 8 GB by default) and context checkpoints, which inflates the peak. They are recorded in the raw log but must not be quoted. The scorer now switches those caches off when the build has the flags and uses the competition's 2,048-token context.
+- **The first memory figures were wrong** (4.7, 10.5 and 13.0 GB): `llama-server` keeps a RAM cache of earlier prompts (up to 8 GB by default) that inflated the peak. See the repeat below.
 
-Next: `AGBE_v2_5_speed_memory` (30 cases, caches off, context 2048, and the v16 competition file as a same-machine control). Not yet run.
+### Speed and memory, repeated with the caches off (notebook `AGBE_v2_5_speed_memory`, 22 Oct 2026)
+
+Same Kaggle CPU (Intel Xeon 2.20 GHz, 4 cores), context 2,048 as in the competition, `--cache-ram 0 --ctx-checkpoints 0`, 30 held-out cases, with the **v16 competition file timed on the same machine as a control**.
+
+| File | Size | Peak memory | Generation | Relative to v16 | Prompt processing | Per answer |
+|---|---|---|---|---|---|---|
+| v16 (competition) | 814 MB | 1,049 MB | 13.87 tokens/s | 1.00x | 42.8 tokens/s | 22.8 s |
+| v2 Gemma 3 1B | 806 MB | 995 MB | 13.84 tokens/s | 1.00x | 43.0 tokens/s | 20.1 s |
+| v2 Qwen3 1.7B | 1,107 MB | 2,040 MB | 10.07 tokens/s | 0.73x | 37.6 tokens/s | 25.2 s |
+| v2 Qwen3 4B | 2,497 MB | 4,484 MB | 4.85 tokens/s | 0.35x | 14.5 tokens/s | 61.7 s |
+
+Reading:
+- **Memory is fine.** Every file fits the 8 GB laptop budget; the edge candidate uses 2.0 GB and the server candidate 4.5 GB.
+- **Speed relative to v16 is the fair comparison.** v16 measured 24.08 tokens/s on the competition machine, so scaling by the ratios gives roughly 17 tokens/s for Qwen3 1.7B and 8 tokens/s for Qwen3 4B there. That is an estimate from a ratio, not a measurement on that machine.
+- **Prompt length is the main cost.** Prompts average about 750 tokens; at 37 tokens/s Qwen3 1.7B spends roughly 20 of its 25 seconds reading them.
+- **Control result:** v16 on the source-grounded test scores 0% grounded pass, 0% valid citation and 17.7% supported sentences. It ignores the sources it is given, which is the reason v2 had to be trained.
+- Quality figures from these 30 cases are not quoted (15 grounded and 15 abstain cases are too few); the 140-case table above is the reference.
+
+Decision candidates: **Qwen3 1.7B for the edge** (2.0 GB, 0.73x v16 speed, 87.1% pass) and **Qwen3 4B for a server or a strong laptop** (4.5 GB, 0.35x v16 speed, 80.0% correct abstention).
 
 ## Reproducing
 
@@ -142,7 +160,7 @@ Kaggle notebooks (generated, then imported by hand): `AGBE_v2_2b_more_data` (mor
 
 1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
 2. Done: `AGBE_v2_3_train.ipynb` ran (results above).
-3. Done for quality and a first speed (see the CPU section). Still to do: trustworthy memory and the v16 control, notebook `AGBE_v2_5_speed_memory`; then cut the prompt (fewer, shorter passages, cached prefix) and re-time.
+3. Done: quality after shrinking, speed against v16 on the same machine, and memory (CPU sections above). Still to do: cut the prompt (fewer, shorter passages, cached prefix) and re-time.
 4. Wire the guard to Qwen3 1.7B (edge) and Qwen3 4B (server) and measure the whole system, including the guard's effect on abstention.
 5. Add harder abstain examples and retrain to lift correct abstention; enlarge the held-out set and split it by document.
 6. Grow the fact base, find an agronomist, follow up the permission emails (1 Nov 2026), then package: container, model card, phone build.
