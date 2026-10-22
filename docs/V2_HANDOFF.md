@@ -1,6 +1,6 @@
 # AGBE v2 handoff
 
-Read this first if you are picking the work up cold, whether you are me in a new session or a person. It records what exists, why, what is verified, what is not, and what to do next. Update it when something meaningful changes. Last updated 18 October 2026 (evening).
+Read [RECOVERY.md](RECOVERY.md) first for the whole picture in one page. Read this if you are picking the work up cold, whether you are me in a new session or a person. It records what exists, why, what is verified, what is not, and what to do next. Update it when something meaningful changes. Last updated 18 October 2026 (evening).
 
 ## 0. Status board (21 October 2026)
 

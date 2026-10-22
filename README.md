@@ -9,6 +9,7 @@ and getting produce to market.
 - **Live site and build notes:** https://agbe-omega.vercel.app
 - **Weights:** https://huggingface.co/NEVODESIGN/agbe-1b
 - **Technical report:** [REPORT.md](REPORT.md)
+- **Recovery guide (everything in one place):** [docs/RECOVERY.md](docs/RECOVERY.md); chronology and faults in [docs/V2_ENGINEERING_LOG.md](docs/V2_ENGINEERING_LOG.md)
 - **Domain:** Agriculture · **Base:** Gemma 3 1B · **Runtime:** llama.cpp · **Quant:** GGUF Q4_K_M
 
 > **This is the `agbe2` line.** The version submitted to the Africa Deep Tech Challenge 2026 (v16) reached the final as **one of the top 10 finalists among 291 submissions** and is preserved at the tag `adtc-2026-final`. Work here targets a grounded, verifiable, deployable v2: answers come from numbered, openly licensed source passages, every sentence is checked against them, and the model says so when no source covers the question.
