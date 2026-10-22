@@ -22,6 +22,8 @@ import argparse, collections, hashlib, json, pathlib, random, re, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "eval"))
+sys.path.insert(0, str(ROOT / "serve"))
 from serve.guard import REPLIES, SYSTEM  # noqa: E402
 from serve.retrieval import Retriever  # noqa: E402
 
@@ -107,6 +109,28 @@ def messages(question, sources, answer):
     return [{"role": "system", "content": SYSTEM + "\n\nSources:\n" + src}, {"role": "user", "content": question}, {"role": "assistant", "content": answer}]
 
 
+def hard_negative_sources(question, pid, claim_rows, passages, by_doc, near, rng, want=3):
+    """Sources for an abstain example that look relevant but do not answer: passages of the SAME document, ranked by how much they share with
+    the question, topped up with retrieved ones. A candidate is dropped if any accepted claim of the answer passage is supported by it, so the
+    example never teaches 'abstain' when the sources do contain the answer."""
+    from claim_check import check_claim
+    from prompt import relevance
+    def answers(text):
+        return any(check_claim(c["claim"], [text]).supported for c in claim_rows)
+    cands = [passages[k] for k in by_doc.get(passages[pid].get("handle"), []) if k != pid]
+    cands.sort(key=lambda p: -relevance(question, p["text"]))
+    picked = [dict(p) for p in cands[:6] if not answers(p["text"])][:2]
+    for p in near:
+        if len(picked) >= want:
+            break
+        if p["passage_id"] != pid and all(p["passage_id"] != q_["passage_id"] for q_ in picked) and not answers(p["text"]):
+            picked.append(dict(p))
+    if len(picked) < want:
+        return None
+    rng.shuffle(picked)
+    return picked[:want]
+
+
 def stage_compose(a):
     rnd = random.Random(7)
     passages = {p["passage_id"]: p for p in load(a.passages)}
@@ -115,6 +139,10 @@ def stage_compose(a):
         if c["status"] == "accepted":
             claims[c["passage_id"]].append(c)
     retr = Retriever(a.passages)
+    by_doc = collections.defaultdict(list)
+    for k_, p_ in passages.items():
+        by_doc[p_.get("handle")].append(k_)
+    hn_rng = random.Random(13)      # separate from rnd, so adding hard negatives never changes the held-out evaluation cases
     out, stats, evals = [], collections.Counter(), []
     holdout = getattr(a, "holdout", 0.0) or 0.0
 
@@ -142,6 +170,8 @@ def stage_compose(a):
                 continue
             if rnd.random() < a.abstain_share:
                 srcs = [dict(d) for d in near[:3]]
+                if getattr(a, "hard_negatives", False):
+                    srcs = hard_negative_sources(q, pid, claims[pid], passages, by_doc, near, hn_rng) or srcs
                 if not srcs:
                     continue
                 out.append({"messages": messages(q, srcs, REPLIES["abstain"]), "kind": "abstain", "passage_id": pid}); stats["abstain"] += 1
@@ -199,6 +229,7 @@ def main():
     c = sub.add_parser("compose")
     c.add_argument("--passages", required=True); c.add_argument("--claims", required=True); c.add_argument("--questions", required=True); c.add_argument("--out", required=True)
     c.add_argument("--abstain-share", type=float, default=0.15); c.add_argument("--refusal-share", type=float, default=0.12)
+    c.add_argument("--hard-negatives", action="store_true", help="build abstain examples from same-document passages that look relevant but do not answer")
     c.add_argument("--variants", type=int, default=2, help="grounded examples per question, with different distractors"); c.add_argument("--holdout", type=float, default=0.0, help="share of passages kept out of training for evaluation"); c.add_argument("--eval-out", default=None)
     a = ap.parse_args()
     stage_questions(a) if a.cmd == "questions" else stage_compose(a)

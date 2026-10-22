@@ -14,6 +14,7 @@ ap.add_argument("cmd", choices=["push", "pull"])
 ap.add_argument("repo")
 ap.add_argument("folder")
 ap.add_argument("--path-in-repo", default="run1")
+ap.add_argument("--ignore", nargs="*", default=[], help="pull only: file patterns inside the folder to skip (for example *.gguf)")
 a = ap.parse_args()
 tok = os.environ.get("HF_TOKEN")
 api = HfApi(token=tok)
@@ -27,7 +28,7 @@ else:
     try:
         scratch = tempfile.mkdtemp(prefix="hfpull_")  # outside the work folder, so it can never be pushed back
         p = snapshot_download(a.repo, repo_type="dataset", token=tok, allow_patterns=[a.path_in_repo + "/*"],
-                              ignore_patterns=[a.path_in_repo + "/.pull/*", a.path_in_repo + "/*/.pull/*", a.path_in_repo + "/.cache/*"], local_dir=scratch)
+                              ignore_patterns=[a.path_in_repo + "/.pull/*", a.path_in_repo + "/*/.pull/*", a.path_in_repo + "/.cache/*"] + [a.path_in_repo + "/" + pat for pat in a.ignore], local_dir=scratch)
         src = pathlib.Path(p) / a.path_in_repo
         if src.exists():
             shutil.copytree(src, a.folder, dirs_exist_ok=True, ignore=shutil.ignore_patterns(".pull", ".cache"))

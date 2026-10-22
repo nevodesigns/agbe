@@ -40,6 +40,7 @@ except Exception: os.environ["HF_TOKEN"] = _s.get_secret("HF_TOKEN")
 STAGES = @@STAGES@@                    # already set for this notebook, nothing to edit
 HF_REPO = "NEVODESIGN/agbe-v2-work"   # private dataset repo that keeps your work between sessions
 DATA_RUN = "run1"                      # the folder this notebook starts from
+FRESH_EVAL = @@FRESH@@                  # False when retraining against the held-out cases that already exist
 RUN = "@@RUN@@"                        # the folder this notebook saves to (the smoke test uses its own, so it cannot disturb run1)
 BASE_KEYS = @@KEYS@@                   # which bases to train; None means all in train/session_config.json
 EPOCHS_OVERRIDE = @@EPOCHS@@           # None means the epochs in train/session_config.json
@@ -58,7 +59,7 @@ WORK = pathlib.Path("/kaggle/working/work"); WORK.mkdir(exist_ok=True)
 PASSAGES = WORK / "passages.jsonl"
 !gunzip -c data/fulltext_v1/passages.jsonl.gz > {PASSAGES}
 !wc -l {PASSAGES}
-!python train/hf_persist.py pull {HF_REPO} {WORK} --path-in-repo {DATA_RUN}
+!python train/hf_persist.py pull {HF_REPO} {WORK} --path-in-repo {DATA_RUN} @@IGNORE@@
 def save(): subprocess.run(["python", "train/hf_persist.py", "push", HF_REPO, str(WORK), "--path-in-repo", RUN])
 ''')
 
@@ -114,7 +115,10 @@ First the training set is rebuilt with 10% of passages held out for testing, the
 """)
 code('''
 if "C" in STAGES:
-  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl --variants {CFG["variants"]} --holdout {CFG["holdout"]} --eval-out {WORK}/rag_eval.jsonl
+  FLAGS = f'--variants {CFG["variants"]} --holdout {CFG["holdout"]}'
+  if FRESH_EVAL: FLAGS += f' --eval-out {WORK}/rag_eval.jsonl'                                             # first time: write the held-out test cases
+  else: FLAGS += f' --abstain-share {CFG["abstain_share"]} --hard-negatives'                               # retraining: keep the SAME held-out cases, harder abstain examples
+  !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl {FLAGS}
   save()
   print(sum(1 for _ in open(WORK / "sft.jsonl")), "training examples;", sum(1 for _ in open(WORK / "rag_eval.jsonl")), "held-out test cases")
   !python train/diagnose_data.py --sft {WORK}/sft.jsonl
@@ -172,13 +176,14 @@ SESSIONS = [  # (label, stages, what, file, run folder, base keys, epochs)
     ("2", '["B"]', "claims, questions and training data, about 3 to 4 hours (already done once; this is the first pass)", "AGBE_v2_2_data.ipynb", "run1", "None", "None"),
     ("2b", '["B"]', "MORE training data: it resumes from the passages already done and adds about 1,150 more, about 3 to 4 hours (the first run took 7.7 s per passage)", "AGBE_v2_2b_more_data.ipynb", "run1", "None", "None"),
     ("3s", '["C", "D", "E"]', "SMOKE TEST of training, export and testing on the data so far, one base and one epoch, about 1 to 2 hours. Its results go to a separate folder and are not the final models", "AGBE_v2_3s_smoketest.ipynb", "smoke", '["gemma1b"]', "1"),
+    ("3a", '["C", "D", "E"]', "RETRAIN Qwen3 1.7B with harder abstain examples (same-document passages that look relevant but do not answer, 30% abstain share), scored on the SAME held-out cases as before, about 1.5 hours. Saves to folder run2, so run1 is untouched", "AGBE_v2_3a_retrain_abstain.ipynb", "run2", '["qwen17"]', "None"),
     ("3", '["C", "D", "E"]', "train the three bases on the full data, export the GGUFs and re-test, about 4 to 6 hours. Run it after 2b has finished", "AGBE_v2_3_train.ipynb", "run1", "None", "None"),
 ]
 meta = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}}
 for n, stages, what, fname, run, keys, epochs in SESSIONS:
     out_cells = []
     for c in cells:
-        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", n).replace("@@RUN@@", run).replace("@@KEYS@@", keys).replace("@@EPOCHS@@", epochs).replace("@@WHAT@@", what)
+        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", n).replace("@@RUN@@", run).replace("@@KEYS@@", keys).replace("@@FRESH@@", "False" if n == "3a" else "True").replace("@@IGNORE@@", '--ignore "*.gguf" "adapter_*"' if n == "3a" else "").replace("@@EPOCHS@@", epochs).replace("@@WHAT@@", what)
         out_cells.append(dict(c, source=src.splitlines(keepends=True)))
     (HERE / fname).write_text(json.dumps({"cells": out_cells, "metadata": meta, "nbformat": 4, "nbformat_minor": 5}, indent=1))
     print("wrote", fname)

@@ -16,6 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "eval")); sys.path.insert(0, str(ROOT / "train"))
 from rag_eval import score, summarise  # noqa: E402
 from serve.guard import build_messages  # noqa: E402
+from serve.prompt import prepare_sources  # noqa: E402
 
 
 def render(tok, messages) -> str:
@@ -54,9 +55,21 @@ def wait_ready(base: str, seconds: int = 600):
     raise RuntimeError("llama-server did not become ready")
 
 
-def run(base: str, tok, recs, max_new: int):
+def case(rec: dict, k: int, max_words: int):
+    """The record the model is shown (ranked, trimmed passages) and the record it is scored against (the same passages, full text)."""
+    if not k and not max_words:
+        return rec, rec
+    shown, full = prepare_sources(rec["question"], rec["sources"], k, max_words)
+    idx = None
+    if rec["kind"] == "grounded":
+        idx = next((i for i, p in enumerate(full, 1) if p.get("passage_id") == rec.get("passage_id")), None)   # None if the retriever missed it
+    return dict(rec, sources=shown), dict(rec, sources=full, expected_index=idx)
+
+
+def run(base: str, tok, recs, max_new: int, k: int = 0, max_words: int = 0):
     rows, p_n, p_ms, g_n, g_ms = [], 0, 0.0, 0, 0.0
-    for i, r in enumerate(recs, 1):
+    for i, r0 in enumerate(recs, 1):
+        r, scored = case(r0, k, max_words)
         text = render(tok, build_messages(r["question"], r["sources"]))
         # tokenise on the server without adding a BOS: the chat template already writes one
         ids = post(base, "/tokenize", {"content": text, "add_special": False, "parse_special": True})["tokens"]
@@ -64,7 +77,7 @@ def run(base: str, tok, recs, max_new: int):
         ans = out["content"].strip()
         t = out.get("timings", {})
         p_n += t.get("prompt_n", len(ids)); p_ms += t.get("prompt_ms", 0.0); g_n += t.get("predicted_n", 0); g_ms += t.get("predicted_ms", 0.0)
-        rows.append({"kind": r["kind"], "question": r["question"], "answer": ans, **score(r, ans)})
+        rows.append({"kind": r["kind"], "question": r["question"], "answer": ans, **score(scored, ans)})
         if i % 10 == 0:
             print(i, "/", len(recs), flush=True)
     speed = {"cases": len(recs), "mean_prompt_tokens": round(p_n / max(1, len(recs))),
@@ -90,6 +103,7 @@ def main():
     ap.add_argument("--eval", required=True); ap.add_argument("--out", required=True)
     ap.add_argument("--threads", type=int, default=4); ap.add_argument("--ctx", type=int, default=2048); ap.add_argument("--port", type=int, default=8081)
     ap.add_argument("--max-new", type=int, default=200); ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--sources", type=int, default=0, help="keep the best K passages (0 keeps all)"); ap.add_argument("--max-words", type=int, default=0, help="trim each passage to about this many words (0 keeps it whole)")
     a = ap.parse_args()
     from transformers import AutoTokenizer
     tok = AutoTokenizer.from_pretrained(a.tokenizer)
@@ -113,8 +127,8 @@ def main():
     proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         wait_ready(base)
-        rows, speed = run(base, tok, recs, a.max_new)
-        speed.update(threads=a.threads, cpu=cpu_name(), peak_memory_mb=peak_memory_mb(proc.pid), file_mb=round(pathlib.Path(a.gguf).stat().st_size / 1e6))
+        rows, speed = run(base, tok, recs, a.max_new, a.sources, a.max_words)
+        speed.update(sources=a.sources, max_words=a.max_words, threads=a.threads, cpu=cpu_name(), peak_memory_mb=peak_memory_mb(proc.pid), file_mb=round(pathlib.Path(a.gguf).stat().st_size / 1e6))
     finally:
         proc.terminate()
         try:

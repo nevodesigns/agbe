@@ -22,6 +22,7 @@ from typing import Callable
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "eval"))
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "serve"))
 from claim_check import check_claim, split_claims, REFUSAL  # noqa: E402
 from extract_claims import dose_like  # noqa: E402
 
@@ -107,11 +108,43 @@ def build_messages(question: str, passages: list[dict]) -> list[dict]:
     return [{"role": "system", "content": SYSTEM + "\n\nSources:\n" + src}, {"role": "user", "content": question}]
 
 
+def review_answer(raw: str, passages: list[dict], threshold: float = 0.6, max_sentences: int = 6) -> Advice:
+    """Steps 3 and 4 of the guard on one model answer: keep a short refusal short, drop unsupported sentences and any chemical rate,
+    cap the length, and abstain if nothing supported survives. Kept separate so it can be tested on recorded answers."""
+    raw = (raw or "").strip()
+    first = raw.split("\n")[0] if raw else ""
+    if REFUSAL.search(first):                                   # the model declined: keep it short
+        sents = re.split(r"(?<=[.!?])\s+", raw)
+        return Advice(" ".join(sents[:2]), "refused", "model refusal, stopped after two sentences")
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n+", raw) if s.strip()]
+    texts = [p["text"] for p in passages]
+    kept, dropped, ratios = [], [], []
+    for s in sentences:
+        if dose_like(s):
+            dropped.append(s)
+            continue
+        if len(s.split()) < 4:                                  # connective fragments pass through
+            kept.append(s)
+            continue
+        r = check_claim(re.sub(r"\[\d+\]", "", s), texts, threshold)
+        ratios.append(1.0 if r.supported else 0.0)
+        (kept if r.supported else dropped).append(s)
+    kept = kept[:max_sentences]
+    if not any(len(s.split()) >= 4 for s in kept):
+        return Advice(REPLIES["abstain"], "abstained", "no supported claims survived", dropped=dropped)
+    used = sorted({int(n) for s in kept for n in re.findall(r"\[(\d+)\]", s) if 1 <= int(n) <= len(passages)} or {1})
+    cites = [{"n": n, "passage_id": passages[n - 1].get("passage_id"), "title": passages[n - 1].get("title"), "page": passages[n - 1].get("page"),
+              "uri": passages[n - 1].get("uri"), "licence": passages[n - 1].get("licence")} for n in used]
+    ratio = sum(ratios) / len(ratios) if ratios else 1.0
+    return Advice(" ".join(kept), "trimmed" if dropped else "answered", "removed unsupported sentences" if dropped else "", cites, round(ratio, 3), dropped)
+
+
 class GuardedAdvisor:
     def __init__(self, retriever, generate: Callable[[list[dict]], str], *, k: int = 3, min_score: float = 1.5,
-                 threshold: float = 0.6, max_sentences: int = 6):
+                 threshold: float = 0.6, max_sentences: int = 6, compact: tuple[int, int] | None = None):
         self.retriever, self.generate = retriever, generate
         self.k, self.min_score, self.threshold, self.max_sentences = k, min_score, threshold, max_sentences
+        self.compact = compact          # (passages kept, words per passage) for a shorter prompt; None keeps the full passages
 
     def advise(self, question: str) -> Advice:
         rule = hard_rule(question)
@@ -120,29 +153,9 @@ class GuardedAdvisor:
         passages = self.retriever.top(question, self.k, self.min_score)
         if not passages:
             return Advice(REPLIES["abstain"], "abstained", "no relevant source")
-        raw = self.generate(build_messages(question, passages)).strip()
-        first = raw.split("\n")[0] if raw else ""
-        if REFUSAL.search(first):                                   # the model declined: keep it short
-            sents = re.split(r"(?<=[.!?])\s+", raw)
-            return Advice(" ".join(sents[:2]), "refused", "model refusal, stopped after two sentences")
-        sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n+", raw) if s.strip()]
-        texts = [p["text"] for p in passages]
-        kept, dropped, ratios = [], [], []
-        for s in sentences:
-            if dose_like(s):
-                dropped.append(s)
-                continue
-            if len(s.split()) < 4:                                  # connective fragments pass through
-                kept.append(s)
-                continue
-            r = check_claim(re.sub(r"\[\d+\]", "", s), texts, self.threshold)
-            ratios.append(1.0 if r.supported else 0.0)
-            (kept if r.supported else dropped).append(s)
-        kept = kept[: self.max_sentences]
-        if not any(len(s.split()) >= 4 for s in kept):
-            return Advice(REPLIES["abstain"], "abstained", "no supported claims survived", dropped=dropped)
-        used = sorted({int(n) for s in kept for n in re.findall(r"\[(\d+)\]", s) if 1 <= int(n) <= len(passages)} or {1})
-        cites = [{"n": n, "passage_id": passages[n - 1]["passage_id"], "title": passages[n - 1]["title"], "page": passages[n - 1]["page"],
-                  "uri": passages[n - 1]["uri"], "licence": passages[n - 1]["licence"]} for n in used]
-        ratio = sum(ratios) / len(ratios) if ratios else 1.0
-        return Advice(" ".join(kept), "trimmed" if dropped else "answered", "removed unsupported sentences" if dropped else "", cites, round(ratio, 3), dropped)
+        shown = passages
+        if self.compact:                # the prompt gets the trimmed passages, the guard checks the answer against the full ones
+            from prompt import prepare_sources
+            shown, passages = prepare_sources(question, passages, *self.compact)
+        raw = self.generate(build_messages(question, shown))
+        return review_answer(raw, passages, self.threshold, self.max_sentences)

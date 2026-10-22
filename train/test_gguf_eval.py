@@ -39,6 +39,17 @@ class T(unittest.TestCase):
         self.assertTrue(SEEN["prompt_is_tokens"]); self.assertEqual(SEEN["temp"], 0.0)
         self.assertEqual(speed["generation_tokens_per_s"], 20.0); self.assertEqual(speed["prompt_tokens_per_s"], 100.0)
 
+    def test_compact_prompt_scores_against_full_passages(self):
+        long = "Maize is planted at the onset of the rains. " * 6 + "Space rows 75 cm apart and plants 25 cm apart within the row. " + "Bags stay on pallets. " * 6
+        recs = [{"kind": "grounded", "question": "how far apart should I space maize rows", "expected_index": 2, "claims": [], "passage_id": "m",
+                 "sources": [{"title": "X", "page": 1, "text": "Goats need water.", "passage_id": "g", "uri": "u", "licence": "CC-BY-4.0"},
+                             {"title": "T", "page": 1, "text": long, "passage_id": "m", "uri": "u", "licence": "CC-BY-4.0"}]}]
+        shown, scored = gguf_eval.case(recs[0], 1, 20)
+        self.assertEqual(len(shown["sources"]), 1)
+        self.assertLess(len(shown["sources"][0]["text"].split()), len(long.split()))
+        self.assertEqual(scored["sources"][0]["text"], long)      # scored against the full passage
+        self.assertEqual(scored["expected_index"], 1)             # the maize passage is now first
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,8 +6,18 @@
   "holdout": 0.1,
   "epochs": 2,
   "bases": {
-    "gemma1b": ["google/gemma-3-1b-it", "1.5e-4"],
-    "qwen17": ["Qwen/Qwen3-1.7B", "1.5e-4"],
-    "qwen4b": ["Qwen/Qwen3-4B-Instruct-2507", "1e-4"]
-  }
+    "gemma1b": [
+      "google/gemma-3-1b-it",
+      "1.5e-4"
+    ],
+    "qwen17": [
+      "Qwen/Qwen3-1.7B",
+      "1.5e-4"
+    ],
+    "qwen4b": [
+      "Qwen/Qwen3-4B-Instruct-2507",
+      "1e-4"
+    ]
+  },
+  "abstain_share": 0.3
 }
