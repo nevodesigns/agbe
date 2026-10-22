@@ -51,6 +51,8 @@ Each was found by a test or by reading the real data. Keeping this list is the p
 
 12. **The first CPU memory reading was wrong.** llama.cpp's server keeps a cache of earlier prompts, so a 1.1 GB model showed a 10 GB peak. Caught because the numbers could not be true; the scorer now disables the caches and the repeat gave 1.0, 2.0 and 4.5 GB.
 
+13. **The abstain test and the abstain training data were contaminated.** 41% of the "no source" cases were answerable by sources that other documents provide. Found while diagnosing why a retraining made abstention worse; every earlier abstention number was understated. The test now flags and separates them, and the training data filters them out.
+
 ## Measurements so far
 
 - **Bake-off (60 prompts, retrieval mode):** Qwen3-4B-Instruct 33/60 with 0 leaks; Gemma 3 1B 25/60, 7 leaks; Qwen3-1.7B 23/60, 4 leaks; Gemma 3 4B 23/60; SmolLM3-3B 25/60, 9 leaks. The small models are within noise. See `docs/BAKEOFF_RESULTS.md`.
@@ -153,6 +155,41 @@ Three pieces are built, tested and committed (`95ab0ff`); two Kaggle notebooks r
 3. **Harder abstention** (`build_grounded_sft.py --hard-negatives --abstain-share 0.30`, notebook `AGBE_v2_3a_retrain_abstain`). The weakest result was correct abstention (41% for Qwen3 1.7B). Abstain examples now use passages of the same document that look relevant but do not answer, and a candidate is dropped if any accepted claim of the answer passage is supported by it (test: a same-document copy of the answer is never used), so the example never teaches abstention when the sources do contain the answer. Abstain examples rise from 118 to 247 of about 1,240 and the training set has fewer grounded ones (798, from 964), so the wrong-abstention rate must be watched. The retraining keeps the existing held-out cases (`FRESH_EVAL = False`), so before and after are comparable, trains only Qwen3 1.7B, and saves to the folder `run2` so `run1` is untouched. The held-out cases use their own random generator and the hard negatives another, so changing the abstain share cannot change the held-out set.
 
 Also added: `hf_persist.py pull --ignore` (skip the GGUF and adapter files when a notebook only needs the data), CI now runs the new tests, and the notebook guide lists the two new notebooks.
+
+## Results of the three experiments, and a correction to my own test (22 Oct 2026)
+
+**Shorter prompt (Qwen3 1.7B, Q4_K_M, all 140 cases, CPU, notebook `AGBE_v2_6_prompt_and_guard`).**
+
+| Prompt | Tokens | Seconds per answer | Grounded pass | Right source | Wrongly abstains | Clean abstention |
+|---|---|---|---|---|---|---|
+| Full (3 whole passages) | 856 | 30.6 | 0.871 | 0.886 | 0.071 | 0.512 |
+| 3 passages x 100 words | 600 | 18.7 (39% faster) | 0.871 | 0.829 | 0.057 | 0.512 |
+| 2 passages x 80 words | 409 | 13.1 (57% faster) | 0.814 | 0.743 | 0.129 | 0.537 |
+| 2 passages x 50 words | 339 | 11.2 (63% faster) | 0.757 | 0.614 | 0.214 | 0.585 |
+
+3 passages of 100 words keeps the pass rate and is 39% faster; it costs about 6 points of citing exactly the right source (88.6% to 82.9%). Shorter settings lose real accuracy because the models were trained on whole passages. **Adopted as the app default** (`AGBE_COMPACT=3,100`, `off` to disable). Training on trimmed prompts is the next lever for the 2-passage settings.
+
+**Model behind the guard** (the guard's own sentence check applied to the recorded 4-bit answers). Grounded pass rises by 1 to 3 points (Gemma 0.729 to 0.743, Qwen3 1.7B 0.871 to 0.900, Qwen3 4B 0.900 to 0.914) because unsupported sentences are removed, every kept sentence is supported, and correct abstention does not fall (Qwen3 4B 0.800 to 0.814). The cost: about 1.5 points more wrong abstentions and slightly fewer exact-source citations, since a trimmed answer can lose its citation. The guard changed only 4 to 10 of 140 answers: the models' off-point answers are mostly supported by their sources, so the guard cannot catch them. That is an abstention problem, not a support problem.
+
+**Retraining for abstention failed.** Qwen3 1.7B retrained with 247 "hard negative" abstain examples (passages of the same document) answered better (grounded pass 0.900, supported 0.938, valid citation 1.000, wrong abstentions 0.000) but abstained less (0.286 against 0.414; on the 41 clean cases 31.7% against 51.2%, ten cases got worse and one better). A likely cause: all three sources came from one document in the abstain examples but not in the grounded ones, so the model could learn "same-document sources mean abstain", a shortcut that does not transfer. The attempt is recorded and abandoned.
+
+**Correction: the abstain test and the abstain training data were contaminated.** An abstain case is built by removing the passage that answers a question, but other documents often repeat the same advice. In **29 of the 70 abstain cases (41%) the sources still shown support an accepted claim of the removed passage**, so the right behaviour was to answer and the case was mislabelled. The same flaw sat in the training abstain examples. Every abstention figure reported before 22 Oct counted all 70 cases and so understated the models. The test now flags these cases (`train/rag_eval.py:mark_leaky`, using the accepted claims in `data/run1_kaggle/claims.jsonl`) and reports abstention on the 41 clean cases separately. Restated:
+
+| Model | All 70 (as first reported) | The 41 clean cases | Answered on the 29 answerable cases |
+|---|---|---|---|
+| Gemma 3 1B untrained | 0.000 | 0.000 | 29/29 |
+| Gemma 3 1B tuned, fp16 | 0.357 | 0.415 | 21/29 |
+| Gemma 3 1B Q4_K_M | 0.386 | 0.439 | 20/29 |
+| Qwen3 1.7B untrained | 0.014 | 0.024 | 27/29 |
+| Qwen3 1.7B tuned, fp16 and Q4_K_M | 0.414 | 0.512 | 21/29 |
+| Qwen3 1.7B retrained (run2) | 0.286 | 0.317 | 22/29 |
+| Qwen3 4B untrained | 0.186 | 0.195 | 23/29 |
+| Qwen3 4B tuned, fp16 | 0.714 | 0.756 | 10/29 |
+| **Qwen3 4B Q4_K_M** | **0.800** | **0.854** | 8/29 |
+
+Qwen3 4B abstains correctly in 85% of the truly unanswerable cases but answers only 28% of the answerable ones, so it is cautious; Qwen3 1.7B answers 72% of them but abstains correctly in only 51% of the clean cases.
+
+**Fix in the training data** (`tools/build_grounded_sft.py:clean_sources`, commit `2e8a45f`): abstain examples are built like the real cases (retrieved passages, from different documents), and a candidate is dropped if it supports any accepted claim of the answer passage. Checked on the real data: 200 abstain examples, none still containing the answer (the plain method left about four in ten). The notebook `AGBE_v2_3a_retrain_abstain` retrains Qwen3 1.7B with this (25% abstain share) on the same held-out cases, saving to `run2`. Not yet run with the fix.
 
 ## Reproducing
 

@@ -11,11 +11,11 @@ Read this first if you are picking the work up cold, whether you are me in a new
 | Claims and training data | Done. 1,205 accepted claims from 429 passages; 1,280 training examples and 140 held-out cases after filters. Raw copies in `data/run1_kaggle/` |
 | Guard, endpoint, evaluation, CI | Built and tested on CPU, CI green |
 | Kaggle pipeline | Runs end to end (train, merge, GGUF, held-out evaluation). Five generated notebooks, see `docs/V2_ENGINEERING_LOG.md` |
-| Trained v2 models | Three bases trained and scored (21 Oct). Shrunk to Q4_K_M and rescored on a CPU: Qwen3 4B 90.0% grounded pass and 80.0% correct abstention, Qwen3 1.7B 87.1% and 41.4%, Gemma 3 1B 72.9% and 38.6%; shrinking costs nothing measurable. Memory (cache off): 1.0, 2.0 and 4.5 GB. Speed against v16 on the same CPU: 1.00x, 0.73x and 0.35x. Edge candidate Qwen3 1.7B, server candidate Qwen3 4B |
+| Trained v2 models | Three bases trained and scored (21 Oct), shrunk to Q4_K_M with no measurable loss. Grounded pass: Qwen3 4B 90.0%, Qwen3 1.7B 87.1%, Gemma 3 1B 72.9%. Correct abstention on the 41 truly unanswerable cases: 85.4%, 51.2%, 43.9% (the original 70-case figure was contaminated, see the engineering log). Memory 1.0, 2.0 and 4.5 GB; speed 1.00x, 0.73x, 0.35x of v16 on the same CPU. Shorter prompt (3 passages x 100 words) adopted as the default: same pass rate, 39% faster. Edge candidate Qwen3 1.7B, server candidate Qwen3 4B |
 | Full training (three bases) | Done. Next: CPU speed, memory and quantised quality; abstain data; wire the guard |
 | Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
 | Agronomist | Not found yet |
-| Prepared, not yet run | notebooks `AGBE_v2_3a_retrain_abstain` (harder abstain data, GPU) and `AGBE_v2_6_prompt_and_guard` (shorter prompt, model plus guard, CPU), both in `~/Downloads/agbe-kaggle/` |
+| Prepared, not yet run | notebook `AGBE_v2_3a_retrain_abstain` (GPU): retrain Qwen3 1.7B with clean abstain examples (the first attempt with same-document hard negatives made abstention worse, 31.7% against 51.2%, and was abandoned) |
 | Not yet verified | speed on the real competition machine, answers reviewed by a person, a shorter prompt and its effect on speed, container build, phone build |
 
 The complete private record (people, accounts, business arrangements, all file locations) is kept outside this repository. The full chronology of faults, fixes and numbers is in `docs/V2_ENGINEERING_LOG.md`.
