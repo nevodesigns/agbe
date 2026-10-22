@@ -128,6 +128,26 @@ def clean_sources(claim_rows, candidates, want=3):
     return None
 
 
+def compact_for_training(question, srcs, pid, claim_rows, setting):
+    """The training version of the shorter prompt: rank the sources, keep the best k, trim each to about w words. The answer passage keeps the
+    sentences that hold the quotes its claims come from, so every training answer is still supported by the text the model is shown.
+    Returns (shown sources, 1-based index of the answer passage or None)."""
+    from prompt import compact, relevance
+    k, w = setting
+    ranked = sorted(srcs, key=lambda p: -relevance(question, p["text"]))[:k]
+    quotes = [c["quote"] for c in claim_rows if c.get("quote")]
+    shown = [dict(p, text=compact(question, p["text"], w, quotes if p["passage_id"] == pid else None)) for p in ranked]
+    n = next((i for i, p in enumerate(shown, 1) if p["passage_id"] == pid), None)
+    return shown, n
+
+
+def answer_supported(answer, texts, floor=0.8):
+    """True if at least `floor` of the answer's sentences are supported by the shown source texts, by the same checker the evaluation uses."""
+    from claim_check import check_claim, split_claims
+    sents = [re.sub(r"\[\d+\]", "", x) for x in split_claims(answer)]
+    return bool(sents) and sum(check_claim(x, texts).supported for x in sents) / len(sents) >= floor
+
+
 def stage_compose(a):
     rnd = random.Random(7)
     passages = {p["passage_id"]: p for p in load(a.passages)}
@@ -135,6 +155,8 @@ def stage_compose(a):
     for c in load(a.claims):
         if c["status"] == "accepted":
             claims[c["passage_id"]].append(c)
+    claim_rows_by_pid = claims
+    compact = tuple(int(x) for x in a.compact.split(",")) if getattr(a, "compact", None) else None
     retr = Retriever(a.passages)
     ab_rng = random.Random(17)      # its own generator, so abstain sources never change the held-out evaluation cases
     out, stats, evals = [], collections.Counter(), []
@@ -173,6 +195,8 @@ def stage_compose(a):
                 if not srcs:
                     stats["skipped_no_clean_sources"] += 1
                     continue
+                if compact:
+                    srcs, _ = compact_for_training(q, srcs, None, [], compact)
                 out.append({"messages": messages(q, srcs, REPLIES["abstain"]), "kind": "abstain", "passage_id": pid}); stats["abstain"] += 1
                 continue
             for variant in range(max(1, getattr(a, "variants", 1))):
@@ -183,6 +207,14 @@ def stage_compose(a):
                 srcs = pool + [passages[pid]]
                 rnd.shuffle(srcs)
                 n = [i for i, p in enumerate(srcs, 1) if p["passage_id"] == pid][0]
+                if compact:
+                    srcs, n = compact_for_training(q, srcs, pid, claim_rows_by_pid[pid], compact)
+                    if n is None:
+                        continue
+                    trial = compose_answer(q, claims[pid], n, max_claims=4 if variant == 0 else 3)
+                    if trial is not None and not answer_supported(trial, [p["text"] for p in srcs]):
+                        stats["skipped_unsupported_after_trim"] += 1   # trimming removed what the answer rests on: never train on that
+                        continue
                 ans = compose_answer(q, claims[pid], n, max_claims=4 if variant == 0 else 3)
                 if ans is None:
                     stats["skipped_off_topic"] += 1
@@ -228,6 +260,7 @@ def main():
     c = sub.add_parser("compose")
     c.add_argument("--passages", required=True); c.add_argument("--claims", required=True); c.add_argument("--questions", required=True); c.add_argument("--out", required=True)
     c.add_argument("--abstain-share", type=float, default=0.15); c.add_argument("--refusal-share", type=float, default=0.12)
+    c.add_argument("--compact", default=None, help="train on the shorter prompt, e.g. 3,100: best 3 passages trimmed to about 100 words")
     c.add_argument("--keep-leaky-abstain", action="store_true", help="old behaviour: do not filter out abstain sources that contain the answer")
     c.add_argument("--variants", type=int, default=2, help="grounded examples per question, with different distractors"); c.add_argument("--holdout", type=float, default=0.0, help="share of passages kept out of training for evaluation"); c.add_argument("--eval-out", default=None)
     a = ap.parse_args()

@@ -26,14 +26,20 @@ def relevance(question: str, text: str) -> float:
     return len(q & words(text)) / len(q) if q else 0.0
 
 
-def compact(question: str, text: str, max_words: int) -> str:
-    """Keep the sentences that share the most words with the question, in their original order, up to max_words (at least one)."""
+def compact(question: str, text: str, max_words: int, must_keep: list[str] | None = None) -> str:
+    """Keep the sentences that share the most words with the question, in their original order, up to max_words (at least one).
+    Sentences that hold any of `must_keep` (verbatim quotes the answer is built from) are always kept, so training answers stay supported
+    by the trimmed text; at serving time there is no such list and relevance alone decides."""
     sents = sentences(text)
     if sum(len(s.split()) for s in sents) <= max_words:
         return text.strip()
-    order = sorted(range(len(sents)), key=lambda i: (-relevance(question, sents[i]), i))
-    keep, total = set(), 0
-    for i in order:
+    norm = lambda t: " ".join(t.split()).lower()
+    quotes = [norm(q) for q in (must_keep or []) if q]
+    keep = {i for i, s in enumerate(sents) if any(q[:40] in norm(s) or norm(s) in q or norm(s)[:40] in q for q in quotes)}   # a quote may span sentences
+    total = sum(len(sents[i].split()) for i in keep)
+    for i in sorted(range(len(sents)), key=lambda i: (-relevance(question, sents[i]), i)):
+        if i in keep:
+            continue
         n = len(sents[i].split())
         if keep and total + n > max_words:
             continue

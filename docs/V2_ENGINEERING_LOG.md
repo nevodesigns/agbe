@@ -207,6 +207,12 @@ Same base, 2 epochs, same held-out cases, the corrected abstain data (200 abstai
 
 Reading: answering and citing improved clearly (the filtered abstain examples stopped teaching abstention where the answer was present, and the answerable cases are no longer penalised); abstention on the clean cases did not move (20 of 41 against 21 of 41). Wrong abstentions are now 1.4%, which leaves room to push abstention harder. The 4-bit file of this retrained model is saved (`run2/agbe-v2-qwen17-q4_k_m.gguf`) but has not been scored yet; the earlier 4-bit files matched their float16 scores. This model replaces run1 as the edge candidate.
 
+## Prepared next: train on the short prompt (22 Oct 2026, built and tested, not yet run)
+
+The product now sends the short prompt (best 3 passages, about 100 words each), but the models were trained on whole passages, which is why the shorter settings lost accuracy. `build_grounded_sft.py --compact 3,100` builds training examples in the same shape: the passages are ranked by shared question words, trimmed to the relevant sentences, and the answer passage always keeps the sentences that hold the quotes its claims come from (whitespace-normalised, and a quote that spans sentences keeps all of them). A trimmed example is then re-checked with the evaluation's own claim checker against the text the model will see, and dropped if fewer than 80% of its sentences are supported: on the real data this removed 34 grounded examples (834 kept), after which every kept grounded example is 100% supported (mean 1.00, minimum 1.00); the whole-passage set has a mean of 0.986 with some zero-support examples. The mean grounded prompt falls from 631 to 397 words. `rag_eval.py` gained `--sources` and `--max-words` so the retrained model is scored on the same short prompt.
+
+Notebooks: `AGBE_v2_3c_train_short_prompt` (GPU, saves to `run3`), `AGBE_v2_7_eval_run2` (CPU, scores the retrained model's 4-bit file under both prompts, so the short-prompt model has a fair comparison) and `AGBE_v2_8_eval_run3` (CPU, after 3c). The question: does training on the short prompt recover the pass rate that the 2-passage settings lost, so that an even shorter prompt becomes usable?
+
 ## Reproducing
 
 ```bash

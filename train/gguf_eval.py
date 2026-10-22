@@ -14,9 +14,8 @@ import argparse, json, pathlib, platform, subprocess, sys, time, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "eval")); sys.path.insert(0, str(ROOT / "train"))
-from rag_eval import mark_leaky, score, summarise  # noqa: E402
+from rag_eval import case, mark_leaky, score, summarise  # noqa: E402
 from serve.guard import build_messages  # noqa: E402
-from serve.prompt import prepare_sources  # noqa: E402
 
 
 def render(tok, messages) -> str:
@@ -53,17 +52,6 @@ def wait_ready(base: str, seconds: int = 600):
             pass
         time.sleep(2)
     raise RuntimeError("llama-server did not become ready")
-
-
-def case(rec: dict, k: int, max_words: int):
-    """The record the model is shown (ranked, trimmed passages) and the record it is scored against (the same passages, full text)."""
-    if not k and not max_words:
-        return rec, rec
-    shown, full = prepare_sources(rec["question"], rec["sources"], k, max_words)
-    idx = None
-    if rec["kind"] == "grounded":
-        idx = next((i for i, p in enumerate(full, 1) if p.get("passage_id") == rec.get("passage_id")), None)   # None if the retriever missed it
-    return dict(rec, sources=shown), dict(rec, sources=full, expected_index=idx)
 
 
 def run(base: str, tok, recs, max_new: int, k: int = 0, max_words: int = 0):

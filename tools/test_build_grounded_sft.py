@@ -103,5 +103,34 @@ class CleanAbstainSources(unittest.TestCase):
         self.assertIsNone(b.clean_sources(claims, cands[:3]))                                  # not enough clean sources: no example
 
 
+class CompactTraining(unittest.TestCase):
+    def test_trimmed_examples_stay_supported_and_cite_the_right_index(self):
+        import re
+        sys.path.insert(0, str(HERE.parent / "eval"))
+        from claim_check import check_claim
+        long = ("Banana aphids spread banana bunchy top virus by feeding on infected plants and then moving to healthy plants. "
+                + "Banana is grown across many regions and is a staple food for millions of households in the tropics. " * 4
+                + "Remove infected mats at once and use clean suckers. " + "Spacing of three metres is common for banana mats in the field. " * 4)
+        P2 = [dict(P[0], text=long, passage_id="p1")] + [dict(x) for x in P[1:]]
+        C2 = [{"passage_id": "p1", "status": "accepted", "claim": "Remove infected mats at once and use clean suckers.", "quote": "Remove infected mats at once and use clean suckers."}]
+        Q2 = [{"passage_id": "p1", "raw": ["What do I do about infected banana mats?"]}]
+        d = pathlib.Path(tempfile.mkdtemp())
+        for n, rows in (("p", P2), ("c", C2), ("q", Q2)):
+            (d / f"{n}.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+        out = d / "o.jsonl"
+        a = type("A", (), dict(passages=str(d / "p.jsonl"), claims=str(d / "c.jsonl"), questions=str(d / "q.jsonl"), out=str(out), abstain_share=0.0, refusal_share=0.12, compact="3,25"))
+        b.stage_compose(a)
+        rows = [json.loads(l) for l in out.read_text().splitlines() if json.loads(l)["kind"] == "grounded"]
+        self.assertTrue(rows)
+        for r in rows:
+            system = r["messages"][0]["content"]
+            srcs = re.findall(r"^\[(\d+)\] \(.*?\) (.*)$", system, re.M)
+            ans = r["messages"][-1]["content"]
+            n = int(re.findall(r"\[(\d+)\]", ans)[-1])
+            shown = dict(srcs)[str(n)]
+            self.assertLessEqual(len(shown.split()), len(long.split()) // 2)                     # really shorter than the whole passage
+            self.assertTrue(check_claim(re.sub(r"\[\d+\]", "", ans).strip().rstrip("."), [shown]).supported)   # still supported by what the model sees
+
+
 if __name__ == "__main__":
     unittest.main()

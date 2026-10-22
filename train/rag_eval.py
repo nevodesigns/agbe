@@ -19,6 +19,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "eval")); sys.path.insert(0, str(ROOT / "train"))
 from claim_check import check_claim, split_claims  # noqa: E402
 from serve.guard import build_messages  # noqa: E402
+from serve.prompt import prepare_sources  # noqa: E402
 
 NO_SOURCE = re.compile(r"\b(do not|don't|does not|did not|cannot|can't|not) (have|find|see|contain|cover|include)\b.{0,40}\b(source|sources|information|answer)\b|\bno source\b|\bnot in the (sources|passages)\b|\bsources? (do|does) not\b", re.I)
 
@@ -61,6 +62,17 @@ def score(rec: dict, answer: str) -> dict:
     return {"pass": ok, "abstained": abstained, "supported_ratio": round(ratio, 3), "valid_citation": valid, "right_source": None, "sentences": len(sents), "leaky": bool(rec.get("leaky"))}
 
 
+def case(rec: dict, k: int, max_words: int):
+    """The record the model is shown (ranked, trimmed passages) and the record it is scored against (the same passages, full text)."""
+    if not k and not max_words:
+        return rec, rec
+    shown, full = prepare_sources(rec["question"], rec["sources"], k, max_words)
+    idx = None
+    if rec["kind"] == "grounded":
+        idx = next((i for i, p in enumerate(full, 1) if p.get("passage_id") == rec.get("passage_id")), None)   # None if the retriever missed it
+    return dict(rec, sources=shown), dict(rec, sources=full, expected_index=idx)
+
+
 def summarise(rows: list[dict]) -> dict:
     g = [r for r in rows if r["kind"] == "grounded"]; a = [r for r in rows if r["kind"] == "abstain"]
     clean = [r for r in a if not r.get("leaky")] if any("leaky" in r for r in a) else []
@@ -76,6 +88,7 @@ def main():
     ap.add_argument("--model"); ap.add_argument("--eval"); ap.add_argument("--out")
     ap.add_argument("--load-4bit", action="store_true"); ap.add_argument("--max-new", type=int, default=200)
     ap.add_argument("--limit", type=int, default=0); ap.add_argument("--dry", action="store_true")
+    ap.add_argument("--sources", type=int, default=0); ap.add_argument("--max-words", type=int, default=0)
     ap.add_argument("--table", nargs="*")
     a = ap.parse_args()
     if a.table is not None:
@@ -95,9 +108,10 @@ def main():
         from bakeoff import load_generator
         gen, _ = load_generator(a.model, a.load_4bit, a.max_new)
     rows = []
-    for i, r in enumerate(recs, 1):
+    for i, r0 in enumerate(recs, 1):
+        r, scored = case(r0, a.sources, a.max_words)
         ans = gen(build_messages(r["question"], r["sources"]))
-        rows.append({"kind": r["kind"], "question": r["question"], "answer": ans, **score(r, ans)})
+        rows.append({"kind": r["kind"], "question": r["question"], "answer": ans, **score(scored, ans)})
         if i % 20 == 0:
             print(i, "/", len(recs), flush=True)
     summ = summarise(rows)

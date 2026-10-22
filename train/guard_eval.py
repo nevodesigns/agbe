@@ -13,8 +13,7 @@ import argparse, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "eval")); sys.path.insert(0, str(ROOT / "train"))
-from rag_eval import mark_leaky, score, summarise  # noqa: E402
-from gguf_eval import case  # noqa: E402
+from rag_eval import case, mark_leaky, score, summarise  # noqa: E402
 from serve.guard import review_answer  # noqa: E402
 
 
