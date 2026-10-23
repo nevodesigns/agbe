@@ -1,6 +1,6 @@
 # AGBE v2 engineering log
 
-What was built after the Africa Deep Tech Challenge final, in the order it happened, with the numbers, the faults found, and how to reproduce each step. Written so that someone picking the work up cold, including the author after a long break, can continue without the chat history. Last updated 21 October 2026.
+What was built after the Africa Deep Tech Challenge final, in the order it happened, with the numbers, the faults found, and how to reproduce each step. Written so that someone picking the work up cold, including the author after a long break, can continue without the chat history. Last updated 23 October 2026.
 
 ## Where things stand (21 Oct 2026)
 
