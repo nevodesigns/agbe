@@ -213,6 +213,23 @@ The product now sends the short prompt (best 3 passages, about 100 words each), 
 
 Notebooks: `AGBE_v2_3c_train_short_prompt` (GPU, saves to `run3`), `AGBE_v2_7_eval_run2` (CPU, scores the retrained model's 4-bit file under both prompts, so the short-prompt model has a fair comparison) and `AGBE_v2_8_eval_run3` (CPU, after 3c). The question: does training on the short prompt recover the pass rate that the 2-passage settings lost, so that an even shorter prompt becomes usable?
 
+## The shipping file scored, training on the short prompt, and a caveat on the guard numbers (23 Oct 2026)
+
+**The retrained edge model as a 4-bit file** (`run2/agbe-v2-qwen17-q4_k_m.gguf`, notebook `AGBE_v2_7_eval_run2`, all 140 cases, 4 CPU threads, context 2048):
+
+| Prompt | Pass | Supported | Valid cite | Right source | Wrongly abstains | Clean abstention | Tokens | Per answer | Memory |
+|---|---|---|---|---|---|---|---|---|---|
+| Whole passages | 0.914 | 0.964 | 1.000 | 0.957 | 0.000 | 0.512 | 856 | 26.6 s | 2,042 MB |
+| 3 passages x 100 words | 0.900 | 0.917 | 0.971 | 0.900 | 0.029 | **0.585** | 600 | **19.0 s** | 2,041 MB |
+
+Shrinking to 4-bit cost about 3 points of pass (0.943 in float16, 0.914 as 4-bit: two cases on 70). The short prompt costs one point of pass and about five of exact-source citation, raises clean abstention (the model is less distracted by long passages) and cuts the time per answer by 29% on this slow cloud CPU.
+
+**Training on the short prompt did not help** (`AGBE_v2_3c_train_short_prompt`, run3; every training answer verified against the trimmed text, 34 unsupported examples dropped). Scored in float16 on the same short prompt: pass 0.914, supported 0.914, valid citation 0.929, right source 0.843, wrongly abstains 0.071, clean abstention 0.415. Against the run2 model on the same short prompt (4-bit: 0.900, 0.917, 0.971, 0.900, 0.029, 0.585) it is no better at answering (a one-point difference is noise) and clearly worse at citing and abstaining (clean abstention 17 points lower, about 7 of 41 cases). The hypothesis that a train and serve mismatch caused the loss at shorter settings is not supported: the model trained on whole passages already copes with the short prompt. The run3 4-bit file was not scored (the float16 gap is large enough), and the training option `--compact` stays in the code, unused by default. Run3 is not adopted.
+
+**Caveat on the guard numbers reported earlier.** The guard keeps a sentence only if the claim checker finds it supported, and the evaluation's supported-sentence measure uses the same checker. After the guard, the supported share is therefore 100% by construction (full prompt: pass 1.000, supported 1.000), so "the guard raises pass by 1 to 3 points" is not independent evidence of quality. What the numbers do show is how little the guard changes (4 to 10 of 140 answers, abstention unchanged), meaning the models rarely say unsupported things in the first place. A real check needs a different judge (a person, or a different model) reading answers.
+
+**Decision.** The edge candidate is the run2 model (Qwen3 1.7B, clean abstain data) served as a 4-bit file with the short prompt (the app default): 90.0% pass, 97.1% valid citation, 2.9% wrong abstentions, 58.5% correct abstention on the clean cases, 2.0 GB, 19 s per answer on a slow shared CPU. The weakest measure is abstention. The next experiment (`AGBE_v2_3d_more_abstain`, run4) raises the abstain share to 40% with the same clean sources and whole passages; `AGBE_v2_9_eval_run4` scores it on the CPU.
+
 ## Reproducing
 
 ```bash

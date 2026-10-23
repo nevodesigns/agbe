@@ -40,6 +40,7 @@ except Exception: os.environ["HF_TOKEN"] = _s.get_secret("HF_TOKEN")
 STAGES = @@STAGES@@                    # already set for this notebook, nothing to edit
 HF_REPO = "NEVODESIGN/agbe-v2-work"   # private dataset repo that keeps your work between sessions
 DATA_RUN = "run1"                      # the folder this notebook starts from
+ABSTAIN = @@ABSTAIN@@                  # None keeps abstain_share from train/session_config.json; a number such as 0.4 overrides it
 COMPACT = "@@COMPACT@@"                # for example 3,100: train and test on the shorter prompt (best 3 passages, about 100 words each); empty means whole passages
 FRESH_EVAL = @@FRESH@@                  # False when retraining against the held-out cases that already exist
 RUN = "@@RUN@@"                        # the folder this notebook saves to (the smoke test uses its own, so it cannot disturb run1)
@@ -118,7 +119,7 @@ code('''
 if "C" in STAGES:
   FLAGS = f'--variants {CFG["variants"]} --holdout {CFG["holdout"]}'
   if FRESH_EVAL: FLAGS += f' --eval-out {WORK}/rag_eval.jsonl'                                             # first time: write the held-out test cases
-  else: FLAGS += f' --abstain-share {CFG["abstain_share"]}'                                                # retraining: keep the SAME held-out cases; abstain sources never contain the answer
+  else: FLAGS += f' --abstain-share {ABSTAIN or CFG["abstain_share"]}'                                                # retraining: keep the SAME held-out cases; abstain sources never contain the answer
   if COMPACT: FLAGS += f' --compact {COMPACT}'
   !python tools/build_grounded_sft.py compose --passages {PASSAGES} --claims {WORK}/claims.jsonl --questions {WORK}/questions.jsonl --out {WORK}/sft.jsonl {FLAGS}
   save()
@@ -181,13 +182,14 @@ SESSIONS = [  # (label, stages, what, file, run folder, base keys, epochs)
     ("3s", '["C", "D", "E"]', "SMOKE TEST of training, export and testing on the data so far, one base and one epoch, about 1 to 2 hours. Its results go to a separate folder and are not the final models", "AGBE_v2_3s_smoketest.ipynb", "smoke", '["gemma1b"]', "1"),
     ("3a", '["C", "D", "E"]', "RETRAIN Qwen3 1.7B with clean abstain examples (retrieved passages from different documents that never contain the answer, 25% abstain share), scored on the SAME held-out cases as before, about 1.5 hours. Saves to folder run2, so run1 is untouched", "AGBE_v2_3a_retrain_abstain.ipynb", "run2", '["qwen17"]', "None"),
     ("3c", '["C", "D", "E"]', "RETRAIN Qwen3 1.7B ON THE SHORT PROMPT the product now uses (best 3 passages, about 100 words each, every training answer still supported by the text shown), and score it on that same short prompt against the same held-out cases, about 1.5 hours. Saves to folder run3, so run1 and run2 are untouched", "AGBE_v2_3c_train_short_prompt.ipynb", "run3", '["qwen17"]', "None"),
+    ("3d", '["C", "D", "E"]', "RETRAIN Qwen3 1.7B with a 40% abstain share (clean sources, whole passages, as in run2 but with more examples of when to say there is no source), scored on the SAME held-out cases, about 1.5 hours. Saves to folder run4", "AGBE_v2_3d_more_abstain.ipynb", "run4", '["qwen17"]', "None"),
     ("3", '["C", "D", "E"]', "train the three bases on the full data, export the GGUFs and re-test, about 4 to 6 hours. Run it after 2b has finished", "AGBE_v2_3_train.ipynb", "run1", "None", "None"),
 ]
 meta = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}}
 for n, stages, what, fname, run, keys, epochs in SESSIONS:
     out_cells = []
     for c in cells:
-        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", n).replace("@@RUN@@", run).replace("@@KEYS@@", keys).replace("@@FRESH@@", "False" if n in ("3a", "3c") else "True").replace("@@IGNORE@@", '--ignore "*.gguf" "adapter_*"' if n in ("3a", "3c") else "").replace("@@COMPACT@@", "3,100" if n == "3c" else "").replace("@@EPOCHS@@", epochs).replace("@@WHAT@@", what)
+        src = "".join(c["source"]).replace("@@STAGES@@", stages).replace("@@N@@", n).replace("@@RUN@@", run).replace("@@KEYS@@", keys).replace("@@FRESH@@", "False" if n in ("3a", "3c", "3d") else "True").replace("@@IGNORE@@", '--ignore "*.gguf" "adapter_*"' if n in ("3a", "3c", "3d") else "").replace("@@COMPACT@@", "3,100" if n == "3c" else "").replace("@@ABSTAIN@@", "0.4" if n == "3d" else "None").replace("@@EPOCHS@@", epochs).replace("@@WHAT@@", what)
         out_cells.append(dict(c, source=src.splitlines(keepends=True)))
     (HERE / fname).write_text(json.dumps({"cells": out_cells, "metadata": meta, "nbformat": 4, "nbformat_minor": 5}, indent=1))
     print("wrote", fname)

@@ -15,8 +15,8 @@ Read [RECOVERY.md](RECOVERY.md) first for the whole picture in one page. Read th
 | Full training (three bases) | Done. Next: CPU speed, memory and quantised quality; abstain data; wire the guard |
 | Permission emails | Sent 18 Oct. IITA Cc bounced. Follow up on or after 1 Nov 2026 |
 | Agronomist | Not found yet |
-| Edge model, retrained (22 Oct) | Qwen3 1.7B retrained with clean abstain data: grounded pass 94.3% (from 87.1%), supported 96.7%, valid citation 98.6%, wrongly abstains 1.4%, abstention on the 41 clean cases 48.8% (unchanged). Float16 score; its 4-bit file (`run2/`) is not scored yet |
-| Prepared, not yet run | `AGBE_v2_3c_train_short_prompt` (GPU) and `AGBE_v2_7_eval_run2` (CPU): train on the short prompt and compare, in `~/Downloads/agbe-kaggle/`; `AGBE_v2_8_eval_run3` follows 3c |
+| Edge model (23 Oct) | Qwen3 1.7B retrained with clean abstain data, as a 4-bit file with the short prompt: 90.0% pass, 97.1% valid citation, 2.9% wrong abstentions, 58.5% correct abstention on the 41 clean cases, 2.0 GB, 19 s per answer on a slow cloud CPU (91.4% pass and 51.2% on whole passages, 26.6 s). Training on the short prompt (run3) did not help and is not adopted |
+| Prepared, not yet run | `AGBE_v2_3d_more_abstain` (GPU, 40% abstain share, run4) and `AGBE_v2_9_eval_run4` (CPU), in `~/Downloads/agbe-kaggle/`. `AGBE_v2_8_eval_run3` is no longer needed |
 | Not yet verified | speed on the real competition machine, answers reviewed by a person, a shorter prompt and its effect on speed, container build, phone build |
 
 The complete private record (people, accounts, business arrangements, all file locations) is kept outside this repository. The full chronology of faults, fixes and numbers is in `docs/V2_ENGINEERING_LOG.md`.

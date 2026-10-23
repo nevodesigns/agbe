@@ -70,4 +70,5 @@ for name, k, w in VARIANTS:
 
 
 build("AGBE_v2_7_eval_run2.ipynb", "run2", "score the retrained Qwen3 1.7B (clean abstain data) as a 4-bit file, full prompt and short prompt", [["full", 0, 0], ["k3w100", 3, 100]])
+build("AGBE_v2_9_eval_run4.ipynb", "run4", "score the Qwen3 1.7B trained with a 40% abstain share, as a 4-bit file, short prompt and full prompt", [["k3w100", 3, 100], ["full", 0, 0]])
 build("AGBE_v2_8_eval_run3.ipynb", "run3", "score the Qwen3 1.7B trained on the short prompt, as a 4-bit file, short prompt and full prompt", [["k3w100", 3, 100], ["full", 0, 0]])
