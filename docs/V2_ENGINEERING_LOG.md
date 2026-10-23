@@ -253,6 +253,19 @@ Notebook 3d retrained Qwen3 1.7B with the abstain share raised from 0.25 to 0.40
 
 Negative result: more abstain examples did not teach the model to abstain more on clean cases (one case fewer). The grounded gain (2 of 70 cases) is within noise. Reading: the 1.7B model's weakness is not too few abstain examples; the 4B model reaches 85.4% on the same cases, so capacity or a different mechanism (a retrieval-score gate before the model) is the next lever. Run4 is not adopted; run2 with the short prompt stays the edge candidate. The run4 4-bit file was not scored and does not need to be.
 
+## Retrieval-score gate (23 October 2026)
+
+Question: can a check before the model ("is the question covered by the sources?") lift correct abstention? Feature: share of the question's content words (weighted by inverse document frequency) found in the single best sentence of the retrieved passages. Test: the 140 held-out cases regenerated locally (matches the 868/200/196 training counts), combined with the saved run2 Q4 answers (short prompt) by position.
+
+| Gate threshold | Grounded answers lost | Clean abstain (of 41) |
+|---|---|---|
+| none | 0 | 24 (58.5%) |
+| 0.30 | 2 | 26 (63.4%) |
+| 0.35 | 5 | 26 |
+| 0.40 | 10 | 28 (68.3%) |
+
+Negative result: each extra clean abstention costs about one correct grounded answer. The test distractors are topically close to the question (they are the nearest passages once the answer passage is removed), so word overlap cannot tell them apart. Not shipped as a new rule. The existing minimum retrieval score (1.5) still removes questions with no related source at all, which this test does not contain. Real off-topic questions need a separate test. Abstention on near-miss sources stays a model job: the 4B model reaches 85.4%.
+
 ## Next steps
 
 1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
