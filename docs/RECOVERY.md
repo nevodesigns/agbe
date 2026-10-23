@@ -66,8 +66,8 @@ Lessons: read the data; make each check able to fail at the exact place of the c
 
 ## 6. Next steps
 
-1. Run `AGBE_v2_3c_train_short_prompt` (GPU) and `AGBE_v2_7_eval_run2` (CPU) in parallel, then `AGBE_v2_8_eval_run3`: does training on the short prompt recover the accuracy the shorter settings lost?
-2. Push abstention (clean abstain share 0.35 to 0.40), now that wrong abstentions are 1.4%.
+1. Done: short-prompt training (run3) did not help; the shipping file (run2 Q4) is scored. No notebook is pending.
+2. Done, no gain: raising the abstain share to 0.40 (run4) gave clean abstention 46.3% against 48.8%. Next lever: a retrieval-score gate before the model, or the 4B model on the server.
 3. Score the retrained model's 4-bit file; test the guard wired to the real model end to end; build a larger test set split by document; have a person review answers.
 4. Model card; verify the Qwen3 model cards' licence before any commercial use; container build; phone build.
 5. Find an agronomist to review the fact base; follow up the permission requests to the publishers whose material is not yet usable (earliest 1 November 2026).

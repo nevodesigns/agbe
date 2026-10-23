@@ -242,13 +242,24 @@ python3 train/diagnose_data.py --claims claims.jsonl --sft sft.jsonl
 
 Kaggle notebooks (generated, then imported by hand): `AGBE_v2_2b_more_data` (more claims, resumes), `AGBE_v2_3s_smoketest` (one base, one epoch, saves to its own folder), `AGBE_v2_3_train` (three bases, two epochs, GGUF, held-out test). Every tunable number is in `train/session_config.json`. Work is kept between sessions in a private Hugging Face dataset repository.
 
+## Run4: 40 percent abstain share (23 October 2026)
+
+Notebook 3d retrained Qwen3 1.7B with the abstain share raised from 0.25 to 0.40 (1,174 examples: 662 grounded, 327 abstain, 185 refusal; final training loss 0.1057, eval loss 0.1794; merge and final-folder checks passed). Merged float16 scores on the 140 held-out cases:
+
+| Run | Grounded pass | Supported | Right source | Wrong abstain | Clean abstain (41 cases) |
+|---|---|---|---|---|---|
+| run2 (share 0.25) | 94.3% | 96.7% | 95.7% | 1.4% | 48.8% (20/41) |
+| run4 (share 0.40) | 97.1% | 97.1% | 95.7% | 0.0% | 46.3% (19/41) |
+
+Negative result: more abstain examples did not teach the model to abstain more on clean cases (one case fewer). The grounded gain (2 of 70 cases) is within noise. Reading: the 1.7B model's weakness is not too few abstain examples; the 4B model reaches 85.4% on the same cases, so capacity or a different mechanism (a retrieval-score gate before the model) is the next lever. Run4 is not adopted; run2 with the short prompt stays the edge candidate. The run4 4-bit file was not scored and does not need to be.
+
 ## Next steps
 
 1. Done: the smoke test passed (`FINAL FOLDER IS THE TUNED MODEL: True`, scores above).
 2. Done: `AGBE_v2_3_train.ipynb` ran (results above).
 3. Done: quality after shrinking, speed against v16 on the same machine, and memory (CPU sections above). Still to do: cut the prompt (fewer, shorter passages, cached prefix) and re-time.
 4. Wire the guard to Qwen3 1.7B (edge) and Qwen3 4B (server) and measure the whole system, including the guard's effect on abstention.
-5. Add harder abstain examples and retrain to lift correct abstention; enlarge the held-out set and split it by document.
+5. Done, did not help (run4 above): more abstain examples. Next: a retrieval-score gate before the model, or the 4B model for the server;  enlarge the held-out set and split it by document.
 6. Grow the fact base, find an agronomist, follow up the permission emails (1 Nov 2026), then package: container, model card, phone build.
 
 ## Lessons
