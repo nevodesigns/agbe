@@ -136,3 +136,10 @@ Notebook 2 produced 375 training examples from 590 passages (570 accepted claims
 - `train/diagnose_data.py`: prints claim and example statistics and random samples, so a log shows data quality.
 - Notebooks (`python3 train/make_v2_notebook.py`): `2b_more_data` (resumes, adds data to run1), `3s_smoketest` (one base, one epoch, saves to folder `smoke`, tests the untested train/merge/export/eval path), `3_train` (three bases, run after 2b).
 Run order: 2b and 3s together, then 3.
+
+
+## Update 23 October 2026 (evening)
+
+- Run4 (40% abstain share): no gain, not adopted. Retrieval-score gate: one-for-one trade, not shipped (see the engineering log).
+- Human review prepared: `docs/review/` holds the 50-answer sheet and the reviewer guide. A FUNAAB student and lecturer are being recruited.
+- Next: end-to-end test of guard plus 4B model on CPU, larger test set split by document, container and model card, Qwen3 licence check.

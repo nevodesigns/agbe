@@ -68,6 +68,6 @@ Lessons: read the data; make each check able to fail at the exact place of the c
 
 1. Done: short-prompt training (run3) did not help; the shipping file (run2 Q4) is scored. No notebook is pending.
 2. Done, no gain: raising the abstain share to 0.40 (run4) gave clean abstention 46.3% against 48.8%. Next lever: a retrieval-score gate before the model, or the 4B model on the server.
-3. Score the retrained model's 4-bit file; test the guard wired to the real model end to end; build a larger test set split by document; have a person review answers.
+3. Human review sheet and reviewer guide are in `docs/review/`; the retrieval-score gate was tried and not shipped. Score the retrained model's 4-bit file; test the guard wired to the real model end to end; build a larger test set split by document; have a person review answers.
 4. Model card; verify the Qwen3 model cards' licence before any commercial use; container build; phone build.
 5. Find an agronomist to review the fact base; follow up the permission requests to the publishers whose material is not yet usable (earliest 1 November 2026).
