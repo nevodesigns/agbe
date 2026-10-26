@@ -30,3 +30,6 @@ data/claims/claims_extractive.jsonl
 # private correspondence and superseded pilot data: kept off the public repository
 docs/outreach/
 data/fulltext_pilot/
+
+# editor settings
+.vscode/
