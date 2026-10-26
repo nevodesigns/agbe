@@ -26,7 +26,7 @@ AGBE v16 (tag `adtc-2026-final`) is the competition record. This branch is the n
 
 - **Tier A (training and retrieval):** items that state CC-BY-4.0, CC-BY-3.0, CC0-1.0 or public domain.
 - **Tier B (evaluation only, never trained on):** NC and SA licences.
-- **Tier C (after written permission):** items with no stated licence, FAO, CABI, NAERLS and similar. See `docs/outreach/permission-emails.md`.
+- **Tier C (after written permission):** items with no stated licence, FAO, CABI, NAERLS and similar. Permission requests are tracked outside the repository.
 
 Registry and rules: `data/sources/`. Facts are not copyrightable, but this project does not rely on that: it writes in its own words, cites, and stays inside the licences. This is not legal advice.
 
@@ -56,7 +56,7 @@ An agronomist is the single biggest lever. See `docs/AGRONOMIST_ROLE.md`.
 ## Status (18 Oct 2026, later)
 
 - Deeper harvest merged: 7,890 Tier A items, 2,962 from IITA.
-- Permission emails written in full with verified addresses (`docs/outreach/permission-emails.md`).
+- Permission requests to the data owners drafted and sent (tracked outside the repository).
 - `serve/` built and tested (14 tests): guard, retriever, backends, FastAPI endpoint with an OpenAI-compatible route and API-key auth.
 - Finding: v16 ignores retrieved sources, so retrieval needs a model trained to use them. See `serve/README.md`.
 - A larger full-text fetch (350 items) was running in the background.
@@ -65,4 +65,4 @@ An agronomist is the single biggest lever. See `docs/AGRONOMIST_ROLE.md`.
 
 - Guard rules extended and measured (53/62 dev attacks, 28/30 holdout, 0 false blocks). CI green.
 - Grounded training-data builder and a GPU trainer script written (trainer untested). Permission emails sent; IITA Cc bounced.
-- Everything left before retraining needs either a GPU session (bake-off, 7B extraction, question generation) or a person (agronomist, replies from the data owners).
+- Everything left before retraining needs either a GPU session (bake-off, 7B extraction, question generation) or a person (agronomist, replies from the publishers).

@@ -242,7 +242,7 @@ Kaggle T4, including GGUF conversion and quantisation.
 no credentials.
 
 Base model Gemma 3 1B, used under the
-[Gemma Terms of Use](https://ai.google.dev/gemma/terms). All licences in this repository are mapped in [LICENCES.md](LICENCES.md). Inference on
+[Gemma Terms of Use](https://ai.google.dev/gemma/terms). All licences in this repository are mapped in [LICENCES.md](LICENCES.md). The documentation index and repository map are in [docs/README.md](docs/README.md). Inference on
 [llama.cpp](https://github.com/ggml-org/llama.cpp).
 
 **Nwokolo Victor Oluebubechukwu**, Lagos · Africa Deep Tech Challenge 2026

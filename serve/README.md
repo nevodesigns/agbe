@@ -4,7 +4,8 @@
 
 ```bash
 pip install -r serve/requirements.txt
-AGBE_GGUF=model/agbe-1b-q4_k_m.gguf AGBE_PASSAGES=data/fulltext/passages.jsonl uvicorn serve.app:app --port 8080
+gunzip -k data/fulltext_v1/passages.jsonl.gz
+AGBE_GGUF=model/agbe-1b-q4_k_m.gguf AGBE_PASSAGES=data/fulltext_v1/passages.jsonl uvicorn serve.app:app --port 8080
 curl -s localhost:8080/advise -H 'Content-Type: application/json' -d '{"question":"How do I keep stored grain safe from rodents?"}'
 ```
 

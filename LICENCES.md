@@ -13,3 +13,10 @@ The repository holds several kinds of material with different licences. This fil
 | llama.cpp, PyTorch, Transformers, PEFT and other libraries | not included | Their own licences | Not part of this repository |
 
 Anyone who already holds a copy of the public code keeps the rights the GPL-3.0 gave them. Nothing here withdraws them.
+
+## For anyone deploying a model from this project
+
+- **Gemma-based files (v16).** Gemma's terms define "Distribution" to include "making Gemma or its functionality available as a hosted service via API, web access, or any other electronic or remote means" (section 1.1(b)). A host must therefore carry Google's use restrictions into its own user terms and give recipients a copy of the terms (section 3.1). Read https://ai.google.dev/gemma/terms before deploying.
+- **Qwen3-based files (v2).** The base model cards state `license: apache-2.0`. Redistribution needs a copy of that licence, notices on modified files, and any NOTICE text. Check the base model's licence file again at release.
+- **Source passages.** Any product that shows or reuses them must keep the attribution in `data/fulltext_v1/ATTRIBUTION.md`. CC-BY-4.0 has no non-commercial limit and no share-alike condition.
+- **Material outside this repository.** FAO web content is, by default, licensed for non-commercial use only. Do not add it to a commercial training set without permission.

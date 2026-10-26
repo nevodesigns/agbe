@@ -37,7 +37,7 @@ Everything below is the manual version of stage A only.
 ```python
 !git clone -b agbe2 https://github.com/nevodesigns/agbe.git && cd agbe && pip -q install -U transformers accelerate bitsandbytes
 import os; from kaggle_secrets import UserSecretsClient; os.environ["HF_TOKEN"] = UserSecretsClient().get_secret("HF_TOKEN")
-!cd agbe && gunzip -c data/fulltext_pilot/passages.jsonl.gz > /tmp/passages.jsonl
+!cd agbe && gunzip -c data/fulltext_v1/passages.jsonl.gz > /tmp/passages.jsonl
 # small models first, full precision
 !cd agbe && python3 train/bakeoff.py --models google/gemma-3-1b-it Qwen/Qwen3-1.7B meta-llama/Llama-3.2-1B-Instruct --passages /tmp/passages.jsonl
 # 3B and 4B need 4-bit on a T4

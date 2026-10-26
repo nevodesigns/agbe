@@ -26,3 +26,7 @@ video/
 data/sources/cgspace_tier_a.jsonl
 data/fulltext/
 data/claims/claims_extractive.jsonl
+
+# private correspondence and superseded pilot data: kept off the public repository
+docs/outreach/
+data/fulltext_pilot/

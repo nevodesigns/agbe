@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """List every source behind a passages or claims file, with its licence and a count, for attribution and audits.
 
-    python3 tools/licence_manifest.py data/fulltext_pilot/passages.jsonl.gz > data/LICENCE_MANIFEST.md
+    python3 tools/licence_manifest.py data/fulltext_v1/passages.jsonl.gz > data/LICENCE_MANIFEST.md
 """
 import collections, gzip, json, sys
 
