@@ -701,7 +701,7 @@ and quantisation commands are in
 | Name | The AGBE agriculture corpus |
 | Source | Original. Composed by [`corpus/generate.py`](corpus/generate.py) from [`corpus/facts.json`](corpus/facts.json), a hand-curated fact base, plus hand-written exemplars in `corpus/gold_*.py` |
 | Size | 1,237 conversations, which is the corpus that produced the shipped v16 build |
-| Licence | Same as this repository. No third-party text |
+| Licence | Same as this repository. No third-party text (this is the v16 corpus; the v2 source documents under `data/` are CC-BY-4.0, see `LICENCES.md`) |
 | Committed | In full, as [`corpus/build/train.jsonl`](corpus/build/train.jsonl) |
 
 Nothing was scraped and nothing was distilled from a larger model. `generate.py`

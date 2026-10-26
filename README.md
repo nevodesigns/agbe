@@ -239,10 +239,10 @@ Kaggle T4, including GGUF conversion and quantisation.
 
 `metadata.json` declares the domain, the two test prompts and the model. The
 `.gguf` is not committed; `download_model.sh` fetches it from a public URL with
-no credentials and verifies the length before accepting it.
+no credentials.
 
 Base model Gemma 3 1B, used under the
-[Gemma Terms of Use](https://ai.google.dev/gemma/terms). Inference on
+[Gemma Terms of Use](https://ai.google.dev/gemma/terms). All licences in this repository are mapped in [LICENCES.md](LICENCES.md). Inference on
 [llama.cpp](https://github.com/ggml-org/llama.cpp).
 
 **Nwokolo Victor Oluebubechukwu**, Lagos · Africa Deep Tech Challenge 2026

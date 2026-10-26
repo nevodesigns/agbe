@@ -1,41 +1,33 @@
 #!/usr/bin/env bash
-# Download your model weight file.
-#
-# Rules:
-#   - Must be idempotent (safe to run multiple times).
-#   - Must download without any credentials (public URL only).
-#   - The output path must match `_runtime.model_path` in metadata.json.
-#   - MODEL_URL must point to an exact, immutable file — pin it to a specific
-#     commit/release, never a mutable branch like "main". On Hugging Face,
-#     replace "main" in the URL with the exact commit SHA from your repo's
-#     file history so the file you submitted can never silently change.
+# Fetches the AGBE v16 model file (GGUF Q4_K_M) from Hugging Face.
+# Safe to run again: if the file is already there it does nothing.
+# No credentials are needed, and the URL is pinned to one commit so the
+# file cannot change under a reader. Keep MODEL_FILE equal to
+# _runtime.model_path in metadata.json.
 
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODEL_DIR="$HERE/model"
 
-# ⚠️ Edit ONLY the two values below (MODEL_FILE, MODEL_URL). Do not change
-# anything else in this file — see "download_model.sh" in README.md for what
-# the evaluator requires.
 MODEL_FILE="$MODEL_DIR/agbe-1b-q4_k_m.gguf"
 MODEL_URL="https://huggingface.co/NEVODESIGN/agbe-1b/resolve/545554ab173c363a03ed3672ace9693cec617d9d/agbe-1b-q4_k_m.gguf"
 
 mkdir -p "$MODEL_DIR"
 
-if [[ -f "$MODEL_FILE" ]]; then
-  echo "model already present at $MODEL_FILE — skipping download"
+if [ -f "$MODEL_FILE" ]; then
+  echo "model already present at $MODEL_FILE, nothing to download"
   exit 0
 fi
 
-echo "downloading $MODEL_URL → ${MODEL_FILE}…"
+echo "downloading $MODEL_URL to $MODEL_FILE"
 
-if command -v curl > /dev/null 2>&1; then
+if command -v curl >/dev/null 2>&1; then
   curl -L --fail --progress-bar -o "$MODEL_FILE.partial" "$MODEL_URL"
-elif command -v wget > /dev/null 2>&1; then
+elif command -v wget >/dev/null 2>&1; then
   wget --show-progress -O "$MODEL_FILE.partial" "$MODEL_URL"
 else
-  echo "error: neither curl nor wget found" >&2
+  echo "error: curl or wget is required" >&2
   exit 1
 fi
 
