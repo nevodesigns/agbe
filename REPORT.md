@@ -5,7 +5,7 @@
 **Model:** AGBE-1B-Q4_K_M · Gemma 3 1B · LoRA r32 · GGUF Q4_K_M
 **Weights:** https://huggingface.co/NEVODESIGN/agbe-1b
 **Repo:** https://github.com/nevodesigns/agbe
-**Site and build notes:** https://agbe-farm.vercel.app
+**Site and build notes:** https://nevo-hackathon.pxxlspace.cv/agbe/
 
 ---
 

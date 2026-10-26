@@ -145,6 +145,6 @@ public, and every number above comes from a tool in the repository.
 
 **Training run:** https://www.kaggle.com/code/nevodm/notebookba584b3371
 
-**Project site:** https://agbe-farm.vercel.app
+**Project site:** https://nevo-hackathon.pxxlspace.cv/agbe/
 
 **Demo:** https://youtu.be/sevKpLqCt-E

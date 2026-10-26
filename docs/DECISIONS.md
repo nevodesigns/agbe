@@ -21,6 +21,7 @@ Each entry: what was decided, when, and why. Reversals are kept, not erased.
 | 23 Oct 2026 | Do not add a retrieval-score gate | Each extra correct abstention cost about one correct grounded answer |
 | 23 Oct 2026 | Treat the guard's support figure as circular; ask a person to review answers | Guard and scorer share one claim checker |
 | 26 Oct 2026 | Add `LICENCES.md`; rewrite the template shell script; keep private correspondence and the superseded pilot out of the repository | A reader must be able to tell which licence covers which material |
+| 26 Oct 2026 | Publish the AGBE site only inside the NEVO hackathon hub; delete the standalone Vercel project and the standalone pxxl site | One home for every project; the hub copy is built from the site repository |
 
 ## Open decisions
 

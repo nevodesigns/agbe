@@ -6,7 +6,7 @@
 laptop with the internet switched off: crops, pests, livestock, soils, storage
 and getting produce to market.
 
-- **Live site and build notes:** https://agbe-omega.vercel.app
+- **Live site and build notes:** https://nevo-hackathon.pxxlspace.cv/agbe/
 - **Weights:** https://huggingface.co/NEVODESIGN/agbe-1b
 - **Technical report:** [REPORT.md](REPORT.md)
 - **Recovery guide (everything in one place):** [docs/RECOVERY.md](docs/RECOVERY.md); chronology and faults in [docs/V2_ENGINEERING_LOG.md](docs/V2_ENGINEERING_LOG.md)
